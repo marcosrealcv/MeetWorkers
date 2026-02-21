@@ -1,0 +1,15 @@
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap');
+
+footer {
+  font-family: 'Poppins', sans-serif;
+}
+
+footer a {
+  transition: transform 0.3s ease, color 0.3s ease;
+  cursor: pointer;
+}
+
+footer a:hover {
+  transform: scale(1.1);
+  color: #5F818C;
+}
