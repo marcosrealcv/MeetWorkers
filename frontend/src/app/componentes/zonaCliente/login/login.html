@@ -1,26 +1,157 @@
 <div class="grid grid-cols-2 gap-8 h-screen">
     <div class="flex flex-col items-center justify-center border-r-2 border-gray-300 pr-8">
-        <h2 class="text-5xl font-bold text-center">Registrar un usuario</h2>
+        <h2 class="text-5xl font-bold text-center">Regístrate</h2>
+        <p class="text-gray-600 mt-4 text-center">Ya sea como cliente o como prestador de servicios</p>
     </div>
     <div class="flex flex-col items-center justify-center pl-8">
-        <form action="" class="w-full max-w-md">
-            <div class="mb-4">
-                <label for="nombre" class="block text-sm font-medium mb-1">Nombre de tu empresa</label>
-                <input type="text" id="nombre" name="nombre" class="w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500">
-            </div>
-             <div class="mb-4">
-                <label for="nombre" class="block text-sm font-medium mb-1">email</label>
-                <input type="email" id="nombre" name="nombre" class="w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500">
-            </div>
-            <div class="mb-4">
-                <label for="nombre" class="block text-sm font-medium mb-1">contraseña</label>
-                <input type="password" id="nombre" name="nombre" class="w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500">
-            </div>
-            <div class="mb-4">
-                <label for="descripcion" class="block text-sm font-medium mb-1">Descripción</label>
-                <textarea id="descripcion" name="descripcion" rows="4" class="w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"></textarea>
-            </div>
-            <button type="submit" class="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600">Registrar Servicio</button>
-        </form>
+        <div class="w-full max-w-md bg-white rounded-lg shadow-lg p-6 max-h-[90vh] overflow-y-auto">
+            <form [formGroup]="formulario" (ngSubmit)="onSubmit()" class="w-full">
+                <!-- SECCIÓN DE INFORMACIÓN BÁSICA -->
+                <div class="mb-5 pb-5 border-b-2 border-gray-200">
+                    <h3 class="text-lg font-semibold mb-3">Información Personal</h3>
+                    
+                    <div class="mb-3">
+                        <label for="nombre" class="block text-sm font-medium mb-1">Nombre *</label>
+                        <input type="text" id="nombre" formControlName="nombre" 
+                            class="w-full border border-gray-300 rounded px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+                        <div *ngIf="formulario.get('nombre')?.invalid && formulario.get('nombre')?.touched" class="text-red-500 text-xs mt-1">
+                            El nombre es requerido
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="apellido" class="block text-sm font-medium mb-1">Apellido *</label>
+                        <input type="text" id="apellido" formControlName="apellido" 
+                            class="w-full border border-gray-300 rounded px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+                        <div *ngIf="formulario.get('apellido')?.invalid && formulario.get('apellido')?.touched" class="text-red-500 text-xs mt-1">
+                            El apellido es requerido
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="telefono" class="block text-sm font-medium mb-1">Teléfono *</label>
+                        <input type="tel" id="telefono" formControlName="telefono" 
+                            class="w-full border border-gray-300 rounded px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+                        <div *ngIf="formulario.get('telefono')?.invalid && formulario.get('telefono')?.touched" class="text-red-500 text-xs mt-1">
+                            El teléfono es requerido
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="email" class="block text-sm font-medium mb-1">Email *</label>
+                        <input type="email" id="email" formControlName="email" 
+                            class="w-full border border-gray-300 rounded px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+                        <div *ngIf="formulario.get('email')?.invalid && formulario.get('email')?.touched" class="text-red-500 text-xs mt-1">
+                            <span *ngIf="formulario.get('email')?.errors?.['required']">El email es requerido</span>
+                            <span *ngIf="formulario.get('email')?.errors?.['email']">Ingresa un email válido</span>
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="contraseña" class="block text-sm font-medium mb-1">Contraseña *</label>
+                        <input type="password" id="contraseña" formControlName="contraseña" 
+                            class="w-full border border-gray-300 rounded px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+                        <div *ngIf="formulario.get('contraseña')?.invalid && formulario.get('contraseña')?.touched" class="text-red-500 text-xs mt-1">
+                            <span *ngIf="formulario.get('contraseña')?.errors?.['required']">La contraseña es requerida</span>
+                            <span *ngIf="formulario.get('contraseña')?.errors?.['minlength']">Mínimo 6 caracteres</span>
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="descripcion" class="block text-sm font-medium mb-1">Descripción personal (opcional)</label>
+                        <textarea id="descripcion" formControlName="descripcion" rows="2" 
+                            class="w-full border border-gray-300 rounded px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"></textarea>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="direccion" class="block text-sm font-medium mb-1">Dirección *</label>
+                        <input type="text" id="direccion" formControlName="direccion" 
+                            placeholder="Ej: Calle Principal 123, Madrid" 
+                            class="w-full border border-gray-300 rounded px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+                        <div *ngIf="formulario.get('direccion')?.invalid && formulario.get('direccion')?.touched" class="text-red-500 text-xs mt-1">
+                            La dirección es requerida
+                        </div>
+                    </div>
+                </div>
+
+                <!-- CASILLA PARA PRESTADOR DE SERVICIOS -->
+                <div class="mb-5 p-3 bg-blue-50 rounded-lg border border-blue-200">
+                    <label class="flex items-center cursor-pointer">
+                        <input type="checkbox" formControlName="es_prestador" 
+                            class="w-5 h-5 text-blue-600 rounded focus:ring-2 focus:ring-blue-500">
+                        <span class="ml-3 text-sm font-medium text-gray-700">¿Proporcionas algún servicio?</span>
+                    </label>
+                </div>
+
+                <!-- SECCIÓN DE INFORMACIÓN DE SERVICIO (CONDICIONAL) -->
+                <div *ngIf="esPrestador" class="mb-5 pb-5 border-b-2 border-gray-200 bg-green-50 p-3 rounded-lg">
+                    <h3 class="text-lg font-semibold mb-3 text-green-700">Información del Servicio</h3>
+
+                    <div class="mb-3">
+                        <label for="tipo_servicio" class="block text-sm font-medium mb-1">Tipo de Servicio *</label>
+                        <input type="text" id="tipo_servicio" formControlName="tipo_servicio" 
+                            placeholder="Ej: Clases de inglés, Reparación de coches, Peluquería" 
+                            class="w-full border border-gray-300 rounded px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-green-500">
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="categoria" class="block text-sm font-medium mb-1">Categoría *</label>
+                        <select id="categoria" formControlName="categoria" 
+                            class="w-full border border-gray-300 rounded px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-green-500">
+                            <option value="" disabled selected>Selecciona una categoría</option>
+                            <option *ngFor="let cat of categorias" [value]="cat">{{ cat }}</option>
+                        </select>
+                    </div>
+
+                    <div class="mb-3" *ngIf="categoriaSeleccionada">
+                        <label for="subcategoria" class="block text-sm font-medium mb-1">Especialización *</label>
+                        <select id="subcategoria" formControlName="subcategoria" 
+                            class="w-full border border-gray-300 rounded px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-green-500">
+                            <option value="" disabled selected>Selecciona una especialización</option>
+                            <option *ngFor="let subcat of subcategoriasActuales" [value]="subcat">{{ subcat }}</option>
+                        </select>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="descripcion_servicio" class="block text-sm font-medium mb-1">Descripción del Servicio *</label>
+                        <textarea id="descripcion_servicio" formControlName="descripcion_servicio" 
+                            rows="2" placeholder="Describe en detalle el servicio que ofreces..." 
+                            class="w-full border border-gray-300 rounded px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-green-500"></textarea>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="ubicacion_servicio" class="block text-sm font-medium mb-1">¿Dónde se realiza el servicio? *</label>
+                        <select id="ubicacion_servicio" formControlName="ubicacion_servicio" 
+                            class="w-full border border-gray-300 rounded px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-green-500">
+                            <option value="" disabled selected>Selecciona una opción</option>
+                            <option *ngFor="let ub of ubicaciones" [value]="ub">{{ ub }}</option>
+                        </select>
+                    </div>
+
+                    <div class="mb-3" *ngIf="necesitaDireccionServicio">
+                        <label for="direccion_servicio" class="block text-sm font-medium mb-1">Dirección de tu lugar de trabajo *</label>
+                        <input type="text" id="direccion_servicio" formControlName="direccion_servicio" 
+                            placeholder="Ej: Calle Principal 123, Madrid" 
+                            class="w-full border border-gray-300 rounded px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-green-500">
+                        <div *ngIf="formulario.get('direccion_servicio')?.invalid && formulario.get('direccion_servicio')?.touched" class="text-red-500 text-xs mt-1">
+                            La dirección es requerida para esta opción
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="coste_hora" class="block text-sm font-medium mb-1">Coste por hora (€) *</label>
+                        <input type="number" id="coste_hora" formControlName="coste_hora" 
+                            placeholder="Ej: 25.50" min="0" step="0.01" 
+                            class="w-full border border-gray-300 rounded px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-green-500">
+                    </div>
+                </div>
+
+                <!-- BOTÓN ENVIAR -->
+                <button type="submit" [disabled]="!formulario.valid" 
+                    class="w-full px-4 py-2 bg-blue-500 text-white rounded font-medium hover:bg-blue-600 disabled:bg-gray-400 disabled:cursor-not-allowed transition">
+                    Registrarse
+                </button>
+            </form>
+        </div>
     </div>
 </div>
