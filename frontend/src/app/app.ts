@@ -3,8 +3,7 @@ import { RouterOutlet } from '@angular/router';
 import { Header } from './componentes/zonaTienda/header/header';
 import { Footer } from './componentes/zonaTienda/footer/footer';
 import { filter } from 'rxjs';
-import { Router, NavigationEnd } from '@angular/router';
-
+import { Router, NavigationEnd } from '@angular/router';  
 @Component({
   selector: 'app-root',
   imports: [RouterOutlet, Header, Footer],
