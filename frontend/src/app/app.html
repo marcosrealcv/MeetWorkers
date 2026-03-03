@@ -1,3 +1,11 @@
-<app-header></app-header>
-<router-outlet></router-outlet>
-<app-footer></app-footer>
+@if (mostrarHeaderFooter()) {
+  <app-header></app-header>
+}
+
+<main>
+  <router-outlet></router-outlet>  
+</main>
+
+@if (mostrarHeaderFooter()) {
+  <app-footer></app-footer>
+}

@@ -1,14 +1,14 @@
 <!-- Agregar mas adelante ña funcion de que dependiendo del usuario si es un usuario normal o un trabajador se le mueste un nav distinto -->
         
-        <nav class="flex justify-between items-center gap-6 w-full relative px-4 py-2" style="background-color: #5F818C;">
+        <nav class="flex justify-between items-center gap-6 w-full relative px-4 py-2 bg-amber-600" style="background-color: #5F818C; ">
             <div class="flex items-center">
-                <img src="logo.png" alt="Logo" class="h-10 w-auto">
+                <img src="logo.png" alt="Logo" class="h-16 w-auto" style="height: 64px; width: auto;">
             </div>
-            <div class="flex items-center gap-4">
+            <div class="flex items-center gap-4 relative z-50">
                 <button class="px-4 py-2" style="color: #F8FAFA;">
-                    <span class="text-sm font-medium "><a href="servicios.html"></a>Servicios</span>
+                    <span class="text-sm font-medium ">Servicios</span>
                 </button>
-                <button class="px-4 py-2" style="color: #F8FAFA;">
+                <button routerLink="/login" class="px-4 py-2" routerLink="/login" style="color: #F8FAFA;">
                     <span class="text-sm font-medium">Cuenta</span>
                 </button>
                 <button class="px-4 py-2" style="color: #F8FAFA;">
