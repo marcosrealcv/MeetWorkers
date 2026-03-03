@@ -1,0 +1,119 @@
+/* Animación para el despliegue suave de los campos de prestador */
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Tarjeta del formulario */
+.bg-white {
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+/* Scrollbar personalizada para la tarjeta */
+.overflow-y-auto {
+  scrollbar-width: thin;
+  scrollbar-color: #cbd5e0 #f7fafc;
+}
+
+.overflow-y-auto::-webkit-scrollbar {
+  width: 6px;
+}
+
+.overflow-y-auto::-webkit-scrollbar-track {
+  background: #f7fafc;
+  border-radius: 10px;
+}
+
+.overflow-y-auto::-webkit-scrollbar-thumb {
+  background: #cbd5e0;
+  border-radius: 10px;
+}
+
+.overflow-y-auto::-webkit-scrollbar-thumb:hover {
+  background: #a0aec0;
+}
+
+.mb-6 {
+  animation: slideDown 0.3s ease-out;
+  margin-bottom: 1rem !important;
+}
+
+/* Estilos para los inputs cuando están deshabilitados */
+input:disabled,
+select:disabled,
+textarea:disabled {
+  background-color: #f3f4f6;
+  cursor: not-allowed;
+}
+
+/* Mejora visual para el checkbox */
+input[type="checkbox"] {
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+input[type="checkbox"]:hover {
+  transform: scale(1.1);
+}
+
+/* Estilos para el textarea */
+textarea {
+  resize: vertical;
+  font-family: inherit;
+}
+
+/* Efecto de transición suave para los cambios de estado */
+input,
+select,
+textarea {
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+/* Enfoque mejorado */
+input:focus,
+select:focus,
+textarea:focus {
+  outline: none;
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+/* Errores de validación */
+.text-red-500 {
+  display: block;
+  font-weight: 500;
+}
+
+/* Secciones con bordes */
+.border-b-2 {
+  transition: all 0.3s ease;
+}
+
+/* Mejora en la responsividad del grid */
+@media (max-width: 768px) {
+  .grid {
+    grid-template-columns: 1fr;
+    gap: 0;
+  }
+  
+  .border-r-2 {
+    border-right: none;
+    border-bottom: 2px solid #d1d5db;
+  }
+  
+  .pr-8 {
+    padding-right: 0;
+    padding-bottom: 2rem;
+  }
+  
+  .pl-8 {
+    padding-left: 0;
+    padding-top: 2rem;
+  }
+}
