@@ -1,4 +1,5 @@
 import { Component, Input } from '@angular/core';
+import { Servicio } from '../../../models/servicio.interface';
 
 @Component({
   selector: 'app-tarjetas-servicios',
@@ -8,10 +9,6 @@ import { Component, Input } from '@angular/core';
 })
 export class TarjetasServicios {
 
-  @Input() titulo: String = 'Servicio';
-  @Input() descripcion: String = 'Descripción del servicio';
-  @Input() imagen: String = 'https://via.placeholder.com/150';
-  @Input() categoria: String = 'Categoría';
-  @Input() precio: String = '0€';
+  @Input({ required : true}) info!: Servicio;
 
 }
