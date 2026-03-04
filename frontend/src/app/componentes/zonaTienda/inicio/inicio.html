@@ -4,19 +4,9 @@
     
     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
         
-        <app-tarjetas-servicios 
-            titulo="Corte de cabello" 
-            descripcion="Un corte de cabello profesional para renovar tu estilo y resaltar tu personalidad." 
-            ubicacion="Calle Principal 123, Ciudad"
-                valoraciones="4.5 estrellas (200 opiniones)" 
-                precio="desde 10€">
-
-        </app-tarjetas-servicios>
-        <app-tarjetas-servicios 
-            titulo="Manicura" 
-            descripcion="Un servicio de manicura completo para cuidar y embellecer tus uñas." 
-            precio="desde 20€">
-        </app-tarjetas-servicios>
+        @for (item of servicios(); track item.id  ) {
+            <app-tarjetas-servicios [info] = "item"></app-tarjetas-servicios>
+        }
 
         </div>
 </div>
