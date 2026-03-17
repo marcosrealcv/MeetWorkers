@@ -1,0 +1,57 @@
+[
+  { "_id": { "$oid": "650a1b2c3d4e5f6a7b8c0001" }, "nombreCategoria": "Automoción", "pathCategoria": "1" },
+  { "_id": { "$oid": "650a1b2c3d4e5f6a7b8c0002" }, "nombreCategoria": "Belleza", "pathCategoria": "2" },
+  { "_id": { "$oid": "650a1b2c3d4e5f6a7b8c0003" }, "nombreCategoria": "Enseñanza", "pathCategoria": "3" },
+  { "_id": { "$oid": "650a1b2c3d4e5f6a7b8c0004" }, "nombreCategoria": "Reparaciones", "pathCategoria": "4" },
+  { "_id": { "$oid": "650a1b2c3d4e5f6a7b8c0005" }, "nombreCategoria": "Limpieza", "pathCategoria": "5" },
+  { "_id": { "$oid": "650a1b2c3d4e5f6a7b8c0006" }, "nombreCategoria": "Cuidado Personal", "pathCategoria": "6" },
+  { "_id": { "$oid": "650a1b2c3d4e5f6a7b8c0007" }, "nombreCategoria": "Construcciones y Reformas", "pathCategoria": "7" },
+  { "_id": { "$oid": "650a1b2c3d4e5f6a7b8c0008" }, "nombreCategoria": "Otro", "pathCategoria": "8" },
+
+  { "_id": { "$oid": "650a1b2c3d4e5f6a7b8c0101" }, "nombreCategoria": "Mecánico", "pathCategoria": "1-1" },
+  { "_id": { "$oid": "650a1b2c3d4e5f6a7b8c0102" }, "nombreCategoria": "Electricista del automóvil", "pathCategoria": "1-2" },
+  { "_id": { "$oid": "650a1b2c3d4e5f6a7b8c0103" }, "nombreCategoria": "Chapista", "pathCategoria": "1-3" },
+  { "_id": { "$oid": "650a1b2c3d4e5f6a7b8c0104" }, "nombreCategoria": "Tapicería", "pathCategoria": "1-4" },
+  { "_id": { "$oid": "650a1b2c3d4e5f6a7b8c0105" }, "nombreCategoria": "Neumáticos", "pathCategoria": "1-5" },
+
+  { "_id": { "$oid": "650a1b2c3d4e5f6a7b8c0201" }, "nombreCategoria": "Peluquería", "pathCategoria": "2-1" },
+  { "_id": { "$oid": "650a1b2c3d4e5f6a7b8c0202" }, "nombreCategoria": "Manicura", "pathCategoria": "2-2" },
+  { "_id": { "$oid": "650a1b2c3d4e5f6a7b8c0203" }, "nombreCategoria": "Pedicura", "pathCategoria": "2-3" },
+  { "_id": { "$oid": "650a1b2c3d4e5f6a7b8c0204" }, "nombreCategoria": "Depilación", "pathCategoria": "2-4" },
+  { "_id": { "$oid": "650a1b2c3d4e5f6a7b8c0205" }, "nombreCategoria": "Masaje facial", "pathCategoria": "2-5" },
+  { "_id": { "$oid": "650a1b2c3d4e5f6a7b8c0206" }, "nombreCategoria": "Estética corporal", "pathCategoria": "2-6" },
+
+  { "_id": { "$oid": "650a1b2c3d4e5f6a7b8c0301" }, "nombreCategoria": "Inglés", "pathCategoria": "3-1" },
+  { "_id": { "$oid": "650a1b2c3d4e5f6a7b8c0302" }, "nombreCategoria": "Matemáticas", "pathCategoria": "3-2" },
+  { "_id": { "$oid": "650a1b2c3d4e5f6a7b8c0303" }, "nombreCategoria": "Español", "pathCategoria": "3-3" },
+  { "_id": { "$oid": "650a1b2c3d4e5f6a7b8c0304" }, "nombreCategoria": "Informática", "pathCategoria": "3-4" },
+  { "_id": { "$oid": "650a1b2c3d4e5f6a7b8c0305" }, "nombreCategoria": "Música", "pathCategoria": "3-5" },
+  { "_id": { "$oid": "650a1b2c3d4e5f6a7b8c0306" }, "nombreCategoria": "Deporte", "pathCategoria": "3-6" },
+  { "_id": { "$oid": "650a1b2c3d4e5f6a7b8c0307" }, "nombreCategoria": "Apoyo escolar", "pathCategoria": "3-7" },
+
+  { "_id": { "$oid": "650a1b2c3d4e5f6a7b8c0401" }, "nombreCategoria": "Carpintería", "pathCategoria": "4-1" },
+  { "_id": { "$oid": "650a1b2c3d4e5f6a7b8c0402" }, "nombreCategoria": "Albañilería", "pathCategoria": "4-2" },
+  { "_id": { "$oid": "650a1b2c3d4e5f6a7b8c0403" }, "nombreCategoria": "Fontanería", "pathCategoria": "4-3" },
+  { "_id": { "$oid": "650a1b2c3d4e5f6a7b8c0404" }, "nombreCategoria": "Electricidad", "pathCategoria": "4-4" },
+  { "_id": { "$oid": "650a1b2c3d4e5f6a7b8c0405" }, "nombreCategoria": "Herrería", "pathCategoria": "4-5" },
+  { "_id": { "$oid": "650a1b2c3d4e5f6a7b8c0406" }, "nombreCategoria": "Vidriería", "pathCategoria": "4-6" },
+
+  { "_id": { "$oid": "650a1b2c3d4e5f6a7b8c0501" }, "nombreCategoria": "Limpieza del hogar", "pathCategoria": "5-1" },
+  { "_id": { "$oid": "650a1b2c3d4e5f6a7b8c0502" }, "nombreCategoria": "Limpieza de oficinas", "pathCategoria": "5-2" },
+  { "_id": { "$oid": "650a1b2c3d4e5f6a7b8c0503" }, "nombreCategoria": "Limpieza de ventanas", "pathCategoria": "5-3" },
+  { "_id": { "$oid": "650a1b2c3d4e5f6a7b8c0504" }, "nombreCategoria": "Presupuesto especial", "pathCategoria": "5-4" },
+
+  { "_id": { "$oid": "650a1b2c3d4e5f6a7b8c0601" }, "nombreCategoria": "Cuidado de niños", "pathCategoria": "6-1" },
+  { "_id": { "$oid": "650a1b2c3d4e5f6a7b8c0602" }, "nombreCategoria": "Cuidado de ancianos", "pathCategoria": "6-2" },
+  { "_id": { "$oid": "650a1b2c3d4e5f6a7b8c0603" }, "nombreCategoria": "Cuidado de mascotas", "pathCategoria": "6-3" },
+
+  { "_id": { "$oid": "650a1b2c3d4e5f6a7b8c0701" }, "nombreCategoria": "Remodelación de baños", "pathCategoria": "7-1" },
+  { "_id": { "$oid": "650a1b2c3d4e5f6a7b8c0702" }, "nombreCategoria": "Remodelación de cocinas", "pathCategoria": "7-2" },
+  { "_id": { "$oid": "650a1b2c3d4e5f6a7b8c0703" }, "nombreCategoria": "Diseño de interiores", "pathCategoria": "7-3" },
+  { "_id": { "$oid": "650a1b2c3d4e5f6a7b8c0704" }, "nombreCategoria": "Muebles a medida", "pathCategoria": "7-4" },
+  { "_id": { "$oid": "650a1b2c3d4e5f6a7b8c0705" }, "nombreCategoria": "Armarios empotrados", "pathCategoria": "7-5" },
+  { "_id": { "$oid": "650a1b2c3d4e5f6a7b8c0706" }, "nombreCategoria": "Estanterías personalizadas", "pathCategoria": "7-6" },
+  { "_id": { "$oid": "650a1b2c3d4e5f6a7b8c0707" }, "nombreCategoria": "Reformas integrales", "pathCategoria": "7-7" },
+
+  { "_id": { "$oid": "650a1b2c3d4e5f6a7b8c0801" }, "nombreCategoria": "Especifica en la descripción", "pathCategoria": "8-1" }
+]
