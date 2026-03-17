@@ -1,6 +1,13 @@
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 
+type CategoriaJsonItem = {
+  nombreCategoria: string;
+  pathCategoria: string;
+};
+
+const API_CATEGORIAS_URL = 'http://localhost:3000/api/categorias';
+
 @Component({
   selector: 'app-login',
   imports: [ReactiveFormsModule],
@@ -9,19 +16,10 @@ import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angula
 })
 export class Login implements OnInit {
   formulario!: FormGroup;
-  categorias = ['Automoción', 'Belleza', 'Enseñanza', 'Reparaciones', 'Limpieza', 'Cuidado Personal', 'Construcciones y Reformas', 'Otro'];
+  categorias: string[] = [];
   ubicaciones = ['A domicilio', 'En mi lugar',  'Ambas opciones'];
   
-  subcategorias: { [key: string]: string[] } = {
-    'Automoción': ['Mecánico', 'Electricista del automóvil', 'Chapista', 'Tapicería', 'Neumáticos'],
-    'Belleza': ['Peluquería', 'Manicura', 'Pedicura', 'Depilación', 'Masaje facial', 'Estética corporal'],
-    'Enseñanza': ['Inglés', 'Matemáticas', 'Español', 'Informática', 'Música', 'Deporte', 'Apoyo escolar'],
-    'Reparaciones': ['Carpintería', 'Albañilería', 'Fontanería', 'Electricidad', 'Herrería', 'Vidriería'],
-    'Limpieza': ['Limpieza del hogar', 'Limpieza de oficinas', 'Limpieza de ventanas', 'Presupuesto especial'],
-    'Cuidado Personal': ['Cuidado de niños', 'Cuidado de ancianos', 'Cuidado de mascotas'],
-    'Construcciones y Reformas': ['Remodelación de baños', 'Remodelación de cocinas', 'Diseño de interiores', 'Muebles a medida', 'Armarios empotrados', 'Estanterías personalizadas', 'Reformas integrales'],
-    'Otro': ['Especifica en la descripción']
-  };
+  subcategorias: { [key: string]: string[] } = {};
 
   constructor(private fb: FormBuilder) {}
 
@@ -43,6 +41,45 @@ export class Login implements OnInit {
       direccion_servicio: [''],
       coste_hora: ['']
     });
+
+    this.formulario.get('categoria')?.valueChanges.subscribe(() => {
+      this.formulario.get('subcategoria')?.setValue('');
+    });
+
+    void this.cargarCategoriasDesdeBackend();
+  }
+
+  private async cargarCategoriasDesdeBackend(): Promise<void> {
+    try {
+      const response = await fetch(API_CATEGORIAS_URL);
+
+      if (!response.ok) {
+        throw new Error(`No se pudieron cargar las categorías desde backend: ${response.status}`);
+      }
+
+      const categoriasJson = (await response.json()) as CategoriaJsonItem[];
+      this.construirCategoriasDesdeJson(categoriasJson);
+    } catch (error) {
+      console.error('Error cargando categorías/subcategorías desde backend:', error);
+    }
+  }
+
+  private construirCategoriasDesdeJson(categoriasJson: CategoriaJsonItem[]): void {
+    const categoriasPrincipales = categoriasJson.filter((item) => !item.pathCategoria.includes('-'));
+
+    this.categorias = categoriasPrincipales.map((item) => item.nombreCategoria);
+
+    const subcategoriasPorCategoria: { [key: string]: string[] } = {};
+
+    for (const categoria of categoriasPrincipales) {
+      const prefijoSubcategoria = `${categoria.pathCategoria}-`;
+
+      subcategoriasPorCategoria[categoria.nombreCategoria] = categoriasJson
+        .filter((item) => item.pathCategoria.startsWith(prefijoSubcategoria))
+        .map((item) => item.nombreCategoria);
+    }
+
+    this.subcategorias = subcategoriasPorCategoria;
   }
 
   onSubmit() {
