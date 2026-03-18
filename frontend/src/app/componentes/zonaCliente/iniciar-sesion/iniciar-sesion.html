@@ -1,0 +1,53 @@
+<section class="min-h-screen bg-slate-100 flex items-center justify-center px-4">
+	<div class="w-full max-w-md bg-white rounded-xl shadow-lg p-8">
+		<h1 class="text-3xl font-bold text-slate-900 mb-2">Iniciar sesión</h1>
+		<p class="text-sm text-slate-600 mb-6">Accede para ver tus datos en el apartado de cuenta.</p>
+
+		<form [formGroup]="formularioLogin" (ngSubmit)="onSubmit()" class="space-y-4">
+			<div>
+				<label for="email" class="block text-sm font-medium mb-1">Email</label>
+				<input
+					id="email"
+					type="email"
+					formControlName="email"
+					class="w-full border border-slate-300 rounded px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-sky-500"
+					placeholder="tu@email.com"
+				/>
+				@if (formularioLogin.get('email')?.invalid && formularioLogin.get('email')?.touched) {
+					<p class="text-xs text-red-600 mt-1">Introduce un email válido</p>
+				}
+			</div>
+
+			<div>
+				<label for="contrasena" class="block text-sm font-medium mb-1">Contraseña</label>
+				<input
+					id="contrasena"
+					type="password"
+					formControlName="contrasena"
+					class="w-full border border-slate-300 rounded px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-sky-500"
+					placeholder="Tu contraseña"
+				/>
+				@if (formularioLogin.get('contrasena')?.invalid && formularioLogin.get('contrasena')?.touched) {
+					<p class="text-xs text-red-600 mt-1">La contraseña es obligatoria</p>
+				}
+			</div>
+
+			@if (mensajeError) {
+				<p class="text-sm text-red-600">{{ mensajeError }}</p>
+			}
+
+			<button
+				type="submit"
+				class="w-full bg-sky-600 hover:bg-sky-700 text-white py-2 rounded font-medium transition disabled:bg-slate-400"
+				[disabled]="formularioLogin.invalid || cargando"
+			>
+				{{ cargando ? 'Validando...' : 'Entrar' }}
+			</button>
+		</form>
+
+		<p class="text-sm text-slate-600 mt-5">
+			¿Aún no tienes cuenta?
+			<a routerLink="/registro" class="text-sky-700 font-medium hover:text-sky-800">Regístrate</a>
+		</p>
+	</div>
+</section>
