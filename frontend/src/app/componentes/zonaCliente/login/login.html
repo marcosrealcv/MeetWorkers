@@ -69,7 +69,10 @@
                                     <span>La contraseña es requerida</span>
                                 }
                                 @if (formulario.get('contraseña')?.errors?.['minlength']) {
-                                    <span>Mínimo 6 caracteres</span>
+                                    <span>Mínimo 8 caracteres</span>
+                                }
+                                @if (formulario.get('contraseña')?.errors?.['pattern']) {
+                                    <span>Debe incluir mayúscula, minúscula, número y símbolo</span>
                                 }
                             </div>
                         }
@@ -181,10 +184,23 @@
                 }
 
                 <!-- BOTÓN ENVIAR -->
-                <button type="submit" [disabled]="!formulario.valid" 
+                    <button type="submit" [disabled]="!formulario.valid || cargandoRegistro" 
                     class="w-full px-4 py-2 bg-blue-500 text-white rounded font-medium hover:bg-blue-600 disabled:bg-gray-400 disabled:cursor-not-allowed transition">
-                    Registrarse
+                        {{ cargandoRegistro ? 'Registrando...' : 'Registrarse' }}
                 </button>
+
+                    @if (errorRegistro) {
+                        <p class="mb-3 text-sm text-red-600">{{ errorRegistro }}</p>
+                    }
+
+                    @if (exitoRegistro) {
+                        <p class="mb-3 text-sm text-green-600">{{ exitoRegistro }}</p>
+                    }
+
+                    <p class="mt-4 text-center text-sm text-gray-600">
+                        ¿Ya tienes cuenta?
+                        <a routerLink="/iniciar-sesion" class="text-blue-600 hover:text-blue-800 font-medium">Inicia sesión</a>
+                    </p>
             </form>
         </div>
     </div>

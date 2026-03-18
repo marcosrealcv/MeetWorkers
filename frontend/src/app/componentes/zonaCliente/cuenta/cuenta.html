@@ -1,0 +1,193 @@
+<section class="max-w-4xl mx-auto py-10 px-4">
+	<h1 class="text-3xl font-bold text-slate-900 mb-6">Mi cuenta</h1>
+
+	@if (cargandoPerfil) {
+		<p class="text-slate-600">Cargando datos de tu cuenta...</p>
+	}
+
+	@if (!cargandoPerfil && errorPerfil) {
+		<div class="bg-red-50 border border-red-200 rounded-lg p-4">
+			<p class="text-red-700 mb-3">{{ errorPerfil }}</p>
+			<button
+				class="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded"
+				(click)="irAIniciarSesion()"
+			>
+				Iniciar sesión
+			</button>
+		</div>
+	}
+
+	@if (!cargandoPerfil && cliente) {
+		<div class="bg-white rounded-xl shadow-sm border border-slate-200 p-6 space-y-4">
+			<div class="flex items-center justify-between">
+				<h2 class="text-lg font-semibold text-slate-900">Datos de la cuenta</h2>
+				@if (!enModoEdicion) {
+					<button class="bg-sky-600 hover:bg-sky-700 text-white px-4 py-2 rounded" (click)="activarEdicion()">Editar</button>
+				}
+			</div>
+
+			@if (mensajeExito) {
+				<p class="text-sm text-green-700 bg-green-50 border border-green-200 rounded p-2">{{ mensajeExito }}</p>
+			}
+
+			@if (!enModoEdicion) {
+			<div class="grid sm:grid-cols-2 gap-4">
+				<div>
+					<p class="text-xs text-slate-500 uppercase tracking-wide">Nombre</p>
+					<p class="text-slate-900 font-medium">{{ cliente.nombre }} {{ cliente.apellido }}</p>
+				</div>
+				<div>
+					<p class="text-xs text-slate-500 uppercase tracking-wide">Email</p>
+					<p class="text-slate-900 font-medium">{{ cliente.email }}</p>
+				</div>
+				<div>
+					<p class="text-xs text-slate-500 uppercase tracking-wide">Teléfono</p>
+					<p class="text-slate-900 font-medium">{{ cliente.telefono }}</p>
+				</div>
+				<div>
+					<p class="text-xs text-slate-500 uppercase tracking-wide">Dirección</p>
+					<p class="text-slate-900 font-medium">{{ cliente.direccion }}</p>
+				</div>
+			</div>
+
+			@if (cliente.descripcion) {
+				<div>
+					<p class="text-xs text-slate-500 uppercase tracking-wide">Descripción personal</p>
+					<p class="text-slate-900">{{ cliente.descripcion }}</p>
+				</div>
+			}
+
+			@if (cliente.es_prestador) {
+				<div class="border-t border-slate-200 pt-4 space-y-3">
+					<h2 class="text-lg font-semibold text-emerald-700">Datos de servicio</h2>
+
+					<div class="grid sm:grid-cols-2 gap-4">
+						<div>
+							<p class="text-xs text-slate-500 uppercase tracking-wide">Tipo de servicio</p>
+							<p class="text-slate-900">{{ cliente.tipo_servicio || '-' }}</p>
+						</div>
+						<div>
+							<p class="text-xs text-slate-500 uppercase tracking-wide">Categoría</p>
+							<p class="text-slate-900">{{ cliente.categoria || '-' }}</p>
+						</div>
+						<div>
+							<p class="text-xs text-slate-500 uppercase tracking-wide">Especialización</p>
+							<p class="text-slate-900">{{ cliente.subcategoria || '-' }}</p>
+						</div>
+						<div>
+							<p class="text-xs text-slate-500 uppercase tracking-wide">Ubicación del servicio</p>
+							<p class="text-slate-900">{{ cliente.ubicacion_servicio || '-' }}</p>
+						</div>
+						<div>
+							<p class="text-xs text-slate-500 uppercase tracking-wide">Dirección de servicio</p>
+							<p class="text-slate-900">{{ cliente.direccion_servicio || '-' }}</p>
+						</div>
+						<div>
+							<p class="text-xs text-slate-500 uppercase tracking-wide">Coste por hora</p>
+							<p class="text-slate-900">{{ cliente.coste_hora || 0 }} €</p>
+						</div>
+					</div>
+
+					<div>
+						<p class="text-xs text-slate-500 uppercase tracking-wide">Descripción del servicio</p>
+						<p class="text-slate-900">{{ cliente.descripcion_servicio || '-' }}</p>
+					</div>
+				</div>
+			}
+				}
+
+				@if (enModoEdicion) {
+					<form [formGroup]="formularioEdicion" (ngSubmit)="guardarCambios()" class="space-y-4">
+						<div class="grid sm:grid-cols-2 gap-4">
+							<div>
+								<label class="block text-sm font-medium mb-1">Nombre</label>
+								<input type="text" formControlName="nombre" class="w-full border border-slate-300 rounded px-3 py-2 text-sm" />
+							</div>
+							<div>
+								<label class="block text-sm font-medium mb-1">Apellido</label>
+								<input type="text" formControlName="apellido" class="w-full border border-slate-300 rounded px-3 py-2 text-sm" />
+							</div>
+							<div>
+								<label class="block text-sm font-medium mb-1">Teléfono</label>
+								<input type="text" formControlName="telefono" class="w-full border border-slate-300 rounded px-3 py-2 text-sm" />
+							</div>
+							<div>
+								<label class="block text-sm font-medium mb-1">Email</label>
+								<input type="email" formControlName="email" class="w-full border border-slate-300 rounded px-3 py-2 text-sm" />
+							</div>
+						</div>
+
+						<div>
+							<label class="block text-sm font-medium mb-1">Dirección</label>
+							<input type="text" formControlName="direccion" class="w-full border border-slate-300 rounded px-3 py-2 text-sm" />
+						</div>
+
+						<div>
+							<label class="block text-sm font-medium mb-1">Descripción personal</label>
+							<textarea rows="2" formControlName="descripcion" class="w-full border border-slate-300 rounded px-3 py-2 text-sm"></textarea>
+						</div>
+
+						<label class="flex items-center gap-3 text-sm font-medium">
+							<input type="checkbox" formControlName="es_prestador" />
+							Soy prestador de servicios
+						</label>
+
+						@if (formularioEdicion.get('es_prestador')?.value) {
+							<div class="grid sm:grid-cols-2 gap-4 border border-slate-200 rounded p-3 bg-slate-50">
+								<div>
+									<label class="block text-sm font-medium mb-1">Tipo de servicio</label>
+									<input type="text" formControlName="tipo_servicio" class="w-full border border-slate-300 rounded px-3 py-2 text-sm" />
+								</div>
+								<div>
+									<label class="block text-sm font-medium mb-1">Categoría</label>
+									<select formControlName="categoria" class="w-full border border-slate-300 rounded px-3 py-2 text-sm">
+										<option value="">Selecciona una categoría</option>
+										@for (cat of categorias; track cat) {
+											<option [value]="cat">{{ cat }}</option>
+										}
+									</select>
+								</div>
+								<div>
+									<label class="block text-sm font-medium mb-1">Especialización</label>
+									<select formControlName="subcategoria" class="w-full border border-slate-300 rounded px-3 py-2 text-sm">
+										<option value="">Selecciona una especialización</option>
+										@for (subcat of subcategoriasActuales; track subcat) {
+											<option [value]="subcat">{{ subcat }}</option>
+										}
+									</select>
+								</div>
+								<div>
+									<label class="block text-sm font-medium mb-1">Ubicación del servicio</label>
+									<select formControlName="ubicacion_servicio" class="w-full border border-slate-300 rounded px-3 py-2 text-sm">
+										<option value="">Selecciona una opción</option>
+										@for (ub of ubicaciones; track ub) {
+											<option [value]="ub">{{ ub }}</option>
+										}
+									</select>
+								</div>
+								<div>
+									<label class="block text-sm font-medium mb-1">Dirección de servicio</label>
+									<input type="text" formControlName="direccion_servicio" class="w-full border border-slate-300 rounded px-3 py-2 text-sm" />
+								</div>
+								<div>
+									<label class="block text-sm font-medium mb-1">Coste por hora</label>
+									<input type="number" formControlName="coste_hora" class="w-full border border-slate-300 rounded px-3 py-2 text-sm" />
+								</div>
+								<div class="sm:col-span-2">
+									<label class="block text-sm font-medium mb-1">Descripción del servicio</label>
+									<textarea rows="2" formControlName="descripcion_servicio" class="w-full border border-slate-300 rounded px-3 py-2 text-sm"></textarea>
+								</div>
+							</div>
+						}
+
+						<div class="flex gap-3 pt-2">
+							<button type="submit" class="bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2 rounded">
+								Guardar cambios
+							</button>
+							<button type="button" class="bg-slate-200 hover:bg-slate-300 text-slate-900 px-4 py-2 rounded" (click)="cancelarEdicion()">Cancelar</button>
+						</div>
+					</form>
+				}
+		</div>
+	}
+</section>
