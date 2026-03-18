@@ -15,10 +15,28 @@ export class Inicio {
       id: 1,
       nombre: 'Mecánico a domicilio',
       descripcion: 'Cambio de aceite y revisión de frenos en tu propio garaje.',
-      precio: 45,
+      precio: 45 + '€',
       categoria: 'Automoción',
-      imagen: 'https://images.unsplash.com/photo-1486262715619-67b85e0b08d3?q=80&w=500',
+      imagen: '/imgs/mecanico.png',
       rating: 4.8
+    },
+    {
+      id: 2,
+      nombre: 'Limpieza a domicilio',
+      descripcion: 'Servicio completo de limpieza y desinfección de tu hogar.',
+      precio: 35 + '€',
+      categoria: 'Limpieza',
+      imagen: '/imgs/limpieza.png',
+      rating: 4.9
+    },
+    {
+      id: 3,
+      nombre: 'Peluquería',
+      descripcion: 'Corte de cabello, peinados y tratamientos de belleza a domicilio.',
+      precio: 20 + '€',
+      categoria: 'Belleza',
+      imagen: '/imgs/peluqueria.png',
+      rating: 4.7
     },
     ]);
 }
