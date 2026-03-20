@@ -1,7 +1,7 @@
 <div class="container mx-auto py-12 px-4">
-    @if (servicio()) {
+    @if (proveedores().length > 0) {
         <div class="mb-8">
-            <h1 class="text-4xl font-bold text-gray-900 mb-2">{{ servicio()!.nombre }}</h1>
+            <h1 class="text-4xl font-bold text-gray-900 mb-2">{{ servicio()?.nombre || 'Prestadores disponibles' }}</h1>
             <p class="text-gray-600 text-lg">Selecciona un proveedor para contratar:</p>
         </div>
 
@@ -12,7 +12,7 @@
         </div>
     } @else {
         <div class="text-center py-12">
-            <p class="text-xl text-gray-600">Servicio no encontrado</p>
+            <p class="text-xl text-gray-600">No hay prestadores para esta subcategoria todavia</p>
         </div>
     }
 </div>

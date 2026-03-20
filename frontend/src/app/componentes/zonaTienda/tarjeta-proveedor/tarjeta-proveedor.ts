@@ -15,7 +15,18 @@ export class TarjetaProveedorComponent {
   constructor(private router: Router) {}
 
   contratarProveedor() {
-    this.router.navigate(['/contratacion'], { queryParams: { proveedorId: this.proveedor.id } });
+    this.router.navigate(['/contratacion'], {
+      queryParams: {
+        proveedorId: this.proveedor.id,
+        nombre: this.proveedor.nombre,
+        especialidad: this.proveedor.especialidad,
+        rating: this.proveedor.rating,
+        resenas: this.proveedor.resenas,
+        precio: this.proveedor.precio,
+        imagen: this.proveedor.imagen,
+        experiencia: this.proveedor.experiencia,
+      },
+    });
   }
 
 }

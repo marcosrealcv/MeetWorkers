@@ -9,12 +9,16 @@
                 <p class="text-xl text-[#5F818C] font-semibold mb-4">{{ proveedor()!.especialidad }}</p>
                 
                 <div class="flex items-center gap-4 mb-6">
-                    <div class="flex text-yellow-400">
-                        @for (star of [1,2,3,4,5]; track star) {
-                            <span class="text-2xl">★</span>
-                        }
-                    </div>
-                    <span class="text-gray-600">({{ proveedor()!.rating }}/5 - {{ proveedor()!.resenas }} reseñas)</span>
+                    @if (proveedor()!.resenas > 0) {
+                        <div class="flex text-yellow-400">
+                            @for (star of [1,2,3,4,5]; track star) {
+                                <span class="text-2xl">★</span>
+                            }
+                        </div>
+                        <span class="text-gray-600">{{ proveedor()!.rating }}/5 - {{ proveedor()!.resenas }} reseñas</span>
+                    } @else {
+                        <span class="text-gray-600">Sin puntuacion - 0 reseñas</span>
+                    }
                 </div>
 
                 <p class="text-gray-600 text-lg font-semibold mb-6">{{ proveedor()!.experiencia }}</p>
