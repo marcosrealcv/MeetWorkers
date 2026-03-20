@@ -1,0 +1,45 @@
+<div class="container mx-auto py-12 px-4">
+    @if (proveedor()) {
+        <div class="max-w-2xl mx-auto bg-white rounded-xl shadow-lg overflow-hidden border border-gray-100">
+            <div class="h-96 w-full">
+                <img [src]="proveedor()!.imagen" alt="proveedor" class="w-full h-full object-cover">
+            </div>
+            <div class="p-8">
+                <h1 class="text-4xl font-bold text-gray-900 mb-2">{{ proveedor()!.nombre }}</h1>
+                <p class="text-xl text-[#5F818C] font-semibold mb-4">{{ proveedor()!.especialidad }}</p>
+                
+                <div class="flex items-center gap-4 mb-6">
+                    <div class="flex text-yellow-400">
+                        @for (star of [1,2,3,4,5]; track star) {
+                            <span class="text-2xl">★</span>
+                        }
+                    </div>
+                    <span class="text-gray-600">({{ proveedor()!.rating }}/5 - {{ proveedor()!.resenas }} reseñas)</span>
+                </div>
+
+                <p class="text-gray-600 text-lg font-semibold mb-6">{{ proveedor()!.experiencia }}</p>
+                <p class="text-gray-600 text-lg mb-8">{{ proveedor()!.precio }}</p>
+
+                <div class="bg-green-50 border border-green-200 rounded-lg p-6 mb-8">
+                    <h2 class="text-lg font-semibold text-gray-900 mb-3">Información de la contratación</h2>
+                    <p class="text-gray-700 mb-4">Completa el formulario a continuación para contratar los servicios de {{ proveedor()!.nombre }}</p>
+                    
+                    <div class="space-y-4">
+                        <input type="text" placeholder="Tu nombre completo" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#5F818C]">
+                        <input type="email" placeholder="Tu correo electrónico" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#5F818C]">
+                        <input type="tel" placeholder="Tu teléfono" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#5F818C]">
+                        <textarea placeholder="Describe lo que necesitas" rows="4" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#5F818C]"></textarea>
+                    </div>
+                </div>
+
+                <button class="w-full py-3 bg-[#5F818C] text-white rounded-lg font-bold text-lg hover:bg-[#4d6972] transition-colors">
+                    Confirmar contratación
+                </button>
+            </div>
+        </div>
+    } @else {
+        <div class="text-center py-12">
+            <p class="text-xl text-gray-600">Proveedor no encontrado</p>
+        </div>
+    }
+</div>
