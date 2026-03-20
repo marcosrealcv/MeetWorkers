@@ -16,7 +16,12 @@ export class TarjetasSubcategorias {
   constructor(private router: Router) {}
 
   contratarServicio() {
-    this.router.navigate(['/detalles-servicio'], { queryParams: { id: this.info.id } });
+    this.router.navigate(['/detalles-servicio'], { 
+      queryParams: { 
+        id: this.info.id,
+        pathCategoria: this.info.pathCategoria 
+      } 
+    });
   }
 
 }

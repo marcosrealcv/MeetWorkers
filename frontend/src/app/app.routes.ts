@@ -42,6 +42,7 @@ export const rutasApp: Routes = [
     path: 'contratacion',
     component: ContratacionComponent
   },
+  {
     path: '**',
     redirectTo: ''
   }
