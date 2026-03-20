@@ -11,6 +11,7 @@ type CategoriaJsonItem = {
 };
 
 const API_CATEGORIAS_URL = 'http://localhost:3000/api/categorias';
+const API_SUBCATEGORIAS_URL = 'http://localhost:3000/api/subcategorias';
 const PASSWORD_REGEX = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z\d]).{8,}$/;
 
 @Component({
@@ -99,29 +100,37 @@ export class Login implements OnInit {
         throw new Error(`No se pudieron cargar las categorías desde backend: ${response.status}`);
       }
 
-      const categoriasJson = (await response.json()) as CategoriaJsonItem[];
-      this.construirCategoriasDesdeJson(categoriasJson);
+      const categoriasPrincipales = (await response.json()) as CategoriaJsonItem[];
+      this.categorias = categoriasPrincipales.map((item) => item.nombreCategoria);
+      this.subcategorias = await this.cargarSubcategoriasPorCategoria(categoriasPrincipales);
     } catch (error) {
       console.error('Error cargando categorías/subcategorías desde backend:', error);
     }
   }
 
-  private construirCategoriasDesdeJson(categoriasJson: CategoriaJsonItem[]): void {
-    const categoriasPrincipales = categoriasJson.filter((item) => !item.pathCategoria.includes('-'));
-
-    this.categorias = categoriasPrincipales.map((item) => item.nombreCategoria);
-
+  private async cargarSubcategoriasPorCategoria(
+    categoriasPrincipales: CategoriaJsonItem[]
+  ): Promise<{ [key: string]: string[] }> {
     const subcategoriasPorCategoria: { [key: string]: string[] } = {};
 
-    for (const categoria of categoriasPrincipales) {
-      const prefijoSubcategoria = `${categoria.pathCategoria}-`;
+    await Promise.all(
+      categoriasPrincipales.map(async (categoria) => {
+        const responseSubcategorias = await fetch(
+          `${API_SUBCATEGORIAS_URL}/${encodeURIComponent(categoria.pathCategoria)}`
+        );
 
-      subcategoriasPorCategoria[categoria.nombreCategoria] = categoriasJson
-        .filter((item) => item.pathCategoria.startsWith(prefijoSubcategoria))
-        .map((item) => item.nombreCategoria);
-    }
+        if (!responseSubcategorias.ok) {
+          throw new Error(`No se pudieron cargar las subcategorías de ${categoria.nombreCategoria}`);
+        }
 
-    this.subcategorias = subcategoriasPorCategoria;
+        const subcategoriasJson = (await responseSubcategorias.json()) as CategoriaJsonItem[];
+        subcategoriasPorCategoria[categoria.nombreCategoria] = subcategoriasJson.map(
+          (item) => item.nombreCategoria
+        );
+      })
+    );
+
+    return subcategoriasPorCategoria;
   }
 
   onSubmit() {

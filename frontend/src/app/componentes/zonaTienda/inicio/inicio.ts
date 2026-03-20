@@ -53,13 +53,13 @@ export class Inicio implements OnInit {
       'Automoción': '/imgs/mecanico.png',
       'Belleza': '/imgs/peluqueria.png',
       'Limpieza': '/imgs/limpieza.png',
-      'Enseñanza': '/imgs/enseñanza.png',
-      'Reparaciones': '/imgs/reparaciones.png',
-      'Cuidado Personal': '/imgs/cuidado.png',
-      'Construcciones y Reformas': '/imgs/construccion.png',
-      'Otro': '/imgs/otro.png'
+      'Enseñanza': '/imgs/peluqueria.png',
+      'Reparaciones': '/imgs/mecanico.png',
+      'Cuidado Personal': '/imgs/limpieza.png',
+      'Construcciones y Reformas': '/imgs/mecanico.png',
+      'Otro': '/imgs/limpieza.png'
     };
-    return imagenes[nombreCategoria] || '/imgs/default.png';
+    return imagenes[nombreCategoria] || '/imgs/limpieza.png';
   }
 }
 
