@@ -5,13 +5,25 @@
                 <img src="logo.png" alt="Logo" class="h-16 w-auto" style="height: 64px; width: auto;">
             </div>
             <div class="flex items-center gap-4 relative z-50">
-                <button class="px-4 py-2" style="color: #F8FAFA;">
-                    <span class="text-sm font-medium ">Servicios</span>
+                @if (!authService.estaAutenticado()) {
+                <button routerLink="/iniciar-sesion" class="px-4 py-2" style="color: #F8FAFA;">
+                    <span class="text-sm font-medium">Iniciar sesión</span>
                 </button>
-                <button routerLink="/login" class="px-4 py-2" routerLink="/login" style="color: #F8FAFA;">
+                <button routerLink="/registro" class="px-4 py-2" style="color: #F8FAFA;">
+                    <span class="text-sm font-medium">Registrarse</span>
+                </button>
+                }
+
+                @if (authService.estaAutenticado()) {
+                <button routerLink="/cuenta" class="px-4 py-2" style="color: #F8FAFA;">
                     <span class="text-sm font-medium">Cuenta</span>
                 </button>
-                <button class="px-4 py-2" style="color: #F8FAFA;">
+                <button class="px-4 py-2" style="color: #F8FAFA;" (click)="cerrarSesion()">
+                    <span class="text-sm font-medium">Cerrar sesión</span>
+                </button>
+                }
+
+                <button routerLink="/" class="px-4 py-2" style="color: #F8FAFA;">
                     <span class="text-sm font-medium">Inicio</span>
                 </button>
             </div>

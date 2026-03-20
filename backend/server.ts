@@ -1,59 +1,39 @@
 import 'dotenv/config';
 import express from 'express';
-import mongoose, { Schema } from 'mongoose';
+import mongoose from 'mongoose';
 import config_pipeline from './config_server_express/config_pipeline';
+import configurarEnrutamiento from './config_enrutamiento/config_enrutamiento';
+import JwtService from './servicios/JwtService';
 
 const app = express();
 config_pipeline(app);
-
-type CategoriaDocument = {
-    nombreCategoria: string;
-    pathCategoria: string;
-};
-
-const categoriaSchema = new Schema<CategoriaDocument>(
-    {
-        nombreCategoria: { type: String, required: true },
-        pathCategoria: { type: String, required: true },
-    },
-    {
-        collection: 'categorias',
-        versionKey: false,
-    }
-);
-
-const CategoriaModel = mongoose.model<CategoriaDocument>('Categoria', categoriaSchema);
-
-app.get('/api/categorias', async (_request, response) => {
-    try {
-        const categorias = await CategoriaModel.find({}, { nombreCategoria: 1, pathCategoria: 1 }).lean();
-        response.status(200).json(categorias);
-    } catch (error) {
-        console.error('Error obteniendo categorías desde MongoDB:', error);
-        response.status(500).json({ error: 'No se pudieron obtener las categorías' });
-    }
-});
+configurarEnrutamiento(app);
 
 async function startServer(): Promise<void> {
-    const mongoUrl = process.env.URL_MONGODB;
+  const mongoUrl = process.env.URL_MONGODB;
 
-    if (!mongoUrl) {
-        throw new Error('La variable URL_MONGODB no está configurada en backend/.env');
+  if (!mongoUrl) {
+    throw new Error('La variable URL_MONGODB no está configurada en backend/.env');
+  }
+
+  const testToken = JwtService.generarJWT({ service: 'startup-check' }, '10m', false);
+  if (testToken.length === 0) {
+    throw new Error('No se pudo inicializar JwtService: revisa JWT_SECRET en backend/.env');
+  }
+
+  await mongoose.connect(mongoUrl);
+  console.log('...Conectado a MongoDB...');
+
+  app.listen(3000, (error?: any) => {
+    if (error) {
+      console.log('Error al INICIAR servidor WEB EXPRESS en puerto 3000:', error);
+    } else {
+      console.log('...Servidor WEB EXPRESS iniciado en puerto 3000...');
     }
-
-    await mongoose.connect(mongoUrl);
-    console.log('...Conectado a MongoDB...');
-
-    app.listen(3000, (error?: any) => {
-        if (error) {
-            console.log('Error al INICIAR servidor WEB EXPRESS en puerto 3000:', error);
-        } else {
-            console.log('...Servidor WEB EXPRESS iniciado en puerto 3000...');
-        }
-    });
+  });
 }
 
 void startServer().catch((error) => {
-    console.error('Error inicializando backend:', error);
-    process.exit(1);
+  console.error('Error inicializando backend:', error);
+  process.exit(1);
 });

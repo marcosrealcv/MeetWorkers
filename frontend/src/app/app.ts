@@ -20,7 +20,9 @@ export class App {
     this.router.events.pipe(
       filter(event => event instanceof NavigationEnd)
     ).subscribe((event: NavigationEnd) => {
-      this.mostrarHeaderFooter.set(event.urlAfterRedirects !== '/login');
+      const urlActual = event.urlAfterRedirects;
+      const ocultarLayout = urlActual === '/registro' || urlActual === '/iniciar-sesion';
+      this.mostrarHeaderFooter.set(!ocultarLayout);
     });
   }
 
