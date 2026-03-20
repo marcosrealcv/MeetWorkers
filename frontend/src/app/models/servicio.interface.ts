@@ -4,6 +4,7 @@ export interface Servicio {
   descripcion: string;
   precio: string;
   categoria: string;
+  pathCategoria: string;
   imagen: string;
   rating: number; 
 }
