@@ -4,7 +4,7 @@
     
     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
         
-        @for (item of servicios(); track item.id  ) {
+        @for (item of serviciosCategorias(); track item.id  ) {
             <app-tarjetas-servicios [info] = "item"></app-tarjetas-servicios>
         }
 
