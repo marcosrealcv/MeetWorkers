@@ -46,7 +46,7 @@ export class DetallesServicioComponent implements OnInit {
               id: index + 1,
               nombre: `${prestador.nombre} ${prestador.apellido}`,
               especialidad: prestador.descripcion_servicio || 'Especialista',
-              rating: 4.5,
+              rating: 0,
               resenas: 0,
               precio: `${prestador.coste_hora}€/hora`,
               imagen: '/imgs/proveedor.png',

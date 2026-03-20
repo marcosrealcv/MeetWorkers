@@ -6,6 +6,14 @@ import { Proveedor } from '../models/proveedor.interface';
 })
 export class ProveedoresService {
 
+  private normalizarSinCalificacion(proveedor: Proveedor): Proveedor {
+    return {
+      ...proveedor,
+      rating: 0,
+      resenas: 0,
+    };
+  }
+
   private proveedoresPorServicio: { [key: number]: Proveedor[] } = {
     1: [
       {
@@ -155,14 +163,16 @@ export class ProveedoresService {
 
   // Obtener proveedores por ID de servicio
   obtenerProveedoresPorServicio(servicioId: number): Proveedor[] {
-    return this.proveedoresPorServicio[servicioId] || [];
+    return (this.proveedoresPorServicio[servicioId] || []).map((proveedor) =>
+      this.normalizarSinCalificacion(proveedor)
+    );
   }
 
   // Obtener proveedor por ID
   obtenerProveedorPorId(proveedorId: number): Proveedor | undefined {
     for (const proveedores of Object.values(this.proveedoresPorServicio)) {
       const proveedor = proveedores.find(p => p.id === proveedorId);
-      if (proveedor) return proveedor;
+      if (proveedor) return this.normalizarSinCalificacion(proveedor);
     }
     return undefined;
   }
@@ -171,7 +181,7 @@ export class ProveedoresService {
   obtenerTodos(): Proveedor[] {
     const todos: Proveedor[] = [];
     for (const proveedores of Object.values(this.proveedoresPorServicio)) {
-      todos.push(...proveedores);
+      todos.push(...proveedores.map((proveedor) => this.normalizarSinCalificacion(proveedor)));
     }
     return todos;
   }

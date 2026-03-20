@@ -1,9 +1,15 @@
 <div class="bg-white rounded-xl shadow-md overflow-hidden border border-gray-100 hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1">
     <div class="relative h-40 w-full">
         <img [src]="proveedor.imagen" alt="proveedor" class="w-full h-full object-cover">
-        <div class="absolute top-2 right-2 bg-white px-2 py-1 rounded-lg shadow text-sm font-bold text-[#5F818C]">
-            {{ proveedor.rating }}★
-        </div>
+        @if (proveedor.resenas > 0) {
+            <div class="absolute top-2 right-2 bg-white px-2 py-1 rounded-lg shadow text-sm font-bold text-[#5F818C]">
+                {{ proveedor.rating }}★
+            </div>
+        } @else {
+            <div class="absolute top-2 right-2 bg-white px-2 py-1 rounded-lg shadow text-sm font-bold text-gray-500">
+                Sin puntuacion
+            </div>
+        }
     </div>
     <div class="p-5">
         <h3 class="text-lg font-bold text-gray-800 mb-1">{{ proveedor.nombre }}</h3>
@@ -11,7 +17,7 @@
         <p class="text-gray-600 text-xs mb-3">{{ proveedor.experiencia }}</p>
         
         <div class="flex items-center justify-between mb-4 text-sm text-gray-600">
-            <span>({{ proveedor.resenas }} reseñas)</span>
+            <span>{{ proveedor.resenas }} reseñas</span>
             <span class="font-bold text-lg text-[#5F818C]">{{ proveedor.precio }}</span>
         </div>
 
