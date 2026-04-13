@@ -1,0 +1,197 @@
+<div class="min-h-screen bg-slate-50 py-12 px-4">
+  <div class="mx-auto max-w-6xl">
+    <div class="grid gap-8 lg:grid-cols-[1.3fr_0.7fr]">
+      <section class="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm sm:p-8">
+        <div class="mb-8 max-w-2xl">
+          <p class="text-sm font-semibold uppercase tracking-[0.25em] text-[#5F818C]">Clientes</p>
+          <h1 class="mt-3 text-3xl font-black text-slate-900 sm:text-4xl">{{ tituloFormulario }}</h1>
+          <p class="mt-4 text-base leading-7 text-slate-600">
+            Describe la reforma, la reparación o el servicio que quieres solicitar y adjunta fotos para que los profesionales entiendan mejor el trabajo.
+          </p>
+          @if (trabajoIdEdicion) {
+            <div class="mt-4 inline-flex items-center rounded-full bg-amber-100 px-3 py-1 text-sm font-semibold text-amber-800">
+              Estás editando un anuncio publicado
+            </div>
+          }
+        </div>
+
+        @if (error) {
+          <div class="mb-6 rounded-2xl border border-red-200 bg-red-50 px-4 py-3 text-sm font-medium text-red-700">
+            {{ error }}
+          </div>
+        }
+
+        @if (resumenErroresFormulario) {
+          <div class="mb-6 rounded-2xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm font-medium text-amber-800">
+            {{ resumenErroresFormulario }}
+          </div>
+        }
+
+        @if (exito) {
+          <div class="mb-6 rounded-2xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm font-medium text-emerald-700">
+            {{ exito }}
+          </div>
+        }
+
+        <form class="space-y-6" [formGroup]="formulario" (ngSubmit)="onSubmit()">
+          <div class="grid gap-5 md:grid-cols-2">
+            <label class="space-y-2">
+              <span class="text-sm font-semibold text-slate-700">Tu nombre</span>
+              <input formControlName="cliente_nombre" type="text" class="w-full rounded-2xl border px-4 py-3 outline-none transition focus:border-[#5F818C] focus:ring-2 focus:ring-[#5F818C]/20" [class.border-slate-300]="!tieneError('cliente_nombre')" [class.border-red-400]="tieneError('cliente_nombre')">
+              @if (tieneError('cliente_nombre')) {
+                <p class="text-xs text-red-600">{{ mensajeError('cliente_nombre') }}</p>
+              }
+            </label>
+
+            <label class="space-y-2">
+              <span class="text-sm font-semibold text-slate-700">Tu correo</span>
+              <input formControlName="cliente_email" type="email" class="w-full rounded-2xl border px-4 py-3 outline-none transition focus:border-[#5F818C] focus:ring-2 focus:ring-[#5F818C]/20" [class.border-slate-300]="!tieneError('cliente_email')" [class.border-red-400]="tieneError('cliente_email')">
+              @if (tieneError('cliente_email')) {
+                <p class="text-xs text-red-600">{{ mensajeError('cliente_email') }}</p>
+              }
+            </label>
+          </div>
+
+          <div class="grid gap-5 md:grid-cols-2">
+            <label class="space-y-2">
+              <span class="text-sm font-semibold text-slate-700">Tu teléfono</span>
+              <input formControlName="cliente_telefono" type="tel" class="w-full rounded-2xl border px-4 py-3 outline-none transition focus:border-[#5F818C] focus:ring-2 focus:ring-[#5F818C]/20" [class.border-slate-300]="!tieneError('cliente_telefono')" [class.border-red-400]="tieneError('cliente_telefono')">
+              @if (tieneError('cliente_telefono')) {
+                <p class="text-xs text-red-600">{{ mensajeError('cliente_telefono') }}</p>
+              }
+            </label>
+
+            <label class="space-y-2">
+              <span class="text-sm font-semibold text-slate-700">Ubicación del trabajo</span>
+              <input formControlName="ubicacion" type="text" placeholder="Ciudad, barrio o dirección" class="w-full rounded-2xl border px-4 py-3 outline-none transition focus:border-[#5F818C] focus:ring-2 focus:ring-[#5F818C]/20" [class.border-slate-300]="!tieneError('ubicacion')" [class.border-red-400]="tieneError('ubicacion')">
+              @if (tieneError('ubicacion')) {
+                <p class="text-xs text-red-600">{{ mensajeError('ubicacion') }}</p>
+              }
+            </label>
+          </div>
+
+          <div class="grid gap-5 md:grid-cols-2">
+            <label class="space-y-2">
+              <span class="text-sm font-semibold text-slate-700">Categoría</span>
+              <select formControlName="categoria" class="w-full rounded-2xl border bg-white px-4 py-3 outline-none transition focus:border-[#5F818C] focus:ring-2 focus:ring-[#5F818C]/20" [class.border-slate-300]="!tieneError('categoria')" [class.border-red-400]="tieneError('categoria')">
+                <option value="">Selecciona una categoría</option>
+                @for (categoria of categorias; track categoria.pathCategoria) {
+                  <option [value]="categoria.pathCategoria">{{ categoria.nombreCategoria }}</option>
+                }
+              </select>
+              @if (tieneError('categoria')) {
+                <p class="text-xs text-red-600">{{ mensajeError('categoria') }}</p>
+              }
+            </label>
+
+            <label class="space-y-2">
+              <span class="text-sm font-semibold text-slate-700">Subcategoría</span>
+              <select formControlName="subcategoria" class="w-full rounded-2xl border bg-white px-4 py-3 outline-none transition focus:border-[#5F818C] focus:ring-2 focus:ring-[#5F818C]/20" [class.border-slate-300]="!tieneError('subcategoria')" [class.border-red-400]="tieneError('subcategoria')">
+                <option value="">Selecciona una subcategoría</option>
+                @for (subcategoria of subcategorias; track subcategoria.pathCategoria) {
+                  <option [value]="subcategoria.pathCategoria">{{ subcategoria.nombreCategoria }}</option>
+                }
+              </select>
+              @if (tieneError('subcategoria')) {
+                <p class="text-xs text-red-600">{{ mensajeError('subcategoria') }}</p>
+              }
+            </label>
+          </div>
+
+          <label class="space-y-2 block">
+            <span class="text-sm font-semibold text-slate-700">Título del trabajo</span>
+            <input formControlName="titulo" type="text" placeholder="Reforma completa de baño" class="w-full rounded-2xl border px-4 py-3 outline-none transition focus:border-[#5F818C] focus:ring-2 focus:ring-[#5F818C]/20" [class.border-slate-300]="!tieneError('titulo')" [class.border-red-400]="tieneError('titulo')">
+            @if (tieneError('titulo')) {
+              <p class="text-xs text-red-600">{{ mensajeError('titulo') }}</p>
+            }
+          </label>
+
+          <label class="space-y-2 block">
+            <span class="text-sm font-semibold text-slate-700">Descripción</span>
+            <textarea formControlName="descripcion" rows="6" placeholder="Explica qué necesitas, medidas aproximadas, materiales, plazos o cualquier detalle útil." class="w-full rounded-3xl border px-4 py-3 outline-none transition focus:border-[#5F818C] focus:ring-2 focus:ring-[#5F818C]/20" [class.border-slate-300]="!tieneError('descripcion')" [class.border-red-400]="tieneError('descripcion')"></textarea>
+            @if (tieneError('descripcion')) {
+              <p class="text-xs text-red-600">{{ mensajeError('descripcion') }}</p>
+            }
+          </label>
+
+          <div class="grid gap-5 md:grid-cols-2">
+            <label class="space-y-2">
+              <span class="text-sm font-semibold text-slate-700">Presupuesto orientativo</span>
+              <input formControlName="presupuesto" type="number" min="0" step="0.01" placeholder="0" class="w-full rounded-2xl border border-slate-300 px-4 py-3 outline-none transition focus:border-[#5F818C] focus:ring-2 focus:ring-[#5F818C]/20">
+            </label>
+
+            <label class="space-y-2">
+              <span class="text-sm font-semibold text-slate-700">Fecha deseada</span>
+              <input formControlName="fecha_limite" type="date" class="w-full rounded-2xl border border-slate-300 px-4 py-3 outline-none transition focus:border-[#5F818C] focus:ring-2 focus:ring-[#5F818C]/20">
+            </label>
+          </div>
+
+          <div class="drop-zone space-y-3 rounded-3xl border-2 border-dashed border-slate-300 bg-slate-50 p-5 transition" [class.drop-zone--active]="arrastrandoArchivos" (dragover)="onDragOver($event)" (dragleave)="onDragLeave($event)" (drop)="onDrop($event)">
+            <div>
+              <span class="text-sm font-semibold text-slate-700">Fotos del trabajo</span>
+              <p class="mt-1 text-sm text-slate-500">Arrastra aquí tus imágenes o selecciónalas manualmente. Solo formatos de imagen. Máximo 15 fotos.</p>
+            </div>
+
+            <input #inputFotos type="file" accept="image/*" multiple (change)="onArchivosSeleccionados($event)" class="hidden">
+            <button type="button" class="inline-flex items-center rounded-full bg-[#5F818C] px-4 py-2 text-sm font-semibold text-white hover:bg-[#4d6972]" (click)="inputFotos.click()">
+              {{ trabajoIdEdicion ? 'Añadir imágenes' : 'Seleccionar imágenes' }}
+            </button>
+
+            @if (fotosSeleccionadas.length > 0) {
+              <div class="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
+                @for (foto of fotosSeleccionadas; track foto; let indice = $index) {
+                  <article class="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
+                    <div class="h-40 w-full bg-slate-100">
+                      <img [src]="foto" alt="Foto seleccionada" class="h-full w-full object-cover">
+                    </div>
+                    <div class="flex items-center justify-between gap-3 px-4 py-3">
+                      <span class="truncate text-xs text-slate-600">{{ nombresFotosSeleccionadas[indice] }}</span>
+                      <button type="button" class="text-sm font-semibold text-[#5F818C] hover:text-[#4d6972]" (click)="quitarFoto(indice)">Eliminar</button>
+                    </div>
+                  </article>
+                }
+              </div>
+            }
+
+            @if (trabajoIdEdicion) {
+              <button type="button" class="text-sm font-semibold text-slate-700 underline underline-offset-4" (click)="volverACrear()">
+                Cancelar edición y crear otro anuncio
+              </button>
+            }
+          </div>
+
+          <button type="submit" [disabled]="!puedeEnviar" class="w-full rounded-2xl bg-[#5F818C] px-6 py-4 text-base font-bold text-white transition hover:bg-[#4d6972] disabled:cursor-not-allowed disabled:opacity-60">
+            @if (cargando) {
+              @if (trabajoIdEdicion) {
+                Actualizando trabajo...
+              } @else {
+                Publicando trabajo...
+              }
+            } @else {
+              {{ textoBotonSubmit }}
+            }
+          </button>
+        </form>
+      </section>
+
+      <aside class="space-y-6">
+        <section class="rounded-3xl bg-[#1f2f35] p-6 text-white shadow-lg">
+          <p class="text-sm font-semibold uppercase tracking-[0.25em] text-[#9ec4ce]">Antes de publicar</p>
+          <h2 class="mt-3 text-2xl font-black">Cuanto más claro lo describas, mejor encaje tendrás</h2>
+          <ul class="mt-5 space-y-4 text-sm leading-6 text-slate-200">
+            <li>Incluye fotos del espacio, desperfecto o referencia visual.</li>
+            <li>Selecciona la categoría y subcategoría correctas para que llegue a los profesionales adecuados.</li>
+            <li>Escribe si buscas solo presupuesto, visita previa o ejecución completa.</li>
+          </ul>
+        </section>
+
+        <section class="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm">
+          <h3 class="text-lg font-bold text-slate-900">Qué pasará después</h3>
+          <p class="mt-3 text-sm leading-6 text-slate-600">
+            Esta primera versión guarda el trabajo en la base de datos. El siguiente paso será mostrar estos anuncios en un panel de avisos para los proveedores que coincidan con la categoría.
+          </p>
+        </section>
+      </aside>
+    </div>
+  </div>
+</div>

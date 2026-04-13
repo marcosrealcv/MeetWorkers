@@ -34,27 +34,27 @@ var __importStar = (this && this.__importStar) || (function () {
 })();
 Object.defineProperty(exports, "__esModule", { value: true });
 const mongoose_1 = __importStar(require("mongoose"));
-const clienteSchema = new mongoose_1.Schema({
-    nombre: { type: String, required: true, trim: true },
-    apellido: { type: String, required: true, trim: true },
-    telefono: { type: String, required: true, trim: true },
-    email: { type: String, required: true, unique: true, lowercase: true, trim: true },
-    contrasena: { type: String, required: true },
-    direccion: { type: String, required: true, trim: true },
-    descripcion: { type: String, default: '' },
-    es_prestador: { type: Boolean, default: false },
-    tipo_servicio: { type: String, default: '' },
-    categoria: { type: String, default: '' },
-    subcategoria: { type: String, default: '' },
-    descripcion_servicio: { type: String, default: '' },
-    ubicacion_servicio: { type: String, default: '' },
-    direccion_servicio: { type: String, default: '' },
-    coste_hora: { type: Number, default: 0 },
-    trabajos_solicitados: { type: [String], default: [] },
+const trabajoSolicitudSchema = new mongoose_1.Schema({
+    cliente_id: { type: String, default: '' },
+    cliente_nombre: { type: String, required: true, trim: true },
+    cliente_email: { type: String, required: true, lowercase: true, trim: true },
+    cliente_telefono: { type: String, required: true, trim: true },
+    titulo: { type: String, required: true, trim: true },
+    descripcion: { type: String, required: true, trim: true },
+    categoria: { type: String, required: true, trim: true },
+    path_categoria: { type: String, required: true, trim: true },
+    subcategoria: { type: String, required: true, trim: true },
+    path_subcategoria: { type: String, required: true, trim: true },
+    ubicacion: { type: String, required: true, trim: true },
+    presupuesto: { type: Number, default: 0 },
+    fecha_limite: { type: String, default: '' },
+    fotos: { type: [String], default: [] },
+    estado: { type: String, default: 'publicado' },
 }, {
-    collection: 'clientes',
+    collection: 'trabajos_solicitados',
     versionKey: false,
+    timestamps: true,
 });
-const ClienteModel = mongoose_1.default.model('Cliente', clienteSchema);
-exports.default = ClienteModel;
-//# sourceMappingURL=ClienteModel.js.map
+const TrabajoSolicitudModel = mongoose_1.default.model('TrabajoSolicitud', trabajoSolicitudSchema);
+exports.default = TrabajoSolicitudModel;
+//# sourceMappingURL=TrabajoSolicitudModel.js.map

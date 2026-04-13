@@ -14,6 +14,7 @@ export interface Cliente {
   ubicacion_servicio?: string;
   direccion_servicio?: string;
   coste_hora?: number;
+  trabajos_solicitados?: string[];
 }
 
 export interface RegistroClientePayload {
@@ -32,6 +33,7 @@ export interface RegistroClientePayload {
   ubicacion_servicio?: string;
   direccion_servicio?: string;
   coste_hora?: number;
+  trabajos_solicitados?: string[];
 }
 
 export interface LoginPayload {
