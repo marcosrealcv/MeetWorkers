@@ -12,11 +12,21 @@ import { Router } from "@angular/router";
 export class TarjetasServicios {
 
   @Input({ required : true}) info!: Servicio;
+  @Input() tipoTarjeta: 'servicio' | 'trabajo' = 'servicio';
 
   constructor(private router: Router) {}
 
   irAServicios() {
+    if (this.tipoTarjeta === 'trabajo') {
+      this.router.navigate(['/cuenta']);
+      return;
+    }
+
     this.router.navigate(['/pagina-servicios'], { queryParams: { pathCategoria: this.info.pathCategoria } });
+  }
+
+  get textoBoton(): string {
+    return this.tipoTarjeta === 'trabajo' ? 'Ver aviso' : 'Saber mas';
   }
 
 }

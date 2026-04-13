@@ -1,0 +1,8 @@
+:host {
+  display: block;
+}
+
+.drop-zone--active {
+  border-color: #5f818c;
+  background-color: rgba(95, 129, 140, 0.1);
+}

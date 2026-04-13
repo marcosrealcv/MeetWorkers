@@ -34,27 +34,24 @@ var __importStar = (this && this.__importStar) || (function () {
 })();
 Object.defineProperty(exports, "__esModule", { value: true });
 const mongoose_1 = __importStar(require("mongoose"));
-const clienteSchema = new mongoose_1.Schema({
-    nombre: { type: String, required: true, trim: true },
-    apellido: { type: String, required: true, trim: true },
-    telefono: { type: String, required: true, trim: true },
-    email: { type: String, required: true, unique: true, lowercase: true, trim: true },
-    contrasena: { type: String, required: true },
-    direccion: { type: String, required: true, trim: true },
-    descripcion: { type: String, default: '' },
-    es_prestador: { type: Boolean, default: false },
-    tipo_servicio: { type: String, default: '' },
-    categoria: { type: String, default: '' },
-    subcategoria: { type: String, default: '' },
-    descripcion_servicio: { type: String, default: '' },
-    ubicacion_servicio: { type: String, default: '' },
-    direccion_servicio: { type: String, default: '' },
-    coste_hora: { type: Number, default: 0 },
-    trabajos_solicitados: { type: [String], default: [] },
+const avisoSchema = new mongoose_1.Schema({
+    prestador_id: { type: String, required: true, trim: true, index: true },
+    trabajo_id: { type: String, required: true, trim: true, index: true },
+    trabajo_titulo: { type: String, required: true, trim: true },
+    trabajo_descripcion: { type: String, required: true, trim: true },
+    categoria: { type: String, required: true, trim: true },
+    subcategoria: { type: String, required: true, trim: true },
+    ubicacion: { type: String, required: true, trim: true },
+    presupuesto: { type: Number, default: 0 },
+    fecha_limite: { type: String, default: '' },
+    foto_principal: { type: String, default: '' },
+    leido: { type: Boolean, default: false },
 }, {
-    collection: 'clientes',
+    collection: 'avisos_prestadores',
     versionKey: false,
+    timestamps: true,
 });
-const ClienteModel = mongoose_1.default.model('Cliente', clienteSchema);
-exports.default = ClienteModel;
-//# sourceMappingURL=ClienteModel.js.map
+avisoSchema.index({ prestador_id: 1, trabajo_id: 1 }, { unique: true });
+const AvisoModel = mongoose_1.default.model('Aviso', avisoSchema);
+exports.default = AvisoModel;
+//# sourceMappingURL=AvisoModel.js.map

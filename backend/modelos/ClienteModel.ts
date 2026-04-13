@@ -16,6 +16,7 @@ export type ClienteDocument = {
   ubicacion_servicio?: string;
   direccion_servicio?: string;
   coste_hora?: number;
+  trabajos_solicitados?: string[];
 };
 
 const clienteSchema = new Schema<ClienteDocument>(
@@ -35,6 +36,7 @@ const clienteSchema = new Schema<ClienteDocument>(
     ubicacion_servicio: { type: String, default: '' },
     direccion_servicio: { type: String, default: '' },
     coste_hora: { type: Number, default: 0 },
+    trabajos_solicitados: { type: [String], default: [] },
   },
   {
     collection: 'clientes',

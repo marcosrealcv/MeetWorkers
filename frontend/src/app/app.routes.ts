@@ -6,6 +6,7 @@ import { Inicio } from './componentes/zonaTienda/inicio/inicio';
 import { PaginaServicios } from './componentes/zonaTienda/pagina-servicios/pagina-servicios';
 import { DetallesServicioComponent } from './componentes/zonaTienda/detalles-servicio/detalles-servicio';
 import { ContratacionComponent } from './componentes/zonaTienda/contratacion/contratacion';
+import { PublicarTrabajoComponent } from './componentes/zonaCliente/publicar-trabajo/publicar-trabajo';
 
 export const rutasApp: Routes = [ 
 
@@ -20,6 +21,10 @@ export const rutasApp: Routes = [
   {
     path: 'cuenta',
     component: Cuenta
+  },
+  {
+    path: 'publicar-trabajo',
+    component: PublicarTrabajoComponent
   },
   {
     path: 'login',

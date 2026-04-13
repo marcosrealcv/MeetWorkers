@@ -10,3 +10,25 @@
 
         </div>
 </div>
+
+@if (esPrestador) {
+<div class="container mx-auto pb-12 px-4">
+    <h2 class="text-3xl font-extrabold text-gray-900 mb-8">Trabajos solicitados</h2>
+
+    @if (cargandoTrabajosSolicitados()) {
+        <p class="text-gray-600 mb-6">Cargando trabajos de tu categoría...</p>
+    }
+
+    @if (!cargandoTrabajosSolicitados() && trabajosSolicitados().length === 0) {
+        <p class="text-gray-600 mb-6">No hay trabajos solicitados en tu categoría por ahora.</p>
+    }
+
+    @if (!cargandoTrabajosSolicitados() && trabajosSolicitados().length > 0) {
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
+        @for (item of trabajosSolicitados(); track item.id) {
+            <app-tarjetas-servicios [info]="item" tipoTarjeta="trabajo"></app-tarjetas-servicios>
+        }
+    </div>
+    }
+</div>
+}

@@ -5,6 +5,9 @@
                 <img src="logo.png" alt="Logo" class="h-16 w-auto" style="height: 64px; width: auto;">
             </div>
             <div class="flex items-center gap-4 relative z-50">
+                <button routerLink="/publicar-trabajo" class="px-4 py-2" style="color: #F8FAFA;">
+                    <span class="text-sm font-medium">Publicar trabajo</span>
+                </button>
                 @if (!authService.estaAutenticado()) {
                 <button routerLink="/iniciar-sesion" class="px-4 py-2" style="color: #F8FAFA;">
                     <span class="text-sm font-medium">Iniciar sesión</span>
@@ -15,7 +18,22 @@
                 }
 
                 @if (authService.estaAutenticado()) {
-                <button routerLink="/cuenta" class="px-4 py-2" style="color: #F8FAFA;">
+                @if (authService.clienteActual()?.es_prestador) {
+                <button class="px-3 py-2 relative" style="color: #F8FAFA;" (click)="irAAvisosPrestador()" aria-label="Notificaciones">
+                    <span class="inline-flex items-center justify-center">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                            <path fill-rule="evenodd" d="M10 2a5 5 0 00-5 5v2.764l-.447.894A1.5 1.5 0 005.894 13h8.212a1.5 1.5 0 001.341-2.342L15 9.764V7a5 5 0 00-5-5zM7.5 15a2.5 2.5 0 005 0h-5z" clip-rule="evenodd" />
+                        </svg>
+                    </span>
+                    @if (cantidadAvisosNoLeidos > 0) {
+                    <span class="absolute -top-1 -right-1 inline-flex min-w-5 h-5 items-center justify-center rounded-full bg-red-500 text-white text-xs font-bold px-1">
+                        {{ cantidadAvisosNoLeidos }}
+                    </span>
+                    }
+                </button>
+                }
+
+                <button routerLink="/cuenta" class="px-4 py-2" style="color: #F8FAFA;" (click)="actualizarContadorAvisos()">
                     <span class="text-sm font-medium">Cuenta</span>
                 </button>
                 <button class="px-4 py-2" style="color: #F8FAFA;" (click)="cerrarSesion()">
