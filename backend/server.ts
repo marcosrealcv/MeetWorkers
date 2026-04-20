@@ -4,6 +4,7 @@ import mongoose from 'mongoose';
 import config_pipeline from './config_server_express/config_pipeline';
 import configurarEnrutamiento from './config_enrutamiento/config_enrutamiento';
 import JwtService from './servicios/JwtService';
+import { inicializarIndices } from './config_server_express/inicializarIndices';
 
 const app = express();
 config_pipeline(app);
@@ -23,6 +24,8 @@ async function startServer(): Promise<void> {
 
   await mongoose.connect(mongoUrl);
   console.log('...Conectado a MongoDB...');
+  
+  await inicializarIndices();
 
   app.listen(3000, (error?: any) => {
     if (error) {

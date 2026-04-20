@@ -354,4 +354,47 @@ routerCliente.get('/:id', async (request: Request, response: Response) => {
   }
 });
 
+// GET /clientes/buscar/prestador/:nombre - Buscar prestador por nombre
+routerCliente.get('/buscar/prestador/:nombre', async (request: Request, response: Response) => {
+  try {
+    const nombre = String(request.params.nombre ?? '').trim();
+
+    if (!nombre || nombre.length < 2) {
+      response.status(400).json({ error: 'El nombre debe tener al menos 2 caracteres' });
+      return;
+    }
+
+    const cliente = await ClienteModel.findOne({
+      nombre: { $regex: nombre, $options: 'i' },
+      es_prestador: true,
+    })
+      .select('_id nombre apellido email categoria subcategoria coste_hora')
+      .lean();
+
+    if (!cliente) {
+      response.status(404).json({ error: 'Prestador no encontrado' });
+      return;
+    }
+
+    response.status(200).json(cliente);
+  } catch (error) {
+    console.error('Error buscando prestador:', error);
+    response.status(500).json({ error: 'No se pudo buscar el prestador' });
+  }
+});
+
+// GET /clientes/prestadores - Obtener todos los prestadores
+routerCliente.get('/prestadores', async (request: Request, response: Response) => {
+  try {
+    const prestadores = await ClienteModel.find({ es_prestador: true })
+      .select('_id nombre apellido email categoria subcategoria coste_hora descripcion_servicio')
+      .lean();
+
+    response.status(200).json(prestadores);
+  } catch (error) {
+    console.error('Error obteniendo prestadores:', error);
+    response.status(500).json({ error: 'No se pudieron obtener los prestadores' });
+  }
+});
+
 export default routerCliente;

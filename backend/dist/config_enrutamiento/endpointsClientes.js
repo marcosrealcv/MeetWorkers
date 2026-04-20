@@ -301,5 +301,44 @@ routerCliente.get('/:id', (request, response) => __awaiter(void 0, void 0, void 
         response.status(500).json({ error: 'No se pudo obtener el perfil del cliente' });
     }
 }));
+// GET /clientes/buscar/prestador/:nombre - Buscar prestador por nombre
+routerCliente.get('/buscar/prestador/:nombre', (request, response) => __awaiter(void 0, void 0, void 0, function* () {
+    var _a;
+    try {
+        const nombre = String((_a = request.params.nombre) !== null && _a !== void 0 ? _a : '').trim();
+        if (!nombre || nombre.length < 2) {
+            response.status(400).json({ error: 'El nombre debe tener al menos 2 caracteres' });
+            return;
+        }
+        const cliente = yield ClienteModel_1.default.findOne({
+            nombre: { $regex: nombre, $options: 'i' },
+            es_prestador: true,
+        })
+            .select('_id nombre apellido email categoria subcategoria coste_hora')
+            .lean();
+        if (!cliente) {
+            response.status(404).json({ error: 'Prestador no encontrado' });
+            return;
+        }
+        response.status(200).json(cliente);
+    }
+    catch (error) {
+        console.error('Error buscando prestador:', error);
+        response.status(500).json({ error: 'No se pudo buscar el prestador' });
+    }
+}));
+// GET /clientes/prestadores - Obtener todos los prestadores
+routerCliente.get('/prestadores', (request, response) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const prestadores = yield ClienteModel_1.default.find({ es_prestador: true })
+            .select('_id nombre apellido email categoria subcategoria coste_hora descripcion_servicio')
+            .lean();
+        response.status(200).json(prestadores);
+    }
+    catch (error) {
+        console.error('Error obteniendo prestadores:', error);
+        response.status(500).json({ error: 'No se pudieron obtener los prestadores' });
+    }
+}));
 exports.default = routerCliente;
 //# sourceMappingURL=endpointsClientes.js.map

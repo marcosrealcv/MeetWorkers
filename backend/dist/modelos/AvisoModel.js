@@ -36,7 +36,9 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const mongoose_1 = __importStar(require("mongoose"));
 const avisoSchema = new mongoose_1.Schema({
     prestador_id: { type: String, required: true, trim: true, index: true },
-    trabajo_id: { type: String, required: true, trim: true, index: true },
+    tipo: { type: String, enum: ['trabajo', 'reserva'], default: 'trabajo' },
+    trabajo_id: { type: String, trim: true, index: true, sparse: true },
+    reserva_id: { type: String, trim: true, index: true, sparse: true },
     trabajo_titulo: { type: String, required: true, trim: true },
     trabajo_descripcion: { type: String, required: true, trim: true },
     categoria: { type: String, required: true, trim: true },
@@ -45,13 +47,29 @@ const avisoSchema = new mongoose_1.Schema({
     presupuesto: { type: Number, default: 0 },
     fecha_limite: { type: String, default: '' },
     foto_principal: { type: String, default: '' },
+    cliente_id: { type: String, trim: true, sparse: true },
+    cliente_nombre: { type: String, trim: true, default: '' },
+    cliente_email: { type: String, trim: true, lowercase: true, sparse: true },
+    cliente_telefono: { type: String, trim: true, default: '' },
+    fecha_reserva: { type: String, default: '' },
+    hora_reserva: { type: String, default: '' },
+    estado_reserva: { type: String, enum: ['pendiente', 'aceptado', 'rechazado'], default: 'pendiente', sparse: true },
     leido: { type: Boolean, default: false },
 }, {
     collection: 'avisos_prestadores',
     versionKey: false,
     timestamps: true,
 });
-avisoSchema.index({ prestador_id: 1, trabajo_id: 1 }, { unique: true });
+// Índices condicionales que solo aplican para trabajos y reservas
+avisoSchema.index({ prestador_id: 1, trabajo_id: 1 }, {
+    unique: true,
+    partialFilterExpression: { tipo: 'trabajo', trabajo_id: { $exists: true, $ne: null } }
+});
+avisoSchema.index({ prestador_id: 1, reserva_id: 1 }, {
+    unique: true,
+    partialFilterExpression: { tipo: 'reserva', reserva_id: { $exists: true, $ne: null } }
+});
+avisoSchema.index({ prestador_id: 1, tipo: 1 });
 const AvisoModel = mongoose_1.default.model('Aviso', avisoSchema);
 exports.default = AvisoModel;
 //# sourceMappingURL=AvisoModel.js.map
