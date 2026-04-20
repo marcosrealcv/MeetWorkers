@@ -46,15 +46,10 @@ routerAvisos.get('/mis-avisos', async (request: Request, response: Response) => 
       return;
     }
 
-    const cliente = await ClienteModel.findById(idCliente, { es_prestador: 1 }).lean();
+    const cliente = await ClienteModel.findById(idCliente, { _id: 1 }).lean();
 
     if (!cliente) {
       response.status(404).json({ error: 'Cliente no encontrado' });
-      return;
-    }
-
-    if (!cliente.es_prestador) {
-      response.status(200).json([]);
       return;
     }
 
@@ -117,15 +112,10 @@ routerAvisos.delete('/:id', async (request: Request, response: Response) => {
       return;
     }
 
-    const cliente = await ClienteModel.findById(idCliente, { es_prestador: 1 }).lean();
+    const cliente = await ClienteModel.findById(idCliente, { _id: 1 }).lean();
 
     if (!cliente) {
       response.status(404).json({ error: 'Cliente no encontrado' });
-      return;
-    }
-
-    if (!cliente.es_prestador) {
-      response.status(403).json({ error: 'Solo un prestador puede eliminar avisos' });
       return;
     }
 

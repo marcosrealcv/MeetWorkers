@@ -15,6 +15,9 @@ export interface TrabajoSolicitud {
   fecha_limite?: string;
   fotos: string[];
   estado: string;
+  prestador_aceptado_id?: string;
+  prestador_aceptado_nombre?: string;
+  fecha_aceptacion?: string;
   createdAt?: string;
   updatedAt?: string;
 }

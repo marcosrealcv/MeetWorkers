@@ -15,6 +15,9 @@ export type TrabajoSolicitudDocument = {
     fecha_limite?: string;
     fotos: string[];
     estado: string;
+    prestador_aceptado_id?: string;
+    prestador_aceptado_nombre?: string;
+    fecha_aceptacion?: string;
 };
 declare const TrabajoSolicitudModel: mongoose.Model<TrabajoSolicitudDocument, {}, {}, {}, mongoose.Document<unknown, {}, TrabajoSolicitudDocument, {}, mongoose.DefaultSchemaOptions> & TrabajoSolicitudDocument & {
     _id: mongoose.Types.ObjectId;

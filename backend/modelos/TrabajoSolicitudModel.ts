@@ -16,6 +16,9 @@ export type TrabajoSolicitudDocument = {
   fecha_limite?: string;
   fotos: string[];
   estado: string;
+  prestador_aceptado_id?: string;
+  prestador_aceptado_nombre?: string;
+  fecha_aceptacion?: string;
 };
 
 const trabajoSolicitudSchema = new Schema<TrabajoSolicitudDocument>(
@@ -35,6 +38,9 @@ const trabajoSolicitudSchema = new Schema<TrabajoSolicitudDocument>(
     fecha_limite: { type: String, default: '' },
     fotos: { type: [String], default: [] },
     estado: { type: String, default: 'publicado' },
+    prestador_aceptado_id: { type: String, default: '' },
+    prestador_aceptado_nombre: { type: String, default: '' },
+    fecha_aceptacion: { type: String, default: '' },
   },
   {
     collection: 'trabajos_solicitados',

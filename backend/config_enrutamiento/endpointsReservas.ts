@@ -121,6 +121,45 @@ routerReservas.get('/pendientes', async (request: Request, response: Response) =
   }
 });
 
+// GET /reservas/mias - Obtener reservas hechas por el cliente autenticado
+routerReservas.get('/mias', async (request: Request, response: Response) => {
+  try {
+    const idCliente = obtenerIdClienteDesdeToken(request.headers.authorization);
+
+    if (!idCliente || !mongoose.Types.ObjectId.isValid(idCliente)) {
+      response.status(401).json({ error: 'Token invalido o ausente' });
+      return;
+    }
+
+    const cliente = await ClienteModel.findById(idCliente).select({ email: 1 }).lean();
+    const emailCliente = typeof cliente?.email === 'string'
+      ? cliente.email.toLowerCase().trim()
+      : '';
+
+    const filtroReservas = emailCliente
+      ? {
+          tipo: 'reserva',
+          $or: [
+            { cliente_id: idCliente },
+            { cliente_email: emailCliente },
+          ],
+        }
+      : {
+          tipo: 'reserva',
+          cliente_id: idCliente,
+        };
+
+    const avisos = await AvisoModel.find(filtroReservas)
+      .sort({ createdAt: -1 })
+      .lean();
+
+    response.status(200).json(avisos);
+  } catch (error) {
+    console.error('Error obteniendo mis reservas:', error);
+    response.status(500).json({ error: 'No se pudieron obtener tus reservas' });
+  }
+});
+
 // POST /reservas - Crear una nueva reserva
 routerReservas.post('/', async (request: Request, response: Response) => {
   try {

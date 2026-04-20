@@ -1,6 +1,11 @@
 <div class="max-w-sm bg-white rounded-xl shadow-md overflow-hidden border border-gray-100 hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1">
     <div class="relative h-48 w-full">
         <img [src]="info.imagen" alt="titulo" class="w-full h-full object-cover">
+          @if (tipoTarjeta === 'trabajo' && info.estadoTrabajo === 'aceptado') {
+          <div class="absolute top-2 left-2 bg-emerald-600 px-2 py-1 rounded-lg shadow text-xs font-bold text-white">
+              Aceptado
+          </div>
+          }
         <div class="absolute top-2 right-2 bg-white px-2 py-1 rounded-lg shadow text-sm font-bold text-[#5F818C]">
            {{ info.precio }}
         </div>
@@ -10,7 +15,16 @@
         <p class="text-gray-600 text-sm line-clamp-3 mb-4">
             {{ info.descripcion }}
         </p>
-        <button (click)="irAServicios()" class="w-full py-2.5 bg-[#5F818C] text-white rounded-lg font-semibold hover:bg-[#4d6972] transition-colors">
+                <button
+                    (click)="irAServicios()"
+                    [disabled]="trabajoAceptado"
+                    class="w-full py-2.5 rounded-lg font-semibold transition-colors"
+                    [class.bg-[#5F818C]]="!trabajoAceptado"
+                    [class.text-white]="!trabajoAceptado"
+                    [class.hover:bg-[#4d6972]]="!trabajoAceptado"
+                    [class.bg-slate-300]="trabajoAceptado"
+                    [class.text-slate-600]="trabajoAceptado"
+                >
               {{ textoBoton }}
         </button>
     </div>

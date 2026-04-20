@@ -36,6 +36,23 @@ export class TrabajosService {
     return this.http.get<TrabajoSolicitud>(`${API_TRABAJOS_URL}/${idTrabajo}`, { headers }).pipe(timeout(10000));
   }
 
+  obtenerTrabajoPublicoPorId(idTrabajo: string): Observable<TrabajoSolicitud> {
+    return this.http.get<TrabajoSolicitud>(`${API_TRABAJOS_URL}/publico/${idTrabajo}`).pipe(timeout(10000));
+  }
+
+  aceptarTrabajoSolicitado(idTrabajo: string): Observable<PublicarTrabajoResponse> {
+    const headers = this.obtenerHeadersAutorizados();
+
+    if (!headers) {
+      return throwError(() => new HttpErrorResponse({
+        status: 401,
+        error: { error: 'No hay una sesion activa, inicia sesion de nuevo' }
+      }));
+    }
+
+    return this.http.put<PublicarTrabajoResponse>(`${API_TRABAJOS_URL}/${idTrabajo}/aceptar`, {}, { headers }).pipe(timeout(10000));
+  }
+
   actualizarTrabajo(idTrabajo: string, payload: NuevoTrabajoSolicitudPayload): Observable<PublicarTrabajoResponse> {
     const headers = this.obtenerHeadersAutorizados();
 

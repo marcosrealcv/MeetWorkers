@@ -1,6 +1,12 @@
 <section class="max-w-4xl mx-auto py-10 px-4">
 	<h1 class="text-3xl font-bold text-slate-900 mb-6">Mi cuenta</h1>
 
+	@if (cargandoPerfil) {
+		<div class="bg-slate-50 border border-slate-200 rounded-lg p-4">
+			<p class="text-slate-700">Cargando datos de tu cuenta...</p>
+		</div>
+	}
+
 	@if (!cargandoPerfil && errorPerfil) {
 		<div class="bg-red-50 border border-red-200 rounded-lg p-4">
 			<p class="text-red-700 mb-3">{{ errorPerfil }}</p>
@@ -232,6 +238,97 @@
 							<span>Fecha límite: {{ trabajo.fecha_limite || '-' }}</span>
 							<span>Publicado: {{ trabajo.createdAt ? (trabajo.createdAt | date:'short') : '-' }}</span>
 						</div>
+					</article>
+				}
+			</div>
+		}
+	</div>
+</section>
+}
+
+@if (!cargandoPerfil && cliente) {
+<section class="max-w-4xl mx-auto pb-10 px-4">
+	<div class="bg-white rounded-xl shadow-sm border border-slate-200 p-6 space-y-4">
+		<div class="flex flex-wrap items-center justify-between gap-3">
+			<h2 class="text-xl font-semibold text-slate-900">Mis reservas realizadas</h2>
+			<span class="inline-flex items-center rounded-full bg-slate-100 px-3 py-1 text-sm font-medium text-slate-700">
+				{{ cantidadMisReservasPendientes }} pendiente{{ cantidadMisReservasPendientes !== 1 ? 's' : '' }}
+			</span>
+		</div>
+
+		@if (!cargandoReservasCliente && errorReservasCliente) {
+			<p class="text-red-700 bg-red-50 border border-red-200 rounded p-3">{{ errorReservasCliente }}</p>
+		}
+
+		@if (!cargandoReservasCliente && !errorReservasCliente && reservasCliente.length === 0) {
+			<p class="text-slate-600">Todavia no has realizado ninguna reserva.</p>
+		}
+
+		@if (!cargandoReservasCliente && !errorReservasCliente && reservasCliente.length > 0) {
+			<div class="space-y-3">
+				@for (reserva of reservasCliente; track reserva._id) {
+					<article class="rounded-lg border p-4" [class.border-blue-200]="reserva.estado_reserva === 'pendiente'" [class.bg-blue-50]="reserva.estado_reserva === 'pendiente'" [class.border-emerald-200]="reserva.estado_reserva === 'aceptado'" [class.bg-emerald-50]="reserva.estado_reserva === 'aceptado'" [class.border-red-200]="reserva.estado_reserva === 'rechazado'" [class.bg-red-50]="reserva.estado_reserva === 'rechazado'" [class.border-slate-200]="!reserva.estado_reserva" [class.bg-white]="!reserva.estado_reserva">
+						<div class="flex flex-wrap items-start justify-between gap-3">
+							<div class="flex-1">
+								<h3 class="text-base font-semibold text-slate-900">{{ reserva.trabajo_titulo }}</h3>
+								<p class="text-sm text-slate-600 mt-1">{{ reserva.categoria }} · {{ reserva.subcategoria }} · {{ reserva.ubicacion }}</p>
+							</div>
+							<span [class]="'inline-flex items-center rounded-full px-2.5 py-1 text-xs font-semibold'"
+								[class.bg-blue-100]="reserva.estado_reserva === 'pendiente'"
+								[class.text-blue-700]="reserva.estado_reserva === 'pendiente'"
+								[class.bg-emerald-100]="reserva.estado_reserva === 'aceptado'"
+								[class.text-emerald-700]="reserva.estado_reserva === 'aceptado'"
+								[class.bg-red-100]="reserva.estado_reserva === 'rechazado'"
+								[class.text-red-700]="reserva.estado_reserva === 'rechazado'">
+								{{ reserva.estado_reserva || 'pendiente' }}
+							</span>
+						</div>
+
+						<p class="text-sm text-slate-700 mt-3">{{ reserva.trabajo_descripcion }}</p>
+
+						<div class="mt-3 flex flex-wrap items-center gap-4 text-sm text-slate-600">
+							<span>Presupuesto: {{ reserva.presupuesto || 0 }} €</span>
+							<span>Fecha: {{ reserva.fecha_reserva }}</span>
+							<span>Hora: {{ reserva.hora_reserva }}</span>
+						</div>
+					</article>
+				}
+			</div>
+		}
+	</div>
+</section>
+}
+
+@if (!cargandoPerfil && cliente && !cliente.es_prestador) {
+<section class="max-w-4xl mx-auto pb-10 px-4">
+	<div class="bg-white rounded-xl shadow-sm border border-slate-200 p-6 space-y-4">
+		<div class="flex flex-wrap items-center justify-between gap-3">
+			<h2 class="text-xl font-semibold text-slate-900">Avisos de mis trabajos</h2>
+		</div>
+
+		@if (!cargandoAvisosCliente && errorAvisosCliente) {
+			<p class="text-red-700 bg-red-50 border border-red-200 rounded p-3">{{ errorAvisosCliente }}</p>
+		}
+
+		@if (!cargandoAvisosCliente && !errorAvisosCliente && avisosCliente.length === 0) {
+			<p class="text-slate-600">Aun no tienes avisos en tus trabajos solicitados.</p>
+		}
+
+		@if (!cargandoAvisosCliente && !errorAvisosCliente && avisosCliente.length > 0) {
+			<div class="space-y-3">
+				@for (aviso of avisosCliente; track aviso._id) {
+					<article class="rounded-lg border p-4" [class.border-emerald-200]="!aviso.leido" [class.bg-emerald-50]="!aviso.leido" [class.border-slate-200]="aviso.leido" [class.bg-white]="aviso.leido">
+						<div class="flex flex-wrap items-start justify-between gap-3">
+							<div>
+								<h3 class="text-base font-semibold text-slate-900">{{ aviso.trabajo_titulo }}</h3>
+								<p class="text-sm text-slate-600 mt-1">{{ aviso.categoria }} · {{ aviso.subcategoria }} · {{ aviso.ubicacion }}</p>
+							</div>
+							@if (!aviso.leido) {
+								<span class="inline-flex items-center rounded-full bg-emerald-100 px-2.5 py-1 text-xs font-semibold text-emerald-700">Nuevo</span>
+							}
+						</div>
+
+						<p class="text-sm text-slate-700 mt-3">{{ aviso.trabajo_descripcion }}</p>
 					</article>
 				}
 			</div>

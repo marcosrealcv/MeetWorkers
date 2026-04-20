@@ -7,6 +7,7 @@ import { PaginaServicios } from './componentes/zonaTienda/pagina-servicios/pagin
 import { DetallesServicioComponent } from './componentes/zonaTienda/detalles-servicio/detalles-servicio';
 import { ContratacionComponent } from './componentes/zonaTienda/contratacion/contratacion';
 import { PublicarTrabajoComponent } from './componentes/zonaCliente/publicar-trabajo/publicar-trabajo';
+import { DetalleAvisoComponent } from './componentes/zonaTienda/detalle-aviso/detalle-aviso';
 
 export const rutasApp: Routes = [ 
 
@@ -46,6 +47,10 @@ export const rutasApp: Routes = [
   {
     path: 'contratacion',
     component: ContratacionComponent
+  },
+  {
+    path: 'detalle-aviso',
+    component: DetalleAvisoComponent
   },
 {    path: '**',
     redirectTo: ''

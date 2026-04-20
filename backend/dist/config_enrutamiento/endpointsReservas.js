@@ -15,6 +15,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const express_1 = require("express");
 const mongoose_1 = __importDefault(require("mongoose"));
 const AvisoModel_1 = __importDefault(require("../modelos/AvisoModel"));
+const ClienteModel_1 = __importDefault(require("../modelos/ClienteModel"));
 const JwtService_1 = __importDefault(require("../servicios/JwtService"));
 const routerReservas = (0, express_1.Router)();
 function extraerTokenBearer(authorizationHeader) {
@@ -94,6 +95,40 @@ routerReservas.get('/pendientes', (request, response) => __awaiter(void 0, void 
     catch (error) {
         console.error('Error obteniendo reservas pendientes:', error);
         response.status(500).json({ error: 'No se pudieron obtener las reservas pendientes' });
+    }
+}));
+// GET /reservas/mias - Obtener reservas hechas por el cliente autenticado
+routerReservas.get('/mias', (request, response) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const idCliente = obtenerIdClienteDesdeToken(request.headers.authorization);
+        if (!idCliente || !mongoose_1.default.Types.ObjectId.isValid(idCliente)) {
+            response.status(401).json({ error: 'Token invalido o ausente' });
+            return;
+        }
+        const cliente = yield ClienteModel_1.default.findById(idCliente).select({ email: 1 }).lean();
+        const emailCliente = typeof (cliente === null || cliente === void 0 ? void 0 : cliente.email) === 'string'
+            ? cliente.email.toLowerCase().trim()
+            : '';
+        const filtroReservas = emailCliente
+            ? {
+                tipo: 'reserva',
+                $or: [
+                    { cliente_id: idCliente },
+                    { cliente_email: emailCliente },
+                ],
+            }
+            : {
+                tipo: 'reserva',
+                cliente_id: idCliente,
+            };
+        const avisos = yield AvisoModel_1.default.find(filtroReservas)
+            .sort({ createdAt: -1 })
+            .lean();
+        response.status(200).json(avisos);
+    }
+    catch (error) {
+        console.error('Error obteniendo mis reservas:', error);
+        response.status(500).json({ error: 'No se pudieron obtener tus reservas' });
     }
 }));
 // POST /reservas - Crear una nueva reserva
