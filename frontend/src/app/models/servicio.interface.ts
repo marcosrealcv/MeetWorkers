@@ -1,3 +1,5 @@
+import { TrabajoSolicitud } from './trabajo-solicitud.interface';
+
 export interface Servicio {
   id: number;
   nombre: string;
@@ -6,5 +8,9 @@ export interface Servicio {
   categoria: string;
   pathCategoria: string;
   imagen: string;
-  rating: number; 
+  rating: number;
+  trabajoId?: string;
+  detalleTrabajo?: TrabajoSolicitud;
+  estadoTrabajo?: string;
+  prestadorAceptadoNombre?: string;
 }

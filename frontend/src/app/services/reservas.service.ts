@@ -60,6 +60,11 @@ export class ReservasService {
     return this.http.get<Reserva[]>(`${API_RESERVAS_URL}/pendientes`, { headers });
   }
 
+  obtenerMisReservas() {
+    const headers = this.getHeaders();
+    return this.http.get<Reserva[]>(`${API_RESERVAS_URL}/mias`, { headers });
+  }
+
   actualizarEstadoReserva(reservaId: string, estado: 'aceptado' | 'rechazado' | 'pendiente') {
     const headers = this.getHeaders();
     return this.http.put<{ mensaje: string; reserva: Reserva }>(

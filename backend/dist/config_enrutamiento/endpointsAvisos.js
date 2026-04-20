@@ -48,13 +48,9 @@ routerAvisos.get('/mis-avisos', (request, response) => __awaiter(void 0, void 0,
             response.status(401).json({ error: 'Token inválido o ausente' });
             return;
         }
-        const cliente = yield ClienteModel_1.default.findById(idCliente, { es_prestador: 1 }).lean();
+        const cliente = yield ClienteModel_1.default.findById(idCliente, { _id: 1 }).lean();
         if (!cliente) {
             response.status(404).json({ error: 'Cliente no encontrado' });
-            return;
-        }
-        if (!cliente.es_prestador) {
-            response.status(200).json([]);
             return;
         }
         const avisos = yield AvisoModel_1.default.find({ prestador_id: idCliente })
@@ -105,13 +101,9 @@ routerAvisos.delete('/:id', (request, response) => __awaiter(void 0, void 0, voi
             response.status(400).json({ error: 'Identificador de aviso inválido' });
             return;
         }
-        const cliente = yield ClienteModel_1.default.findById(idCliente, { es_prestador: 1 }).lean();
+        const cliente = yield ClienteModel_1.default.findById(idCliente, { _id: 1 }).lean();
         if (!cliente) {
             response.status(404).json({ error: 'Cliente no encontrado' });
-            return;
-        }
-        if (!cliente.es_prestador) {
-            response.status(403).json({ error: 'Solo un prestador puede eliminar avisos' });
             return;
         }
         const resultadoEliminacion = yield AvisoModel_1.default.deleteOne({

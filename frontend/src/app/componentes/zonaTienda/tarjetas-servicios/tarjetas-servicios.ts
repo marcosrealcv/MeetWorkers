@@ -18,7 +18,14 @@ export class TarjetasServicios {
 
   irAServicios() {
     if (this.tipoTarjeta === 'trabajo') {
-      this.router.navigate(['/cuenta']);
+      if (!this.info.trabajoId || this.trabajoAceptado) {
+        return;
+      }
+
+      this.router.navigate(['/detalle-aviso'], {
+        queryParams: { trabajoId: this.info.trabajoId },
+        state: { detalleTrabajo: this.info.detalleTrabajo }
+      });
       return;
     }
 
@@ -26,7 +33,15 @@ export class TarjetasServicios {
   }
 
   get textoBoton(): string {
-    return this.tipoTarjeta === 'trabajo' ? 'Ver aviso' : 'Saber mas';
+    if (this.tipoTarjeta === 'trabajo') {
+      return this.trabajoAceptado ? 'Ya aceptado' : 'Ver aviso';
+    }
+
+    return 'Saber mas';
+  }
+
+  get trabajoAceptado(): boolean {
+    return this.tipoTarjeta === 'trabajo' && this.info.estadoTrabajo === 'aceptado';
   }
 
 }

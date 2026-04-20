@@ -50,6 +50,9 @@ const trabajoSolicitudSchema = new mongoose_1.Schema({
     fecha_limite: { type: String, default: '' },
     fotos: { type: [String], default: [] },
     estado: { type: String, default: 'publicado' },
+    prestador_aceptado_id: { type: String, default: '' },
+    prestador_aceptado_nombre: { type: String, default: '' },
+    fecha_aceptacion: { type: String, default: '' },
 }, {
     collection: 'trabajos_solicitados',
     versionKey: false,

@@ -99,6 +99,10 @@ export class Inicio implements OnInit {
           pathCategoria: trabajo.path_categoria,
           imagen: trabajo.fotos[0] || this.obtenerImagenCategoria(trabajo.categoria),
           rating: 0,
+          trabajoId: trabajo._id,
+          detalleTrabajo: trabajo,
+          estadoTrabajo: trabajo.estado,
+          prestadorAceptadoNombre: trabajo.prestador_aceptado_nombre,
         }));
 
         this.trabajosSolicitados.set(tarjetasTrabajo);
