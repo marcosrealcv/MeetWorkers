@@ -18,6 +18,7 @@ const mongoose_1 = __importDefault(require("mongoose"));
 const config_pipeline_1 = __importDefault(require("./config_server_express/config_pipeline"));
 const config_enrutamiento_1 = __importDefault(require("./config_enrutamiento/config_enrutamiento"));
 const JwtService_1 = __importDefault(require("./servicios/JwtService"));
+const inicializarIndices_1 = require("./config_server_express/inicializarIndices");
 const app = (0, express_1.default)();
 (0, config_pipeline_1.default)(app);
 (0, config_enrutamiento_1.default)(app);
@@ -33,6 +34,7 @@ function startServer() {
         }
         yield mongoose_1.default.connect(mongoUrl);
         console.log('...Conectado a MongoDB...');
+        yield (0, inicializarIndices_1.inicializarIndices)();
         app.listen(3000, (error) => {
             if (error) {
                 console.log('Error al INICIAR servidor WEB EXPRESS en puerto 3000:', error);

@@ -1,0 +1,67 @@
+/* Modal de Calendario */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #888;
+  border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #555;
+}
+
+/* Animación de entrada del modal */
+@keyframes slideIn {
+  from {
+    transform: scale(0.95);
+    opacity: 0;
+  }
+  to {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+.modal-content {
+  animation: slideIn 0.2s ease-out;
+}
+
+/* Estilos para los botones de fecha */
+.fecha-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.fecha-btn.selected {
+  background-color: #5F818C;
+  color: white;
+  border-color: #5F818C;
+}
+
+/* Estilos para los botones de hora */
+.hora-btn {
+  transition: all 0.2s ease;
+}
+
+.hora-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.hora-btn.selected {
+  background-color: #5F818C;
+  color: white;
+  border-color: #5F818C;
+}
+
+.hora-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}

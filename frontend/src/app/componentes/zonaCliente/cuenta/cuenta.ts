@@ -8,6 +8,7 @@ import { Cliente } from '../../../models/cliente.interface';
 import { AvisoPrestador } from '../../../models/aviso.interface';
 import { AvisosService } from '../../../services/avisos.service';
 import { TrabajosService } from '../../../services/trabajos.service';
+import { ReservasService, Reserva } from '../../../services/reservas.service';
 import { TrabajoSolicitud } from '../../../models/trabajo-solicitud.interface';
 
 type CategoriaJsonItem = {
@@ -42,6 +43,10 @@ export class Cuenta implements OnInit {
   trabajosPublicados: TrabajoSolicitud[] = [];
   cargandoTrabajosPublicados = false;
   errorTrabajosPublicados = '';
+  reservasPrestador: Reserva[] = [];
+  cargandoReservas = false;
+  errorReservas = '';
+  idsReservasProcesando = new Set<string>();
 
   formularioEdicion = this.fb.group({
     nombre: [''],
@@ -65,6 +70,7 @@ export class Cuenta implements OnInit {
     private readonly router: Router,
     private readonly avisosService: AvisosService,
     private readonly trabajosService: TrabajosService,
+    private readonly reservasService: ReservasService,
   ) {}
 
   ngOnInit(): void {
@@ -153,6 +159,7 @@ export class Cuenta implements OnInit {
     this.rellenarFormulario(cliente);
     this.cargandoPerfil = false;
     this.cargarAvisosSiEsPrestador(cliente);
+    this.cargarReservasSiEsPrestador(cliente);
     this.cargarMisTrabajosPublicados(cliente);
   }
 
@@ -391,6 +398,93 @@ export class Cuenta implements OnInit {
     }
 
     return 'Mis trabajos publicados';
+  }
+
+  cargarReservasSiEsPrestador(clienteBase?: Cliente): void {
+    const cliente = clienteBase ?? this.cliente;
+
+    if (!cliente?.es_prestador) {
+      this.reservasPrestador = [];
+      this.errorReservas = '';
+      this.cargandoReservas = false;
+      return;
+    }
+
+    this.cargandoReservas = true;
+    this.errorReservas = '';
+
+    this.reservasService.obtenerReservas().subscribe({
+      next: (reservas) => {
+        this.reservasPrestador = reservas;
+        this.cargandoReservas = false;
+      },
+      error: (error: HttpErrorResponse) => {
+        if (error.status === 401 || error.status === 403) {
+          this.reservasPrestador = [];
+          this.errorReservas = '';
+          this.cargandoReservas = false;
+          return;
+        }
+
+        this.errorReservas = error.error?.error ?? 'No se pudieron cargar las reservas';
+        this.cargandoReservas = false;
+      },
+    });
+  }
+
+  cambiarEstadoReserva(idReserva: string, nuevoEstado: 'aceptado' | 'rechazado'): void {
+    if (!idReserva || this.idsReservasProcesando.has(idReserva)) {
+      return;
+    }
+
+    this.idsReservasProcesando.add(idReserva);
+
+    this.reservasService.actualizarEstadoReserva(idReserva, nuevoEstado).subscribe({
+      next: () => {
+        this.reservasPrestador = this.reservasPrestador.map((reserva) =>
+          reserva._id === idReserva ? { ...reserva, estado_reserva: nuevoEstado } : reserva
+        );
+        this.idsReservasProcesando.delete(idReserva);
+      },
+      error: (error: HttpErrorResponse) => {
+        this.idsReservasProcesando.delete(idReserva);
+        this.errorReservas = error.error?.error ?? `No se pudo ${nuevoEstado === 'aceptado' ? 'aceptar' : 'rechazar'} la reserva`;
+      },
+    });
+  }
+
+  eliminarReserva(idReserva: string): void {
+    if (!idReserva || this.idsReservasProcesando.has(idReserva)) {
+      return;
+    }
+
+    const confirmado = window.confirm('¿Quieres eliminar esta reserva?');
+    if (!confirmado) {
+      return;
+    }
+
+    const reservasAnteriores = [...this.reservasPrestador];
+    this.reservasPrestador = this.reservasPrestador.filter((reserva) => reserva._id !== idReserva);
+    this.idsReservasProcesando.add(idReserva);
+
+    this.reservasService.eliminarReserva(idReserva).subscribe({
+      next: () => {
+        this.idsReservasProcesando.delete(idReserva);
+      },
+      error: (error: HttpErrorResponse) => {
+        this.reservasPrestador = reservasAnteriores;
+        this.idsReservasProcesando.delete(idReserva);
+        this.errorReservas = error.error?.error ?? 'No se pudo eliminar la reserva';
+      },
+    });
+  }
+
+  estaProcesandoReserva(idReserva: string): boolean {
+    return this.idsReservasProcesando.has(idReserva);
+  }
+
+  get cantidadReservasPendientes(): number {
+    return this.reservasPrestador.filter((reserva) => reserva.estado_reserva === 'pendiente').length;
   }
 
   get categoriaSeleccionada(): string {

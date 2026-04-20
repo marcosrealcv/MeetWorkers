@@ -42,10 +42,11 @@ export class DetallesServicioComponent implements OnInit {
             this.prestadores.set(prestadores);
             
             // Convertir prestadores a proveedores para usarlos en la tarjeta
-            const proveedoresConvertidos: Proveedor[] = prestadores.map((prestador, index) => ({
-              id: index + 1,
-              nombre: `${prestador.nombre} ${prestador.apellido}`,
-              especialidad: prestador.descripcion_servicio || 'Especialista',
+            // Usando el _id real del prestador en BD
+            const proveedoresConvertidos: Proveedor[] = prestadores.map((prestador: any) => ({
+              id: prestador._id, // Usar el ID real de la BD
+              nombre: `${prestador.nombre} ${prestador.apellido || ''}`,
+              especialidad: prestador.descripcion_servicio || prestador.subcategoria || 'Especialista',
               rating: 0,
               resenas: 0,
               precio: `${prestador.coste_hora}€/hora`,
@@ -57,20 +58,47 @@ export class DetallesServicioComponent implements OnInit {
           },
           error: (err) => {
             console.error('Error cargando prestadores:', err);
-            // Fallback a datos locales si hay ID
-            if (servicioId) {
-              const proveedores = this.proveedoresService.obtenerProveedoresPorServicio(Number(servicioId));
-              this.proveedores.set(proveedores);
-            }
+            // Cargar todos los prestadores si falla la búsqueda por categoría
+            this.proveedoresService.obtenerPrestadores().subscribe({
+              next: (prestadoresReales) => {
+                const proveedoresConvertidos: Proveedor[] = prestadoresReales.map((prestador) => ({
+                  id: prestador._id,
+                  nombre: `${prestador.nombre} ${prestador.apellido || ''}`,
+                  especialidad: prestador.descripcion_servicio || prestador.subcategoria || 'Especialista',
+                  rating: 0,
+                  resenas: 0,
+                  precio: `${prestador.coste_hora}€/hora`,
+                  imagen: '/imgs/proveedor.png',
+                  experiencia: 'Prestador verificado'
+                }));
+                this.proveedores.set(proveedoresConvertidos);
+              }
+            });
           }
         });
       } else if (servicioId) {
-        // Fallback a datos locales si no hay pathCategoria
+        // Fallback: cargar todos los prestadores reales
         const servicio = this.serviciosService.obtenerPorId(Number(servicioId));
         this.servicio.set(servicio || null);
         
-        const proveedores = this.proveedoresService.obtenerProveedoresPorServicio(Number(servicioId));
-        this.proveedores.set(proveedores);
+        this.proveedoresService.obtenerPrestadores().subscribe({
+          next: (prestadoresReales) => {
+            const proveedoresConvertidos: Proveedor[] = prestadoresReales.map((prestador) => ({
+              id: prestador._id,
+              nombre: `${prestador.nombre} ${prestador.apellido || ''}`,
+              especialidad: prestador.descripcion_servicio || prestador.subcategoria || 'Especialista',
+              rating: 0,
+              resenas: 0,
+              precio: `${prestador.coste_hora}€/hora`,
+              imagen: '/imgs/proveedor.png',
+              experiencia: 'Prestador verificado'
+            }));
+            this.proveedores.set(proveedoresConvertidos);
+          },
+          error: (err) => {
+            console.error('Error cargando prestadores:', err);
+          }
+        });
       }
     });
   }

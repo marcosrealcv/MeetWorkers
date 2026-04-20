@@ -24,21 +24,160 @@
                 <p class="text-gray-600 text-lg font-semibold mb-6">{{ proveedor()!.experiencia }}</p>
                 <p class="text-gray-600 text-lg mb-8">{{ proveedor()!.precio }}</p>
 
+                <!-- Botón Consultar Disponibilidad -->
+                <button 
+                    (click)="abrirCalendario()"
+                    class="w-full py-3 mb-6 bg-blue-500 text-white rounded-lg font-bold text-lg hover:bg-blue-600 transition-colors"
+                >
+                    📅 Consultar disponibilidad
+                </button>
+
+                <!-- Modal Calendario -->
+                @if (mostrarCalendario()) {
+                    <div class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+                        <div class="bg-white rounded-xl shadow-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto p-8">
+                            <div class="flex justify-between items-center mb-6">
+                                <h2 class="text-2xl font-bold text-gray-900">Selecciona fecha y hora</h2>
+                                <button 
+                                    (click)="cerrarCalendario()"
+                                    class="text-gray-500 hover:text-gray-700 text-2xl"
+                                >
+                                    ✕
+                                </button>
+                            </div>
+
+                            <!-- Selección de Fecha -->
+                            <div class="mb-8">
+                                <h3 class="text-lg font-semibold text-gray-900 mb-4">Elige un día disponible:</h3>
+                                <div class="grid grid-cols-3 gap-3 mb-4">
+                                    @for (dia of diasDisponibles(); track dia) {
+                                        <button
+                                            (click)="seleccionarFecha(dia)"
+                                            [class.ring-2]="fechaSeleccionada() === dia"
+                                            [class.ring-[#5F818C]]="fechaSeleccionada() === dia"
+                                            [class.bg-[#5F818C]]="fechaSeleccionada() === dia"
+                                            [class.text-white]="fechaSeleccionada() === dia"
+                                            class="px-4 py-3 border border-gray-300 rounded-lg hover:border-[#5F818C] transition-all cursor-pointer"
+                                        >
+                                            <div class="text-sm font-semibold">
+                                                {{ dia | date: 'dd/MM' }}
+                                            </div>
+                                            <div class="text-xs text-gray-500" [class.text-white]="fechaSeleccionada() === dia">
+                                                {{ dia | date: 'EEE' }}
+                                            </div>
+                                        </button>
+                                    }
+                                </div>
+                            </div>
+
+                            <!-- Selección de Hora -->
+                            @if (fechaSeleccionada()) {
+                                <div class="mb-8">
+                                    <h3 class="text-lg font-semibold text-gray-900 mb-4">Elige una franja horaria:</h3>
+                                    <div class="grid grid-cols-3 gap-3">
+                                        @for (hora of franjas(); track hora) {
+                                            <button
+                                                (click)="seleccionarHora(hora)"
+                                                [class.ring-2]="horaSeleccionada() === hora"
+                                                [class.ring-[#5F818C]]="horaSeleccionada() === hora"
+                                                [class.bg-[#5F818C]]="horaSeleccionada() === hora"
+                                                [class.text-white]="horaSeleccionada() === hora"
+                                                class="px-4 py-3 border border-gray-300 rounded-lg hover:border-[#5F818C] transition-all cursor-pointer font-semibold"
+                                            >
+                                                {{ hora }}
+                                            </button>
+                                        }
+                                    </div>
+                                </div>
+                            }
+
+                            <!-- Resumen y Confirmar -->
+                            @if (fechaSeleccionada() && horaSeleccionada()) {
+                                <div class="bg-green-50 border border-green-200 rounded-lg p-4 mb-6">
+                                    <p class="text-gray-700">
+                                        <span class="font-semibold">Disponibilidad seleccionada:</span> 
+                                        {{ fechaSeleccionada() | date: 'dd/MM/yyyy' }} a las {{ horaSeleccionada() }}
+                                    </p>
+                                </div>
+                            }
+
+                            <div class="flex gap-3">
+                                <button 
+                                    (click)="cerrarCalendario()"
+                                    class="flex-1 py-2 border border-gray-300 text-gray-900 rounded-lg font-semibold hover:bg-gray-50 transition-colors"
+                                >
+                                    Cancelar
+                                </button>
+                                <button 
+                                    (click)="confirmarDisponibilidad()"
+                                    [disabled]="!fechaSeleccionada() || !horaSeleccionada()"
+                                    [class.opacity-50]="!fechaSeleccionada() || !horaSeleccionada()"
+                                    [class.cursor-not-allowed]="!fechaSeleccionada() || !horaSeleccionada()"
+                                    class="flex-1 py-2 bg-[#5F818C] text-white rounded-lg font-semibold hover:bg-[#4d6972] transition-colors"
+                                >
+                                    Confirmar disponibilidad
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                }
+
+                <!-- Formulario de Contratación -->
                 <div class="bg-green-50 border border-green-200 rounded-lg p-6 mb-8">
                     <h2 class="text-lg font-semibold text-gray-900 mb-3">Información de la contratación</h2>
                     <p class="text-gray-700 mb-4">Completa el formulario a continuación para contratar los servicios de {{ proveedor()!.nombre }}</p>
                     
                     <div class="space-y-4">
-                        <input type="text" placeholder="Tu nombre completo" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#5F818C]">
-                        <input type="email" placeholder="Tu correo electrónico" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#5F818C]">
-                        <input type="tel" placeholder="Tu teléfono" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#5F818C]">
-                        <textarea placeholder="Describe lo que necesitas" rows="4" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#5F818C]"></textarea>
+                        <input 
+                            type="text" 
+                            placeholder="Tu nombre completo" 
+                            [value]="formulario().nombre"
+                            (input)="actualizarFormularioDesdeEvento('nombre', $event)"
+                            class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#5F818C]"
+                        >
+                        <input 
+                            type="email" 
+                            placeholder="Tu correo electrónico" 
+                            [value]="formulario().email"
+                            (input)="actualizarFormularioDesdeEvento('email', $event)"
+                            class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#5F818C]"
+                        >
+                        <input 
+                            type="tel" 
+                            placeholder="Tu teléfono" 
+                            [value]="formulario().telefono"
+                            (input)="actualizarFormularioDesdeEvento('telefono', $event)"
+                            class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#5F818C]"
+                        >
+                        <textarea 
+                            placeholder="Describe lo que necesitas" 
+                            rows="4" 
+                            [value]="formulario().descripcion"
+                            (input)="actualizarFormularioDesdeEvento('descripcion', $event)"
+                            class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#5F818C]"
+                        ></textarea>
                     </div>
                 </div>
 
-                <button class="w-full py-3 bg-[#5F818C] text-white rounded-lg font-bold text-lg hover:bg-[#4d6972] transition-colors">
-                    Confirmar contratación
+                <button 
+                    (click)="confirmarContratacion()"
+                    [disabled]="isSubmitting() || !fechaSeleccionada() || !horaSeleccionada()"
+                    [class.opacity-50]="isSubmitting() || !fechaSeleccionada() || !horaSeleccionada()"
+                    [class.cursor-not-allowed]="isSubmitting() || !fechaSeleccionada() || !horaSeleccionada()"
+                    class="w-full py-3 bg-[#5F818C] text-white rounded-lg font-bold text-lg hover:bg-[#4d6972] transition-colors"
+                >
+                    @if (isSubmitting()) {
+                        <span>Enviando...</span>
+                    } @else {
+                        <span>Confirmar contratación</span>
+                    }
                 </button>
+
+                @if (submitted()) {
+                    <div class="mt-4 bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded-lg">
+                        ✓ ¡Reserva enviada exitosamente! El prestador será notificado.
+                    </div>
+                }
             </div>
         </div>
     } @else {
