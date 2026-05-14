@@ -270,6 +270,87 @@ routerReservas.put('/:id', async (request: Request, response: Response) => {
   }
 });
 
+// PUT /reservas/:id/resena - Crear o actualizar reseña de una reserva (por el cliente)
+routerReservas.put('/:id/resena', async (request: Request, response: Response) => {
+  try {
+    const idCliente = obtenerIdClienteDesdeToken(request.headers.authorization);
+    const avisoId = String(request.params.id ?? '').trim();
+    const { calificacion, comentario } = request.body as { 
+      calificacion?: number; 
+      comentario?: string;
+    };
+
+    if (!idCliente || !mongoose.Types.ObjectId.isValid(idCliente)) {
+      response.status(401).json({ error: 'Token inválido o ausente' });
+      return;
+    }
+
+    if (!mongoose.Types.ObjectId.isValid(avisoId)) {
+      response.status(400).json({ error: 'ID de reserva inválido' });
+      return;
+    }
+
+    // Validar calificación
+    if (!calificacion || calificacion < 1 || calificacion > 5 || !Number.isInteger(calificacion)) {
+      response.status(400).json({ error: 'La calificación debe ser un número entre 1 y 5' });
+      return;
+    }
+
+    // Validar comentario
+    if (!comentario || String(comentario).trim().length === 0) {
+      response.status(400).json({ error: 'El comentario no puede estar vacío' });
+      return;
+    }
+
+    // Encontrar la reserva con el cliente
+    const cliente = await ClienteModel.findById(idCliente).select({ email: 1 }).lean();
+    const emailCliente = typeof cliente?.email === 'string'
+      ? cliente.email.toLowerCase().trim()
+      : '';
+
+    const filtroReserva = emailCliente
+      ? {
+          _id: avisoId,
+          tipo: 'reserva',
+          $or: [
+            { cliente_id: idCliente },
+            { cliente_email: emailCliente },
+          ],
+        }
+      : {
+          _id: avisoId,
+          tipo: 'reserva',
+          cliente_id: idCliente,
+        };
+
+    const avisoActualizado = await AvisoModel.findOneAndUpdate(
+      filtroReserva,
+      {
+        $set: {
+          resena_calificacion: calificacion,
+          resena_comentario: String(comentario).trim(),
+          resena_fecha: new Date().toISOString(),
+          tiene_resena: true,
+        },
+      },
+      { new: true }
+    ).lean();
+
+    if (!avisoActualizado) {
+      response.status(404).json({ error: 'Reserva no encontrada o no tienes permiso para dejar una reseña' });
+      return;
+    }
+
+    response.status(200).json({
+      mensaje: 'Reseña guardada correctamente',
+      reserva: avisoActualizado,
+    });
+  } catch (error) {
+    console.error('Error guardando reseña:', error);
+    response.status(500).json({ error: 'No se pudo guardar la reseña' });
+  }
+});
+
 // DELETE /reservas/:id - Eliminar una reserva
 routerReservas.delete('/:id', async (request: Request, response: Response) => {
   try {
@@ -301,6 +382,72 @@ routerReservas.delete('/:id', async (request: Request, response: Response) => {
   } catch (error) {
     console.error('Error eliminando reserva:', error);
     response.status(500).json({ error: 'No se pudo eliminar la reserva' });
+  }
+});
+
+// GET /reservas/prestador/:prestadorId/resenas - Obtener reseñas de un prestador específico (público)
+routerReservas.get('/prestador/:prestadorId/resenas', async (request: Request, response: Response) => {
+  try {
+    const prestadorId = String(request.params.prestadorId ?? '').trim();
+
+    if (!mongoose.Types.ObjectId.isValid(prestadorId)) {
+      response.status(400).json({ error: 'ID de prestador inválido' });
+      return;
+    }
+
+    // Obtener todas las reservas donde este prestador tiene reseñas
+    const resenasRecibidas = await AvisoModel.find(
+      {
+        prestador_id: prestadorId,
+        tipo: 'reserva',
+        tiene_resena: true,
+      },
+      {
+        cliente_nombre: 1,
+        resena_calificacion: 1,
+        resena_comentario: 1,
+        resena_fecha: 1,
+        trabajo_titulo: 1,
+      }
+    ).lean();
+
+    response.status(200).json(resenasRecibidas || []);
+  } catch (error) {
+    console.error('Error obteniendo reseñas del prestador:', error);
+    response.status(500).json({ error: 'No se pudieron obtener las reseñas del prestador' });
+  }
+});
+
+// GET /reservas/resenas/recibidas - Obtener reseñas recibidas como prestador
+routerReservas.get('/resenas/recibidas', async (request: Request, response: Response) => {
+  try {
+    const idPrestador = obtenerIdClienteDesdeToken(request.headers.authorization);
+
+    if (!idPrestador || !mongoose.Types.ObjectId.isValid(idPrestador)) {
+      response.status(401).json({ error: 'Token inválido o ausente' });
+      return;
+    }
+
+    // Obtener todas las reservas donde este usuario es prestador y tiene reseña
+    const resenasRecibidas = await AvisoModel.find(
+      {
+        prestador_id: idPrestador,
+        tipo: 'reserva',
+        tiene_resena: true,
+      },
+      {
+        cliente_nombre: 1,
+        resena_calificacion: 1,
+        resena_comentario: 1,
+        resena_fecha: 1,
+        trabajo_titulo: 1,
+      }
+    ).lean();
+
+    response.status(200).json(resenasRecibidas || []);
+  } catch (error) {
+    console.error('Error obteniendo reseñas recibidas:', error);
+    response.status(500).json({ error: 'No se pudieron obtener las reseñas recibidas' });
   }
 });
 

@@ -20,6 +20,10 @@ export type AvisoDocument = {
     hora_reserva?: string;
     estado_reserva?: 'pendiente' | 'aceptado' | 'rechazado';
     leido: boolean;
+    resena_calificacion?: number;
+    resena_comentario?: string;
+    resena_fecha?: string;
+    tiene_resena?: boolean;
 };
 declare const AvisoModel: mongoose.Model<AvisoDocument, {}, {}, {}, mongoose.Document<unknown, {}, AvisoDocument, {}, mongoose.DefaultSchemaOptions> & AvisoDocument & {
     _id: mongoose.Types.ObjectId;

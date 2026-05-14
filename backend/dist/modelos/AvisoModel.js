@@ -55,6 +55,10 @@ const avisoSchema = new mongoose_1.Schema({
     hora_reserva: { type: String, default: '' },
     estado_reserva: { type: String, enum: ['pendiente', 'aceptado', 'rechazado'], default: 'pendiente', sparse: true },
     leido: { type: Boolean, default: false },
+    resena_calificacion: { type: Number, min: 1, max: 5, sparse: true },
+    resena_comentario: { type: String, trim: true, sparse: true },
+    resena_fecha: { type: String, sparse: true },
+    tiene_resena: { type: Boolean, default: false },
 }, {
     collection: 'avisos_prestadores',
     versionKey: false,

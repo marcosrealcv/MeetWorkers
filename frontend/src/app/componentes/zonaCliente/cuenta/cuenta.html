@@ -291,6 +291,27 @@
 							<span>Fecha: {{ reserva.fecha_reserva }}</span>
 							<span>Hora: {{ reserva.hora_reserva }}</span>
 						</div>
+
+						@if (reserva.estado_reserva === 'aceptado' && !reserva.tiene_resena) {
+							<div class="mt-4 flex gap-2">
+								<button type="button" class="bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2 rounded text-sm font-semibold" (click)="abrirModalResena(reserva)">
+									✓ Trabajo hecho
+								</button>
+							</div>
+						}
+
+						@if (reserva.tiene_resena) {
+							<div class="mt-4 rounded-lg border border-yellow-200 bg-yellow-50 p-3">
+								<div class="flex items-center gap-1 mb-2">
+									<span class="text-sm font-semibold text-slate-900">Tu reseña:</span>
+									@for (star of [1,2,3,4,5]; track star) {
+										<span [class]="'text-lg'" [class.text-yellow-400]="star <= (reserva.resena_calificacion || 0)" [class.text-slate-300]="star > (reserva.resena_calificacion || 0)">★</span>
+									}
+									<span class="text-sm text-slate-600 ml-1">({{ reserva.resena_calificacion || 0 }}/5)</span>
+								</div>
+								<p class="text-sm text-slate-700">{{ reserva.resena_comentario }}</p>
+							</div>
+						}
 					</article>
 				}
 			</div>
@@ -487,4 +508,151 @@
 		}
 	</div>
 </section>
+}
+
+@if (!cargandoPerfil && cliente?.es_prestador) {
+<section class="max-w-4xl mx-auto pb-10 px-4">
+	<div class="bg-white rounded-xl shadow-sm border border-slate-200 p-6 space-y-4">
+		<div class="flex flex-wrap items-center justify-between gap-3">
+			<h2 class="text-xl font-semibold text-slate-900">Mis reseñas recibidas</h2>
+			@if (resenasRecibidas.length > 0) {
+				<div class="flex items-center gap-3">
+					<div class="flex items-center gap-1">
+						@for (star of [1,2,3,4,5]; track star) {
+							<span [class]="'text-lg'" [class.text-yellow-400]="star <= promedioCalificacion" [class.text-slate-300]="star > promedioCalificacion">★</span>
+						}
+					</div>
+					<span class="text-sm font-semibold text-slate-700">{{ promedioCalificacion | number:'1.1-1' }}/5 ({{ resenasRecibidas.length }} reseña{{ resenasRecibidas.length !== 1 ? 's' : '' }})</span>
+				</div>
+			}
+		</div>
+
+		@if (!cargandoResenasRecibidas && errorResenasRecibidas) {
+			<p class="text-red-700 bg-red-50 border border-red-200 rounded p-3">{{ errorResenasRecibidas }}</p>
+		}
+
+		@if (!cargandoResenasRecibidas && !errorResenasRecibidas && resenasRecibidas.length === 0) {
+			<p class="text-slate-600">Todavía no has recibido ninguna reseña. Cuando los clientes completen trabajos contigo, podrán dejarte reseñas.</p>
+		}
+
+		@if (!cargandoResenasRecibidas && !errorResenasRecibidas && resenasRecibidas.length > 0) {
+			<div class="space-y-3">
+				@for (resena of resenasRecibidas; track resena._id) {
+					<article class="rounded-lg border border-slate-200 bg-white p-4">
+						<div class="flex flex-wrap items-start justify-between gap-3">
+							<div class="flex-1">
+								<h3 class="text-base font-semibold text-slate-900">{{ resena.trabajo_titulo }}</h3>
+								<p class="text-sm text-slate-600 mt-1">Por: {{ resena.cliente_nombre }}</p>
+							</div>
+							<div class="flex items-center gap-1">
+								@for (star of [1,2,3,4,5]; track star) {
+									<span [class]="'text-lg'" [class.text-yellow-400]="star <= (resena.resena_calificacion || 0)" [class.text-slate-300]="star > (resena.resena_calificacion || 0)">★</span>
+								}
+								<span class="text-sm font-semibold text-slate-700 ml-1">({{ resena.resena_calificacion }}/5)</span>
+							</div>
+						</div>
+
+						<p class="text-sm text-slate-700 mt-3">{{ resena.resena_comentario }}</p>
+
+						@if (resena.resena_fecha) {
+							<p class="text-xs text-slate-500 mt-3">{{ resena.resena_fecha | date:'short' }}</p>
+						}
+					</article>
+				}
+			</div>
+		}
+	</div>
+</section>
+}
+
+<!-- Modal de Reseña -->
+@if (mostrarModalResena) {
+	<div class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+		<div class="bg-white rounded-xl shadow-2xl max-w-md w-full p-8">
+			<div class="flex justify-between items-center mb-6">
+				<h2 class="text-2xl font-bold text-slate-900">Dejar reseña</h2>
+				<button (click)="cerrarModalResena()" class="text-slate-400 hover:text-slate-600 text-2xl">✕</button>
+			</div>
+
+			@if (errorResena) {
+				<div class="mb-4 rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
+					{{ errorResena }}
+				</div>
+			}
+
+			@if (exitoResena) {
+				<div class="mb-4 rounded-lg border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm text-emerald-700">
+					{{ exitoResena }}
+				</div>
+			}
+
+			<div class="space-y-6">
+				<!-- Información del trabajo -->
+				<div>
+					<p class="text-sm font-medium text-slate-700 mb-1">Trabajo:</p>
+					<p class="text-slate-900 font-semibold">{{ reservaEnResena?.trabajo_titulo }}</p>
+				</div>
+
+				<!-- Calificación -->
+				<div>
+					<p class="text-sm font-medium text-slate-700 mb-3">Calificación</p>
+					<div class="flex gap-2">
+						@for (estrella of [1,2,3,4,5]; track estrella) {
+							<button 
+								type="button"
+								(click)="actualizarCalificacion(estrella)"
+								class="text-3xl transition-colors"
+								[class.text-yellow-400]="estrella <= formularioResena.calificacion"
+								[class.text-slate-300]="estrella > formularioResena.calificacion"
+							>
+								★
+							</button>
+						}
+					</div>
+					<p class="text-xs text-slate-500 mt-2">{{ formularioResena.calificacion }} de 5 estrellas</p>
+				</div>
+
+				<!-- Comentario -->
+				<div>
+					<label class="block text-sm font-medium text-slate-700 mb-2">
+						Tu comentario (mínimo 10 caracteres)
+					</label>
+					<textarea 
+						#comentarioInput
+						[value]="formularioResena.comentario"
+						(input)="actualizarComentario(comentarioInput.value)"
+						[disabled]="cargandoResena"
+						class="w-full border border-slate-300 rounded-lg px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent disabled:bg-slate-100"
+						rows="4"
+						placeholder="Cuéntanos tu experiencia con este servicio..."
+					></textarea>
+					<p class="text-xs text-slate-500 mt-1">{{ formularioResena.comentario.length }} caracteres</p>
+				</div>
+
+				<!-- Botones -->
+				<div class="flex gap-3 pt-4">
+					<button 
+						type="button"
+						(click)="cerrarModalResena()"
+						[disabled]="cargandoResena"
+						class="flex-1 border border-slate-300 text-slate-900 px-4 py-2 rounded-lg font-semibold hover:bg-slate-50 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+					>
+						Cancelar
+					</button>
+					<button 
+						type="button"
+						(click)="enviarResena()"
+						[disabled]="cargandoResena"
+						class="flex-1 bg-emerald-600 text-white px-4 py-2 rounded-lg font-semibold hover:bg-emerald-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+					>
+						@if (cargandoResena) {
+							⏳ Guardando...
+						} @else {
+							Enviar reseña
+						}
+					</button>
+				</div>
+			</div>
+		</div>
+	</div>
 }

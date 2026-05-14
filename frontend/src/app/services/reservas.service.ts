@@ -23,6 +23,10 @@ export interface Reserva {
   hora_reserva: string;
   estado_reserva?: 'pendiente' | 'aceptado' | 'rechazado';
   leido: boolean;
+  resena_calificacion?: number;
+  resena_comentario?: string;
+  resena_fecha?: string;
+  tiene_resena?: boolean;
   createdAt?: string;
   updatedAt?: string;
 }
@@ -79,6 +83,29 @@ export class ReservasService {
     return this.http.delete<{ mensaje: string }>(
       `${API_RESERVAS_URL}/${reservaId}`,
       { headers }
+    );
+  }
+
+  crearResena(reservaId: string, calificacion: number, comentario: string) {
+    const headers = this.getHeaders();
+    return this.http.put<{ mensaje: string; reserva: Reserva }>(
+      `${API_RESERVAS_URL}/${reservaId}/resena`,
+      { calificacion, comentario },
+      { headers }
+    );
+  }
+
+  obtenerResenasRecibidas() {
+    const headers = this.getHeaders();
+    return this.http.get<Reserva[]>(
+      `${API_RESERVAS_URL}/resenas/recibidas`,
+      { headers }
+    );
+  }
+
+  obtenerResenasPrestador(prestadorId: string) {
+    return this.http.get<Reserva[]>(
+      `${API_RESERVAS_URL}/prestador/${prestadorId}/resenas`
     );
   }
 }
