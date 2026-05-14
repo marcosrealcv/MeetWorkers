@@ -74,6 +74,7 @@ routerCategorias.get('/prestadores-categoria/:pathCategoria', async (request: Re
         $or: filtroSubcategoria,
       },
       { 
+        _id: 1,
         nombre: 1, 
         apellido: 1, 
         descripcion_servicio: 1, 
@@ -95,6 +96,7 @@ routerCategorias.get('/prestadores', async (_request: Request, response: Respons
     const prestadores = await ClienteModel.find(
       { es_prestador: true },
       { 
+        _id: 1,
         nombre: 1, 
         apellido: 1, 
         descripcion_servicio: 1, 

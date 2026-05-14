@@ -12,10 +12,16 @@
                     @if (proveedor()!.resenas > 0) {
                         <div class="flex text-yellow-400">
                             @for (star of [1,2,3,4,5]; track star) {
-                                <span class="text-2xl">★</span>
+                                <span class="text-2xl" [class.text-yellow-400]="star <= proveedor()!.rating" [class.text-gray-300]="star > proveedor()!.rating">★</span>
                             }
                         </div>
                         <span class="text-gray-600">{{ proveedor()!.rating }}/5 - {{ proveedor()!.resenas }} reseñas</span>
+                        <button 
+                            (click)="abrirResenas()"
+                            class="ml-auto text-sm bg-blue-50 text-blue-600 px-3 py-1 rounded-lg hover:bg-blue-100 transition-colors border border-blue-200"
+                        >
+                            👁️ Ver reseñas
+                        </button>
                     } @else {
                         <span class="text-gray-600">Sin puntuacion - 0 reseñas</span>
                     }
@@ -118,6 +124,63 @@
                                     Confirmar disponibilidad
                                 </button>
                             </div>
+                        </div>
+                    </div>
+                }
+
+                <!-- Modal de Reseñas -->
+                @if (mostrarTodasResenas()) {
+                    <div class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+                        <div class="bg-white rounded-xl shadow-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto p-8">
+                            <div class="flex justify-between items-center mb-6">
+                                <h2 class="text-2xl font-bold text-gray-900">Reseñas de {{ proveedor()!.nombre }}</h2>
+                                <button 
+                                    (click)="cerrarResenas()"
+                                    class="text-gray-500 hover:text-gray-700 text-2xl"
+                                >
+                                    ✕
+                                </button>
+                            </div>
+
+                            <!-- Resumen de puntuación -->
+                            @if (proveedor()!.resenas > 0) {
+                                <div class="mb-6 p-4 bg-blue-50 border border-blue-200 rounded-lg">
+                                    <div class="flex items-center gap-4">
+                                        <div>
+                                            <div class="flex text-yellow-400 mb-2">
+                                                @for (star of [1,2,3,4,5]; track star) {
+                                                    <span class="text-3xl" [class.text-yellow-400]="star <= proveedor()!.rating" [class.text-gray-300]="star > proveedor()!.rating">★</span>
+                                                }
+                                            </div>
+                                            <p class="text-lg font-bold text-gray-900">{{ proveedor()!.rating }}/5</p>
+                                        </div>
+                                        <div class="flex-1">
+                                            <p class="text-gray-600">Basado en {{ proveedor()!.resenas }} reseña{{ proveedor()!.resenas !== 1 ? 's' : '' }}</p>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Lista de reseñas -->
+                                <div class="space-y-4">
+                                    @for (resena of proveedor()!.resenasDetalladas; track resena._id) {
+                                        <div class="border border-gray-200 rounded-lg p-4 hover:shadow-md transition-shadow">
+                                            <div class="flex items-start justify-between mb-3">
+                                                <div>
+                                                    <p class="font-semibold text-gray-900">{{ resena.cliente_nombre }}</p>
+                                                    <p class="text-xs text-gray-500">{{ resena.resena_fecha | date: 'dd/MM/yyyy' }}</p>
+                                                </div>
+                                                <div class="flex text-yellow-400">
+                                                    @for (star of [1,2,3,4,5]; track star) {
+                                                        <span [class.text-yellow-400]="star <= (resena.resena_calificacion || 0)" [class.text-gray-300]="star > (resena.resena_calificacion || 0)">★</span>
+                                                    }
+                                                </div>
+                                            </div>
+                                            <p class="text-sm text-gray-600 mb-2 font-medium">{{ resena.trabajo_titulo }}</p>
+                                            <p class="text-sm text-gray-700">{{ resena.resena_comentario }}</p>
+                                        </div>
+                                    }
+                                </div>
+                            }
                         </div>
                     </div>
                 }

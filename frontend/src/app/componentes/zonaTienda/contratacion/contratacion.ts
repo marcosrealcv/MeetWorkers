@@ -24,6 +24,8 @@ export class ContratacionComponent implements OnInit {
   horaSeleccionada = signal<string>('');
   isSubmitting = signal(false);
   submitted = signal(false);
+  cargandoResenas = signal(false);
+  mostrarTodasResenas = signal(false);
   formulario = signal({
     nombre: '',
     email: '',
@@ -51,8 +53,8 @@ export class ContratacionComponent implements OnInit {
       const experiencia = params.get('experiencia');
 
       if (proveedorId && nombre && especialidad && rating && resenas && precio && imagen && experiencia) {
-        this.proveedor.set({
-          id: proveedorId, // Ya es string desde los query params
+        const nuevoProveedor: Proveedor = {
+          id: proveedorId,
           nombre,
           especialidad,
           rating: Number(rating),
@@ -60,15 +62,16 @@ export class ContratacionComponent implements OnInit {
           precio,
           imagen,
           experiencia,
-        });
+        };
+        this.proveedor.set(nuevoProveedor);
+        this.cargarResenas(proveedorId);
         return;
       }
 
       if (proveedorId && typeof proveedorId === 'string') {
-        // El proveedorId es un string (_id de MongoDB)
         this.proveedoresService.obtenerProveedorPorId(proveedorId)?.subscribe({
           next: (prestadorReal) => {
-            this.proveedor.set({
+            const nuevoProveedor: Proveedor = {
               id: prestadorReal._id,
               nombre: `${prestadorReal.nombre} ${prestadorReal.apellido || ''}`,
               especialidad: prestadorReal.subcategoria || 'Especialista',
@@ -77,7 +80,9 @@ export class ContratacionComponent implements OnInit {
               precio: `${prestadorReal.coste_hora}€/hora`,
               imagen: '/imgs/proveedor.png',
               experiencia: 'Prestador verificado'
-            });
+            };
+            this.proveedor.set(nuevoProveedor);
+            this.cargarResenas(prestadorReal._id);
           },
           error: (err) => {
             console.error('Error cargando proveedor:', err);
@@ -90,7 +95,6 @@ export class ContratacionComponent implements OnInit {
       this.proveedor.set(null);
     });
 
-    // Pre-rellenar datos del cliente autenticado si existen
     const clienteActual = this.authService.clienteActual();
     if (clienteActual) {
       this.formulario.update(form => ({
@@ -100,6 +104,30 @@ export class ContratacionComponent implements OnInit {
         telefono: clienteActual.telefono || '',
       }));
     }
+  }
+
+  private cargarResenas(proveedorId: string): void {
+    this.cargandoResenas.set(true);
+
+    this.reservasService.obtenerResenasPrestador(proveedorId).subscribe({
+      next: (resenas) => {
+        if (this.proveedor()) {
+          this.proveedor.update(prov => ({
+            ...prov!,
+            resenasDetalladas: resenas,
+            resenas: resenas.length,
+            rating: resenas.length > 0 
+              ? Number((resenas.reduce((total, r) => total + (r.resena_calificacion || 0), 0) / resenas.length).toFixed(1))
+              : 0
+          }));
+        }
+        this.cargandoResenas.set(false);
+      },
+      error: (error) => {
+        console.error('Error cargando reseñas:', error);
+        this.cargandoResenas.set(false);
+      }
+    });
   }
 
   abrirCalendario() {
@@ -134,6 +162,14 @@ export class ContratacionComponent implements OnInit {
     this.mostrarCalendario.set(false);
     this.fechaSeleccionada.set('');
     this.horaSeleccionada.set('');
+  }
+
+  abrirResenas() {
+    this.mostrarTodasResenas.set(true);
+  }
+
+  cerrarResenas() {
+    this.mostrarTodasResenas.set(false);
   }
 
   seleccionarFecha(fecha: string) {

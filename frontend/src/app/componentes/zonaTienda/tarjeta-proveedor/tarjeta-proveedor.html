@@ -2,8 +2,9 @@
     <div class="relative h-40 w-full">
         <img [src]="proveedor.imagen" alt="proveedor" class="w-full h-full object-cover">
         @if (proveedor.resenas > 0) {
-            <div class="absolute top-2 right-2 bg-white px-2 py-1 rounded-lg shadow text-sm font-bold text-[#5F818C]">
-                {{ proveedor.rating }}★
+            <div class="absolute top-2 right-2 bg-white px-3 py-1 rounded-lg shadow text-sm font-bold text-[#5F818C] flex items-center gap-1">
+                <span>{{ proveedor.rating }}★</span>
+                <span class="text-xs text-gray-500">({{ proveedor.resenas }})</span>
             </div>
         } @else {
             <div class="absolute top-2 right-2 bg-white px-2 py-1 rounded-lg shadow text-sm font-bold text-gray-500">
@@ -38,6 +39,10 @@
                         <p class="text-xs text-gray-700 line-clamp-2">{{ resena.resena_comentario || '' }}</p>
                     </div>
                 }
+            </div>
+        } @else if (!cargandoResenas && (proveedor.resenasDetalladas?.length ?? 0) === 0 && proveedor.resenas === 0) {
+            <div class="mb-4 p-3 bg-blue-50 border border-blue-200 rounded-lg">
+                <p class="text-xs text-blue-700">Sin reseñas aún. Sé el primero en contratar este prestador.</p>
             </div>
         }
 
