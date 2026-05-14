@@ -17,9 +17,29 @@
         <p class="text-gray-600 text-xs mb-3">{{ proveedor.experiencia }}</p>
         
         <div class="flex items-center justify-between mb-4 text-sm text-gray-600">
-            <span>{{ proveedor.resenas }} reseñas</span>
+            <span>{{ proveedor.resenas }} reseña{{ proveedor.resenas !== 1 ? 's' : '' }}</span>
             <span class="font-bold text-lg text-[#5F818C]">{{ proveedor.precio }}</span>
         </div>
+
+        <!-- Reseñas detalladas -->
+        @if (!cargandoResenas && (proveedor.resenasDetalladas?.length ?? 0) > 0) {
+            <div class="mb-4 space-y-3 max-h-64 overflow-y-auto border-t border-gray-200 pt-3">
+                @for (resena of proveedor.resenasDetalladas; track resena._id) {
+                    <div class="rounded-lg bg-slate-50 p-3 border border-slate-200">
+                        <div class="flex items-center justify-between mb-1">
+                            <p class="text-sm font-semibold text-gray-800">{{ resena.cliente_nombre }}</p>
+                            <div class="flex items-center gap-0.5">
+                                @for (star of [1,2,3,4,5]; track star) {
+                                    <span class="text-xs" [class.text-yellow-400]="star <= (resena.resena_calificacion || 0)" [class.text-slate-300]="star > (resena.resena_calificacion || 0)">★</span>
+                                }
+                            </div>
+                        </div>
+                        <p class="text-xs text-slate-600 mb-1">{{ resena.trabajo_titulo }}</p>
+                        <p class="text-xs text-gray-700 line-clamp-2">{{ resena.resena_comentario || '' }}</p>
+                    </div>
+                }
+            </div>
+        }
 
         <button (click)="contratarProveedor()" class="w-full py-2.5 bg-[#5F818C] text-white rounded-lg font-semibold hover:bg-[#4d6972] transition-colors">
             Contratar

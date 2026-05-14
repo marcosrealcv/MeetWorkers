@@ -1,5 +1,5 @@
 import { Component, OnDestroy, OnInit, inject } from '@angular/core';
-import { DatePipe } from '@angular/common';
+import { DatePipe, CommonModule } from '@angular/common';
 import { HttpErrorResponse } from '@angular/common/http';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { NavigationEnd, Router } from '@angular/router';
@@ -22,7 +22,7 @@ const API_SUBCATEGORIAS_URL = 'http://localhost:3000/api/subcategorias';
 
 @Component({
   selector: 'app-cuenta',
-  imports: [ReactiveFormsModule, DatePipe],
+  imports: [ReactiveFormsModule, DatePipe, CommonModule],
   templateUrl: './cuenta.html',
   styleUrl: './cuenta.css',
 })
@@ -57,6 +57,23 @@ export class Cuenta implements OnInit {
   errorReservas = '';
   errorReservasCliente = '';
   idsReservasProcesando = new Set<string>();
+
+  // Modal de reseña
+  mostrarModalResena = false;
+  reservaEnResena: Reserva | null = null;
+  formularioResena: { calificacion: number; comentario: string } = {
+    calificacion: 5,
+    comentario: '',
+  };
+  cargandoResena = false;
+  errorResena = '';
+  exitoResena = '';
+
+  // Reseñas recibidas
+  resenasRecibidas: Reserva[] = [];
+  cargandoResenasRecibidas = false;
+  errorResenasRecibidas = '';
+  promedioCalificacion = 0;
 
   formularioEdicion = this.fb.group({
     nombre: [''],
@@ -193,6 +210,7 @@ export class Cuenta implements OnInit {
     this.cargarReservasSiEsPrestador(cliente);
     this.cargarMisReservas(cliente);
     this.cargarMisTrabajosPublicados(cliente);
+    this.cargarResenasRecibidas(cliente);
   }
 
   private rellenarFormulario(cliente: Cliente): void {
@@ -601,4 +619,140 @@ export class Cuenta implements OnInit {
     return this.subcategorias[categoria] || [];
   }
 
+  cargarResenasRecibidas(clienteBase?: Cliente): void {
+    const cliente = clienteBase ?? this.cliente;
+
+    if (!cliente?.es_prestador) {
+      this.resenasRecibidas = [];
+      this.promedioCalificacion = 0;
+      this.errorResenasRecibidas = '';
+      this.cargandoResenasRecibidas = false;
+      return;
+    }
+
+    this.cargandoResenasRecibidas = true;
+    this.errorResenasRecibidas = '';
+
+    this.reservasService.obtenerResenasRecibidas().subscribe({
+      next: (resenas) => {
+        this.resenasRecibidas = resenas;
+        this.calcularPromedioCalificacion();
+        this.cargandoResenasRecibidas = false;
+      },
+      error: (error: HttpErrorResponse) => {
+        if (error.status === 401 || error.status === 403) {
+          this.resenasRecibidas = [];
+          this.promedioCalificacion = 0;
+          this.errorResenasRecibidas = '';
+          this.cargandoResenasRecibidas = false;
+          return;
+        }
+
+        this.errorResenasRecibidas = error.error?.error ?? 'No se pudieron cargar las reseñas recibidas';
+        this.cargandoResenasRecibidas = false;
+      },
+    });
+  }
+
+  private calcularPromedioCalificacion(): void {
+    if (this.resenasRecibidas.length === 0) {
+      this.promedioCalificacion = 0;
+      return;
+    }
+
+    const suma = this.resenasRecibidas.reduce((total, resena) => total + (resena.resena_calificacion || 0), 0);
+    this.promedioCalificacion = suma / this.resenasRecibidas.length;
+  }
+
+  // Métodos para manejar reseñas
+  abrirModalResena(reserva: Reserva): void {
+    if (!reserva._id || reserva.estado_reserva !== 'aceptado' || reserva.tiene_resena) {
+      return;
+    }
+
+    this.reservaEnResena = reserva;
+    this.mostrarModalResena = true;
+    this.formularioResena = {
+      calificacion: 5,
+      comentario: '',
+    };
+    this.errorResena = '';
+    this.exitoResena = '';
+  }
+
+  cerrarModalResena(): void {
+    this.mostrarModalResena = false;
+    this.reservaEnResena = null;
+    this.formularioResena = {
+      calificacion: 5,
+      comentario: '',
+    };
+    this.errorResena = '';
+    this.exitoResena = '';
+  }
+
+  enviarResena(): void {
+    if (!this.reservaEnResena?._id) {
+      this.errorResena = 'Error: No se encontró la reserva';
+      return;
+    }
+
+    const { calificacion, comentario } = this.formularioResena;
+
+    // Validaciones
+    if (!calificacion || calificacion < 1 || calificacion > 5) {
+      this.errorResena = 'Por favor selecciona una calificación entre 1 y 5 estrellas';
+      return;
+    }
+
+    if (!comentario || comentario.trim().length === 0) {
+      this.errorResena = 'Por favor escribe un comentario para la reseña';
+      return;
+    }
+
+    if (comentario.trim().length < 10) {
+      this.errorResena = 'El comentario debe tener al menos 10 caracteres';
+      return;
+    }
+
+    this.cargandoResena = true;
+    this.errorResena = '';
+    this.exitoResena = '';
+
+    this.reservasService.crearResena(this.reservaEnResena._id, calificacion, comentario).subscribe({
+      next: (response) => {
+        // Actualizar la reserva en la lista
+        this.reservasCliente = this.reservasCliente.map((reserva) =>
+          reserva._id === this.reservaEnResena?._id
+            ? {
+                ...reserva,
+                resena_calificacion: calificacion,
+                resena_comentario: comentario,
+                tiene_resena: true,
+              }
+            : reserva
+        );
+
+        this.cargandoResena = false;
+        this.exitoResena = '¡Reseña guardada exitosamente! Gracias por tu comentario.';
+
+        // Cerrar modal después de 2 segundos
+        setTimeout(() => {
+          this.cerrarModalResena();
+        }, 2000);
+      },
+      error: (error: HttpErrorResponse) => {
+        this.cargandoResena = false;
+        this.errorResena = error.error?.error ?? 'No se pudo guardar la reseña. Intenta de nuevo.';
+      },
+    });
+  }
+
+  actualizarCalificacion(nuevaCalificacion: number): void {
+    this.formularioResena.calificacion = nuevaCalificacion;
+  }
+
+  actualizarComentario(texto: string): void {
+    this.formularioResena.comentario = texto;
+  }
 }

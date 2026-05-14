@@ -7,4 +7,12 @@ export interface Proveedor {
   precio: string;
   imagen: string;
   experiencia: string;
+  resenasDetalladas?: Array<{
+    _id?: string;
+    cliente_nombre: string;
+    resena_calificacion?: number;
+    resena_comentario?: string;
+    resena_fecha?: string;
+    trabajo_titulo: string;
+  }>;
 }
