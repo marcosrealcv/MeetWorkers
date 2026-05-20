@@ -61,8 +61,14 @@
 
                     <div class="mb-3">
                         <label for="contraseña" class="block text-sm font-medium mb-1">Contraseña *</label>
-                        <input type="password" id="contraseña" formControlName="contraseña" 
-                            class="w-full border border-gray-300 rounded px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+                        <div class="relative">
+                            <input [type]="mostrarContrasena ? 'text' : 'password'" id="contraseña" formControlName="contraseña" 
+                                class="w-full border border-gray-300 rounded px-3 py-2 pr-20 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+                            <button type="button" (click)="alternarVisibilidadContrasena()"
+                                class="absolute inset-y-0 right-0 px-3 text-xs font-medium text-blue-700 hover:text-blue-900">
+                                {{ mostrarContrasena ? 'Ocultar' : 'Mostrar' }}
+                            </button>
+                        </div>
                         @if (formulario.get('contraseña')?.invalid && formulario.get('contraseña')?.touched) {
                             <div class="text-red-500 text-xs mt-1">
                                 @if (formulario.get('contraseña')?.errors?.['required']) {

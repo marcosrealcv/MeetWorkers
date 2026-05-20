@@ -42,6 +42,7 @@ const clienteSchema = new mongoose_1.Schema({
     contrasena: { type: String, required: true },
     direccion: { type: String, required: true, trim: true },
     descripcion: { type: String, default: '' },
+    foto_perfil: { type: String, default: '' },
     es_prestador: { type: Boolean, default: false },
     tipo_servicio: { type: String, default: '' },
     categoria: { type: String, default: '' },

@@ -53,6 +53,7 @@ function normalizarClientePayload(payload) {
         descripcion_servicio: String((_l = payload.descripcion_servicio) !== null && _l !== void 0 ? _l : '').trim(),
         ubicacion_servicio: String((_m = payload.ubicacion_servicio) !== null && _m !== void 0 ? _m : '').trim(),
         direccion_servicio: String((_o = payload.direccion_servicio) !== null && _o !== void 0 ? _o : '').trim(),
+        foto_perfil: typeof payload.foto_perfil === 'string' ? payload.foto_perfil.trim() : '',
         coste_hora: Number.isFinite(costeHora) ? costeHora : 0,
     };
 }
@@ -114,6 +115,9 @@ function sanitizarCamposEditables(payload) {
     }
     if (typeof payload.descripcion === 'string') {
         clienteEditable.descripcion = payload.descripcion.trim();
+    }
+    if (typeof payload.foto_perfil === 'string') {
+        clienteEditable.foto_perfil = payload.foto_perfil.trim();
     }
     if (typeof payload.es_prestador === 'boolean') {
         clienteEditable.es_prestador = payload.es_prestador;
@@ -269,7 +273,7 @@ routerCliente.put('/perfil', (request, response) => __awaiter(void 0, void 0, vo
             camposActualizables.direccion_servicio = '';
             camposActualizables.coste_hora = 0;
         }
-        const clienteActualizado = yield ClienteModel_1.default.findByIdAndUpdate(idCliente, { $set: camposActualizables }, { new: true }).lean();
+        const clienteActualizado = yield ClienteModel_1.default.findByIdAndUpdate(idCliente, { $set: camposActualizables }, { returnDocument: 'after' }).lean();
         if (!clienteActualizado) {
             response.status(404).json({ error: 'Cliente no encontrado' });
             return;

@@ -209,7 +209,7 @@ routerReservas.put('/:id', (request, response) => __awaiter(void 0, void 0, void
             _id: avisoId,
             prestador_id: idPrestador,
             tipo: 'reserva',
-        }, { $set: { estado_reserva } }, { new: true }).lean();
+        }, { $set: { estado_reserva } }, { returnDocument: 'after' }).lean();
         if (!avisoActualizado) {
             response.status(404).json({ error: 'Reserva no encontrada' });
             return;
@@ -275,7 +275,7 @@ routerReservas.put('/:id/resena', (request, response) => __awaiter(void 0, void 
                 resena_fecha: new Date().toISOString(),
                 tiene_resena: true,
             },
-        }, { new: true }).lean();
+        }, { returnDocument: 'after' }).lean();
         if (!avisoActualizado) {
             response.status(404).json({ error: 'Reserva no encontrada o no tienes permiso para dejar una reseña' });
             return;

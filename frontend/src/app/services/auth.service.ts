@@ -4,7 +4,8 @@ import { tap, throwError } from 'rxjs';
 import { AuthResponse, Cliente, LoginPayload, RegistroClientePayload } from '../models/cliente.interface';
 import { JwtService } from './jwt.service';
 
-const API_CLIENTES_URL = 'http://localhost:3000/api/clientes';
+// NOTE: backend dev server may run on a different port during development
+const API_CLIENTES_URL = 'http://localhost:3001/api/clientes';
 const CLIENTE_STORAGE_KEY = 'meetworkers_cliente';
 
 @Injectable({
@@ -33,6 +34,10 @@ export class AuthService {
         this.guardarSesion(response.cliente, response.token);
       })
     );
+  }
+
+  restablecerContrasena(payload: { email: string; nuevaContrasena: string }) {
+    return this.http.post<{ mensaje: string }>(`${API_CLIENTES_URL}/restablecer-contrasena`, payload);
   }
 
   cargarPerfilCliente() {
