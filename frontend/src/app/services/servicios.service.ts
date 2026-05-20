@@ -15,7 +15,7 @@ export class ServiciosService {
       precio: '45€',
       categoria: 'Automoción',
       pathCategoria: '1-1',
-      imagen: '/imgs/mecanico.png',
+      imagen: '/imgs/automocion/automocion.png',
       rating: 4.8
     },
     {
@@ -25,7 +25,7 @@ export class ServiciosService {
       precio: '35€',
       categoria: 'Limpieza',
       pathCategoria: '5-1',
-      imagen: '/imgs/limpieza.png',
+      imagen: '/imgs/limpieza/limpieza.png',
       rating: 4.9
     },
     {
@@ -35,7 +35,7 @@ export class ServiciosService {
       precio: '20€',
       categoria: 'Belleza',
       pathCategoria: '2-1',
-      imagen: '/imgs/peluqueria.png',
+      imagen: '/imgs/belleza/belleza.png',
       rating: 4.7
     },
 
@@ -43,12 +43,22 @@ export class ServiciosService {
 
     {
       id: 2,
+      nombre: 'Mecanico',
+      descripcion: 'Reparación y mantenimiento de sistemas mecánicos del vehículo.',
+      precio: '45€',
+      categoria: 'Automoción',
+      pathCategoria: '1-2',
+      imagen: '/imgs/automocion/mecanico/mecanico.png',
+      rating: 4.8
+    },
+    {
+      id: 7,
       nombre: 'Electricista del automóvil',
       descripcion: 'Reparación y mantenimiento de sistemas eléctricos del vehículo.',
       precio: '50€',
       categoria: 'Automoción',
-      pathCategoria: '1-2',
-      imagen: '/imgs/mecanico.png',
+      pathCategoria: '1-3',
+      imagen: '/imgs/automocion/electricista_auto/electricista_auto.png',
       rating: 4.7
     },
     // Limpieza
@@ -60,7 +70,7 @@ export class ServiciosService {
       precio: '40€',
       categoria: 'Limpieza',
       pathCategoria: '5-2',
-      imagen: '/imgs/limpieza.png',
+      imagen: '/imgs/limpieza/limpieza.png',
       rating: 4.8
     },
     // Belleza
@@ -72,7 +82,7 @@ export class ServiciosService {
       precio: '15€',
       categoria: 'Belleza',
       pathCategoria: '2-2',
-      imagen: '/imgs/peluqueria.png',
+      imagen: '/imgs/belleza/belleza.png',
       rating: 4.6
     }
   ];

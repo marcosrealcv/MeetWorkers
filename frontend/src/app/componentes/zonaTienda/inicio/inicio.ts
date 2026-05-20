@@ -59,16 +59,16 @@ export class Inicio implements OnInit {
   // Función auxiliar para obtener imagen según categoría
   private obtenerImagenCategoria(nombreCategoria: string): string {
     const imagenes: { [key: string]: string } = {
-      'Automoción': '/imgs/mecanico.png',
-      'Belleza': '/imgs/peluqueria.png',
-      'Limpieza': '/imgs/limpieza.png',
-      'Enseñanza': '/imgs/peluqueria.png',
-      'Reparaciones': '/imgs/mecanico.png',
-      'Cuidado Personal': '/imgs/limpieza.png',
-      'Construcciones y Reformas': '/imgs/mecanico.png',
-      'Otro': '/imgs/limpieza.png'
+      'Automoción': '/imgs/automocion/automocion.png',
+      'Belleza': '/imgs/belleza/belleza.png',
+      'Limpieza': '/imgs/limpieza/limpieza.png',
+      'Enseñanza': '/imgs/enseñanza/enseñanza.png',
+      'Reparaciones': '/imgs/reparaciones/reparaciones.png',
+      'Cuidado Personal': '/imgs/cuidado_personal/cuidado.png',
+      'Construcciones y Reformas': '/imgs/construcciones_y_reformas/consturccion.png',
+      'Otro': '/imgs/limpieza/limpieza.png'
     };
-    return imagenes[nombreCategoria] || '/imgs/limpieza.png';
+    return imagenes[nombreCategoria] || '/imgs/limpieza/limpieza.png';
   }
 
   get esPrestador(): boolean {
