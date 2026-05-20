@@ -31,7 +31,7 @@ function normalizarClientePayload(payload: Record<string, unknown>): ClienteDocu
     ubicacion_servicio: String(payload.ubicacion_servicio ?? '').trim(),
     direccion_servicio: String(payload.direccion_servicio ?? '').trim(),
     coste_hora: Number.isFinite(costeHora) ? costeHora : 0,
-  };
+  }; 
 }
 
 function validarCliente(cliente: ClienteDocument): string | null {

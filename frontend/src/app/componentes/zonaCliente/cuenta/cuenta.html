@@ -1,658 +1,882 @@
-<section class="max-w-4xl mx-auto py-10 px-4">
-	<h1 class="text-3xl font-bold text-slate-900 mb-6">Mi cuenta</h1>
+<!-- Dashboard Principal -->
+<div class="min-h-screen bg-linear-to-br from-slate-50 to-slate-100">
+  <!-- Estado de carga -->
+  @if (cargandoPerfil) {
+    <div class="flex items-center justify-center min-h-screen">
+      <div class="text-center">
+        <div class="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-sky-600 mx-auto mb-4"></div>
+        <p class="text-slate-600">Cargando tu dashboard...</p>
+      </div>
+    </div>
+  }
 
-	@if (cargandoPerfil) {
-		<div class="bg-slate-50 border border-slate-200 rounded-lg p-4">
-			<p class="text-slate-700">Cargando datos de tu cuenta...</p>
-		</div>
-	}
+  <!-- Error de sesión -->
+  @if (!cargandoPerfil && errorPerfil) {
+    <div class="max-w-md mx-auto mt-20 p-6 bg-white rounded-lg shadow-lg">
+      <div class="text-center">
+        <div class="text-red-600 text-4xl mb-4">⚠️</div>
+        <p class="text-red-700 mb-6">{{ errorPerfil }}</p>
+        <button
+          class="bg-sky-600 hover:bg-sky-700 text-white px-6 py-2 rounded-lg font-medium"
+          (click)="irAIniciarSesion()"
+        >
+          Iniciar sesión
+        </button>
+      </div>
+    </div>
+  }
 
-	@if (!cargandoPerfil && errorPerfil) {
-		<div class="bg-red-50 border border-red-200 rounded-lg p-4">
-			<p class="text-red-700 mb-3">{{ errorPerfil }}</p>
-			<button
-				class="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded"
-				(click)="irAIniciarSesion()"
-			>
-				Iniciar sesión
-			</button>
-		</div>
-	}
+  <!-- Contenido Principal -->
+  @if (!cargandoPerfil && cliente && !errorPerfil) {
+    <!-- Header del Perfil -->
+    <div class="bg-white border-b border-slate-200">
+      <div class="max-w-6xl mx-auto px-4 py-8">
+        <div class="flex items-end gap-6 flex-wrap">
+          <!-- Foto de Perfil -->
+          <div class="relative">
+            <div class="w-32 h-32 rounded-full bg-linear-to-br from-sky-400 to-blue-600 flex items-center justify-center overflow-hidden shadow-lg">
+              @if (previewFoto) {
+                <img [src]="previewFoto" alt="Foto de perfil" class="w-full h-full object-cover" />
+              } @else {
+                <span class="text-4xl">👤</span>
+              }
+            </div>
+            @if (enModoEdicion) {
+              <button
+                (click)="clickInputFoto()"
+                class="absolute bottom-0 right-0 bg-sky-600 hover:bg-sky-700 text-white rounded-full p-3 shadow-lg"
+                title="Cambiar foto de perfil"
+              >
+                📷
+              </button>
+              <input
+                #inputFoto
+                type="file"
+                accept="image/*"
+                (change)="alSeleccionarFoto($event)"
+                class="hidden"
+              />
+            }
+          </div>
 
-	@if (!cargandoPerfil && cliente) {
-		<div class="bg-white rounded-xl shadow-sm border border-slate-200 p-6 space-y-4">
-			<div class="flex items-center justify-between">
-				<h2 class="text-lg font-semibold text-slate-900">Datos de la cuenta</h2>
-				@if (!enModoEdicion) {
-					<button class="bg-sky-600 hover:bg-sky-700 text-white px-4 py-2 rounded" (click)="activarEdicion()">Editar</button>
-				}
-			</div>
+          <!-- Info del Perfil -->
+          <div class="flex-1">
+            <h1 class="text-3xl font-bold text-slate-900">
+              {{ cliente.nombre }} {{ cliente.apellido }}
+            </h1>
+            <p class="text-slate-600 mt-2">{{ cliente.email }}</p>
+            <p class="text-slate-500 text-sm mt-1">{{ cliente.telefono }}</p>
+            @if (cliente.es_prestador) {
+              <div class="mt-4">
+                <span class="inline-block bg-emerald-100 text-emerald-700 px-3 py-1 rounded-full text-sm font-medium">
+                  ✓ Prestador verificado
+                </span>
+              </div>
+            }
+          </div>
 
-			@if (mensajeExito) {
-				<p class="text-sm text-green-700 bg-green-50 border border-green-200 rounded p-2">{{ mensajeExito }}</p>
-			}
+          <!-- Botón Editar -->
+          @if (!enModoEdicion) {
+            <button
+              (click)="activarEdicion()"
+              class="bg-sky-600 hover:bg-sky-700 text-white px-6 py-3 rounded-lg font-medium flex items-center gap-2 shadow-md"
+            >
+              ✏️ Editar perfil
+            </button>
+          }
+        </div>
 
-			@if (!enModoEdicion) {
-			<div class="grid sm:grid-cols-2 gap-4">
-				<div>
-					<p class="text-xs text-slate-500 uppercase tracking-wide">Nombre</p>
-					<p class="text-slate-900 font-medium">{{ cliente.nombre }} {{ cliente.apellido }}</p>
-				</div>
-				<div>
-					<p class="text-xs text-slate-500 uppercase tracking-wide">Email</p>
-					<p class="text-slate-900 font-medium">{{ cliente.email }}</p>
-				</div>
-				<div>
-					<p class="text-xs text-slate-500 uppercase tracking-wide">Teléfono</p>
-					<p class="text-slate-900 font-medium">{{ cliente.telefono }}</p>
-				</div>
-				<div>
-					<p class="text-xs text-slate-500 uppercase tracking-wide">Dirección</p>
-					<p class="text-slate-900 font-medium">{{ cliente.direccion }}</p>
-				</div>
-			</div>
+        <!-- Mensajes de estado -->
+        @if (mensajeExito) {
+          <div class="mt-6 p-4 bg-emerald-50 border border-emerald-200 rounded-lg text-emerald-700 flex items-center gap-2">
+            <span>✓</span>
+            <span>{{ mensajeExito }}</span>
+          </div>
+        }
+        @if (errorPerfil) {
+          <div class="mt-6 p-4 bg-red-50 border border-red-200 rounded-lg text-red-700 flex items-center gap-2">
+            <span>✕</span>
+            <span>{{ errorPerfil }}</span>
+          </div>
+        }
+        @if (errorFoto) {
+          <div class="mt-6 p-4 bg-red-50 border border-red-200 rounded-lg text-red-700 flex items-center gap-2">
+            <span>✕</span>
+            <span>{{ errorFoto }}</span>
+          </div>
+        }
+      </div>
+    </div>
 
-			@if (cliente.descripcion) {
-				<div>
-					<p class="text-xs text-slate-500 uppercase tracking-wide">Descripción personal</p>
-					<p class="text-slate-900">{{ cliente.descripcion }}</p>
-				</div>
-			}
+    <!-- Tabs/Navegación -->
+    <div class="bg-white border-b border-slate-200">
+      <div class="max-w-6xl mx-auto px-4">
+        <div class="flex gap-1 overflow-x-auto">
+          <button
+            (click)="cambiarPestana('perfil')"
+            [class.bg-sky-600]="pestanaActiva === 'perfil'"
+            [class.text-white]="pestanaActiva === 'perfil'"
+            [class.text-slate-600]="pestanaActiva !== 'perfil'"
+            class="px-6 py-4 font-medium border-b-2 transition-colors whitespace-nowrap"
+            [class.border-sky-600]="pestanaActiva === 'perfil'"
+            [class.border-transparent]="pestanaActiva !== 'perfil'"
+          >
+            👤 Mi Perfil
+          </button>
 
-			@if (cliente.es_prestador) {
-				<div class="border-t border-slate-200 pt-4 space-y-3">
-					<h2 class="text-lg font-semibold text-emerald-700">Datos de servicio</h2>
+          <button
+            (click)="cambiarPestana('mis-trabajos')"
+            [class.bg-sky-600]="pestanaActiva === 'mis-trabajos'"
+            [class.text-white]="pestanaActiva === 'mis-trabajos'"
+            [class.text-slate-600]="pestanaActiva !== 'mis-trabajos'"
+            class="px-6 py-4 font-medium border-b-2 transition-colors whitespace-nowrap relative"
+            [class.border-sky-600]="pestanaActiva === 'mis-trabajos'"
+            [class.border-transparent]="pestanaActiva !== 'mis-trabajos'"
+          >
+            📋 Mis Trabajos
+            @if (trabajosPublicados.length > 0) {
+              <span class="absolute top-3 right-2 bg-red-500 text-white text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center">
+                {{ trabajosPublicados.length }}
+              </span>
+            }
+          </button>
 
-					<div class="grid sm:grid-cols-2 gap-4">
-						<div>
-							<p class="text-xs text-slate-500 uppercase tracking-wide">Tipo de servicio</p>
-							<p class="text-slate-900">{{ cliente.tipo_servicio || '-' }}</p>
-						</div>
-						<div>
-							<p class="text-xs text-slate-500 uppercase tracking-wide">Categoría</p>
-							<p class="text-slate-900">{{ cliente.categoria || '-' }}</p>
-						</div>
-						<div>
-							<p class="text-xs text-slate-500 uppercase tracking-wide">Especialización</p>
-							<p class="text-slate-900">{{ cliente.subcategoria || '-' }}</p>
-						</div>
-						<div>
-							<p class="text-xs text-slate-500 uppercase tracking-wide">Ubicación del servicio</p>
-							<p class="text-slate-900">{{ cliente.ubicacion_servicio || '-' }}</p>
-						</div>
-						<div>
-							<p class="text-xs text-slate-500 uppercase tracking-wide">Dirección de servicio</p>
-							<p class="text-slate-900">{{ cliente.direccion_servicio || '-' }}</p>
-						</div>
-						<div>
-							<p class="text-xs text-slate-500 uppercase tracking-wide">Coste por hora</p>
-							<p class="text-slate-900">{{ cliente.coste_hora || 0 }} €</p>
-						</div>
-					</div>
+          <button
+            (click)="cambiarPestana('reservas')"
+            [class.bg-sky-600]="pestanaActiva === 'reservas'"
+            [class.text-white]="pestanaActiva === 'reservas'"
+            [class.text-slate-600]="pestanaActiva !== 'reservas'"
+            class="px-6 py-4 font-medium border-b-2 transition-colors whitespace-nowrap relative"
+            [class.border-sky-600]="pestanaActiva === 'reservas'"
+            [class.border-transparent]="pestanaActiva !== 'reservas'"
+          >
+            📅 Reservas
+            @if (cliente.es_prestador && cantidadReservasPendientes > 0) {
+              <span class="absolute top-3 right-2 bg-red-500 text-white text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center">
+                {{ cantidadReservasPendientes }}
+              </span>
+            }
+            @if (!cliente.es_prestador && cantidadMisReservasPendientes > 0) {
+              <span class="absolute top-3 right-2 bg-red-500 text-white text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center">
+                {{ cantidadMisReservasPendientes }}
+              </span>
+            }
+          </button>
 
-					<div>
-						<p class="text-xs text-slate-500 uppercase tracking-wide">Descripción del servicio</p>
-						<p class="text-slate-900">{{ cliente.descripcion_servicio || '-' }}</p>
-					</div>
-				</div>
-			}
-				}
+          @if (cliente.es_prestador) {
+            <button
+              (click)="cambiarPestana('resenas')"
+              [class.bg-sky-600]="pestanaActiva === 'resenas'"
+              [class.text-white]="pestanaActiva === 'resenas'"
+              [class.text-slate-600]="pestanaActiva !== 'resenas'"
+              class="px-6 py-4 font-medium border-b-2 transition-colors whitespace-nowrap relative"
+              [class.border-sky-600]="pestanaActiva === 'resenas'"
+              [class.border-transparent]="pestanaActiva !== 'resenas'"
+            >
+              ⭐ Reseñas
+              @if (resenasRecibidas.length > 0) {
+                <span class="absolute top-3 right-2 bg-red-500 text-white text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center">
+                  {{ resenasRecibidas.length }}
+                </span>
+              }
+            </button>
 
-				@if (enModoEdicion) {
-					<form [formGroup]="formularioEdicion" (ngSubmit)="guardarCambios()" class="space-y-4">
-						<div class="grid sm:grid-cols-2 gap-4">
-							<div>
-								<label class="block text-sm font-medium mb-1">Nombre</label>
-								<input type="text" formControlName="nombre" class="w-full border border-slate-300 rounded px-3 py-2 text-sm" />
-							</div>
-							<div>
-								<label class="block text-sm font-medium mb-1">Apellido</label>
-								<input type="text" formControlName="apellido" class="w-full border border-slate-300 rounded px-3 py-2 text-sm" />
-							</div>
-							<div>
-								<label class="block text-sm font-medium mb-1">Teléfono</label>
-								<input type="text" formControlName="telefono" class="w-full border border-slate-300 rounded px-3 py-2 text-sm" />
-							</div>
-							<div>
-								<label class="block text-sm font-medium mb-1">Email</label>
-								<input type="email" formControlName="email" class="w-full border border-slate-300 rounded px-3 py-2 text-sm" />
-							</div>
-						</div>
+            <button
+              (click)="cambiarPestana('servicios')"
+              [class.bg-sky-600]="pestanaActiva === 'servicios'"
+              [class.text-white]="pestanaActiva === 'servicios'"
+              [class.text-slate-600]="pestanaActiva !== 'servicios'"
+              class="px-6 py-4 font-medium border-b-2 transition-colors whitespace-nowrap"
+              [class.border-sky-600]="pestanaActiva === 'servicios'"
+              [class.border-transparent]="pestanaActiva !== 'servicios'"
+            >
+              🔧 Mis Servicios
+            </button>
+          }
+        </div>
+      </div>
+    </div>
 
-						<div>
-							<label class="block text-sm font-medium mb-1">Dirección</label>
-							<input type="text" formControlName="direccion" class="w-full border border-slate-300 rounded px-3 py-2 text-sm" />
-						</div>
+    <!-- Contenido de las Pestañas -->
+    <div class="max-w-6xl mx-auto px-4 py-8">
+      <!-- Tab: Perfil -->
+      @if (pestanaActiva === 'perfil') {
+        <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-8">
+          @if (!enModoEdicion) {
+            <!-- Vista: Datos del Perfil -->
+            <div class="space-y-6">
+              <div>
+                <h2 class="text-2xl font-bold text-slate-900 mb-6">Información Personal</h2>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div>
+                    <p class="text-xs text-slate-500 uppercase tracking-wide font-semibold">Nombre</p>
+                    <p class="text-lg text-slate-900 font-medium mt-1">{{ cliente.nombre }}</p>
+                  </div>
+                  <div>
+                    <p class="text-xs text-slate-500 uppercase tracking-wide font-semibold">Apellido</p>
+                    <p class="text-lg text-slate-900 font-medium mt-1">{{ cliente.apellido }}</p>
+                  </div>
+                  <div>
+                    <p class="text-xs text-slate-500 uppercase tracking-wide font-semibold">Email</p>
+                    <p class="text-lg text-slate-900 font-medium mt-1">{{ cliente.email }}</p>
+                  </div>
+                  <div>
+                    <p class="text-xs text-slate-500 uppercase tracking-wide font-semibold">Teléfono</p>
+                    <p class="text-lg text-slate-900 font-medium mt-1">{{ cliente.telefono }}</p>
+                  </div>
+                  <div>
+                    <p class="text-xs text-slate-500 uppercase tracking-wide font-semibold">Dirección</p>
+                    <p class="text-lg text-slate-900 font-medium mt-1">{{ cliente.direccion }}</p>
+                  </div>
+                </div>
+              </div>
 
-						<div>
-							<label class="block text-sm font-medium mb-1">Descripción personal</label>
-							<textarea rows="2" formControlName="descripcion" class="w-full border border-slate-300 rounded px-3 py-2 text-sm"></textarea>
-						</div>
+              @if (cliente.descripcion) {
+                <div>
+                  <p class="text-xs text-slate-500 uppercase tracking-wide font-semibold">Acerca de ti</p>
+                  <p class="text-slate-700 mt-2">{{ cliente.descripcion }}</p>
+                </div>
+              }
 
-						<label class="flex items-center gap-3 text-sm font-medium">
-							<input type="checkbox" formControlName="es_prestador" />
-							Soy prestador de servicios
-						</label>
+              @if (cliente.es_prestador) {
+                <div class="border-t border-slate-200 pt-6">
+                  <h3 class="text-xl font-bold text-emerald-700 mb-4">Información de Servicios</h3>
+                  <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div>
+                      <p class="text-xs text-slate-500 uppercase tracking-wide font-semibold">Tipo de Servicio</p>
+                      <p class="text-lg text-slate-900 font-medium mt-1">{{ cliente.tipo_servicio || '-' }}</p>
+                    </div>
+                    <div>
+                      <p class="text-xs text-slate-500 uppercase tracking-wide font-semibold">Categoría</p>
+                      <p class="text-lg text-slate-900 font-medium mt-1">{{ cliente.categoria || '-' }}</p>
+                    </div>
+                    <div>
+                      <p class="text-xs text-slate-500 uppercase tracking-wide font-semibold">Especialización</p>
+                      <p class="text-lg text-slate-900 font-medium mt-1">{{ cliente.subcategoria || '-' }}</p>
+                    </div>
+                    <div>
+                      <p class="text-xs text-slate-500 uppercase tracking-wide font-semibold">Coste por Hora</p>
+                      <p class="text-lg text-slate-900 font-medium mt-1">{{ cliente.coste_hora || 0 }} €</p>
+                    </div>
+                    <div>
+                      <p class="text-xs text-slate-500 uppercase tracking-wide font-semibold">Ubicación del Servicio</p>
+                      <p class="text-lg text-slate-900 font-medium mt-1">{{ cliente.ubicacion_servicio || '-' }}</p>
+                    </div>
+                    <div>
+                      <p class="text-xs text-slate-500 uppercase tracking-wide font-semibold">Dirección de Servicio</p>
+                      <p class="text-lg text-slate-900 font-medium mt-1">{{ cliente.direccion_servicio || '-' }}</p>
+                    </div>
+                  </div>
+                  @if (cliente.descripcion_servicio) {
+                    <div class="mt-6">
+                      <p class="text-xs text-slate-500 uppercase tracking-wide font-semibold">Descripción del Servicio</p>
+                      <p class="text-slate-700 mt-2">{{ cliente.descripcion_servicio }}</p>
+                    </div>
+                  }
+                </div>
+              }
+            </div>
+          } @else {
+            <!-- Formulario: Editar Perfil -->
+            <form [formGroup]="formularioEdicion" (ngSubmit)="guardarCambios()" class="space-y-6">
+              <h2 class="text-2xl font-bold text-slate-900">Editar Perfil</h2>
 
-						@if (formularioEdicion.get('es_prestador')?.value) {
-							<div class="grid sm:grid-cols-2 gap-4 border border-slate-200 rounded p-3 bg-slate-50">
-								<div>
-									<label class="block text-sm font-medium mb-1">Tipo de servicio</label>
-									<input type="text" formControlName="tipo_servicio" class="w-full border border-slate-300 rounded px-3 py-2 text-sm" />
-								</div>
-								<div>
-									<label class="block text-sm font-medium mb-1">Categoría</label>
-									<select formControlName="categoria" class="w-full border border-slate-300 rounded px-3 py-2 text-sm">
-										<option value="">Selecciona una categoría</option>
-										@for (cat of categorias; track cat) {
-											<option [value]="cat">{{ cat }}</option>
-										}
-									</select>
-								</div>
-								<div>
-									<label class="block text-sm font-medium mb-1">Especialización</label>
-									<select formControlName="subcategoria" class="w-full border border-slate-300 rounded px-3 py-2 text-sm">
-										<option value="">Selecciona una especialización</option>
-										@for (subcat of subcategoriasActuales; track subcat) {
-											<option [value]="subcat">{{ subcat }}</option>
-										}
-									</select>
-								</div>
-								<div>
-									<label class="block text-sm font-medium mb-1">Ubicación del servicio</label>
-									<select formControlName="ubicacion_servicio" class="w-full border border-slate-300 rounded px-3 py-2 text-sm">
-										<option value="">Selecciona una opción</option>
-										@for (ub of ubicaciones; track ub) {
-											<option [value]="ub">{{ ub }}</option>
-										}
-									</select>
-								</div>
-								<div>
-									<label class="block text-sm font-medium mb-1">Dirección de servicio</label>
-									<input type="text" formControlName="direccion_servicio" class="w-full border border-slate-300 rounded px-3 py-2 text-sm" />
-								</div>
-								<div>
-									<label class="block text-sm font-medium mb-1">Coste por hora</label>
-									<input type="number" formControlName="coste_hora" class="w-full border border-slate-300 rounded px-3 py-2 text-sm" />
-								</div>
-								<div class="sm:col-span-2">
-									<label class="block text-sm font-medium mb-1">Descripción del servicio</label>
-									<textarea rows="2" formControlName="descripcion_servicio" class="w-full border border-slate-300 rounded px-3 py-2 text-sm"></textarea>
-								</div>
-							</div>
-						}
+              <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div>
+                  <label class="block text-sm font-semibold text-slate-700 mb-2">Nombre</label>
+                  <input
+                    type="text"
+                    formControlName="nombre"
+                    class="w-full px-4 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-sky-500"
+                  />
+                </div>
+                <div>
+                  <label class="block text-sm font-semibold text-slate-700 mb-2">Apellido</label>
+                  <input
+                    type="text"
+                    formControlName="apellido"
+                    class="w-full px-4 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-sky-500"
+                  />
+                </div>
+                <div>
+                  <label class="block text-sm font-semibold text-slate-700 mb-2">Email</label>
+                  <input
+                    type="email"
+                    formControlName="email"
+                    class="w-full px-4 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-sky-500"
+                  />
+                </div>
+                <div>
+                  <label class="block text-sm font-semibold text-slate-700 mb-2">Teléfono</label>
+                  <input
+                    type="text"
+                    formControlName="telefono"
+                    class="w-full px-4 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-sky-500"
+                  />
+                </div>
+              </div>
 
-						<div class="flex gap-3 pt-2">
-							<button type="submit" class="bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2 rounded">
-								Guardar cambios
-							</button>
-							<button type="button" class="bg-slate-200 hover:bg-slate-300 text-slate-900 px-4 py-2 rounded" (click)="cancelarEdicion()">Cancelar</button>
-						</div>
-					</form>
-				}
-		</div>
-	}
-</section>
+              <div>
+                <label class="block text-sm font-semibold text-slate-700 mb-2">Dirección</label>
+                <input
+                  type="text"
+                  formControlName="direccion"
+                  class="w-full px-4 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-sky-500"
+                />
+              </div>
 
-@if (!cargandoPerfil && cliente) {
-<section class="max-w-4xl mx-auto pb-10 px-4">
-	<div class="bg-white rounded-xl shadow-sm border border-slate-200 p-6 space-y-4">
-		<div class="flex flex-wrap items-center justify-between gap-3">
-			<h2 class="text-xl font-semibold text-slate-900">{{ tituloBloqueTrabajos }}</h2>
-		</div>
+              <div>
+                <label class="block text-sm font-semibold text-slate-700 mb-2">Acerca de ti</label>
+                <textarea
+                  formControlName="descripcion"
+                  rows="4"
+                  class="w-full px-4 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-sky-500"
+                  placeholder="Cuéntanos un poco sobre ti..."
+                ></textarea>
+              </div>
 
-		@if (!cargandoTrabajosPublicados && errorTrabajosPublicados) {
-			<p class="text-red-700 bg-red-50 border border-red-200 rounded p-3">{{ errorTrabajosPublicados }}</p>
-		}
+              <!-- Sección Prestador -->
+              <div class="border-t border-slate-200 pt-6">
+                <label class="flex items-center gap-3 cursor-pointer">
+                  <input
+                    type="checkbox"
+                    formControlName="es_prestador"
+                    class="w-5 h-5 rounded border-slate-300 text-sky-600 focus:ring-sky-500"
+                  />
+                  <span class="text-sm font-semibold text-slate-700">Soy prestador de servicios</span>
+                </label>
 
-		@if (!cargandoTrabajosPublicados && !errorTrabajosPublicados && trabajosPublicados.length === 0) {
-			<p class="text-slate-600">Todavía no has publicado ningún trabajo.</p>
-		}
+                @if (formularioEdicion.get('es_prestador')?.value) {
+                  <div class="mt-6 p-6 bg-slate-50 border border-slate-200 rounded-lg space-y-6">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                      <div>
+                        <label class="block text-sm font-semibold text-slate-700 mb-2">Tipo de Servicio</label>
+                        <input
+                          type="text"
+                          formControlName="tipo_servicio"
+                          class="w-full px-4 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-sky-500"
+                        />
+                      </div>
+                      <div>
+                        <label class="block text-sm font-semibold text-slate-700 mb-2">Categoría</label>
+                        <select
+                          formControlName="categoria"
+                          class="w-full px-4 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-sky-500"
+                        >
+                          <option value="">Selecciona una categoría</option>
+                          @for (cat of categorias; track cat) {
+                            <option [value]="cat">{{ cat }}</option>
+                          }
+                        </select>
+                      </div>
+                      <div>
+                        <label class="block text-sm font-semibold text-slate-700 mb-2">Especialización</label>
+                        <select
+                          formControlName="subcategoria"
+                          class="w-full px-4 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-sky-500"
+                        >
+                          <option value="">Selecciona una especialización</option>
+                          @for (subcat of subcategoriasActuales; track subcat) {
+                            <option [value]="subcat">{{ subcat }}</option>
+                          }
+                        </select>
+                      </div>
+                      <div>
+                        <label class="block text-sm font-semibold text-slate-700 mb-2">Coste por Hora (€)</label>
+                        <input
+                          type="number"
+                          formControlName="coste_hora"
+                          class="w-full px-4 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-sky-500"
+                        />
+                      </div>
+                      <div>
+                        <label class="block text-sm font-semibold text-slate-700 mb-2">Ubicación del Servicio</label>
+                        <select
+                          formControlName="ubicacion_servicio"
+                          class="w-full px-4 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-sky-500"
+                        >
+                          <option value="">Selecciona una opción</option>
+                          @for (ub of ubicaciones; track ub) {
+                            <option [value]="ub">{{ ub }}</option>
+                          }
+                        </select>
+                      </div>
+                      <div>
+                        <label class="block text-sm font-semibold text-slate-700 mb-2">Dirección de Servicio</label>
+                        <input
+                          type="text"
+                          formControlName="direccion_servicio"
+                          class="w-full px-4 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-sky-500"
+                        />
+                      </div>
+                    </div>
 
-		@if (!cargandoTrabajosPublicados && !errorTrabajosPublicados && trabajosPublicados.length > 0) {
-			<div class="space-y-3">
-				@for (trabajo of trabajosPublicados; track trabajo._id) {
-					<article class="rounded-lg border border-slate-200 bg-white p-4">
-						<div class="flex flex-wrap items-start justify-between gap-3">
-							<div>
-								<h3 class="text-base font-semibold text-slate-900">{{ trabajo.titulo }}</h3>
-								<p class="text-sm text-slate-600 mt-1">{{ trabajo.categoria }} · {{ trabajo.subcategoria }} · {{ trabajo.ubicacion }}</p>
-							</div>
-							<div class="flex items-center gap-2">
-								<span class="inline-flex items-center rounded-full bg-slate-100 px-2.5 py-1 text-xs font-semibold text-slate-700">
-									{{ trabajo.estado || 'publicado' }}
-								</span>
-								<button type="button" class="rounded bg-sky-600 px-3 py-1.5 text-xs font-semibold text-white hover:bg-sky-700" (click)="editarTrabajo(trabajo._id)">
-									Editar
-								</button>
-								<button type="button" class="rounded bg-red-600 px-3 py-1.5 text-xs font-semibold text-white hover:bg-red-700" (click)="eliminarTrabajo(trabajo._id)">
-									Eliminar
-								</button>
-							</div>
-						</div>
+                    <div>
+                      <label class="block text-sm font-semibold text-slate-700 mb-2">Descripción del Servicio</label>
+                      <textarea
+                        formControlName="descripcion_servicio"
+                        rows="4"
+                        class="w-full px-4 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-sky-500"
+                        placeholder="Describe los servicios que ofreces..."
+                      ></textarea>
+                    </div>
+                  </div>
+                }
+              </div>
 
-						<p class="text-sm text-slate-700 mt-3">{{ trabajo.descripcion }}</p>
+              <!-- Botones -->
+              <div class="flex gap-3 pt-6 border-t border-slate-200">
+                <button
+                  type="submit"
+                  class="bg-emerald-600 hover:bg-emerald-700 text-white px-8 py-3 rounded-lg font-semibold shadow-md"
+                >
+                  ✓ Guardar cambios
+                </button>
+                <button
+                  type="button"
+                  (click)="cancelarEdicion()"
+                  class="bg-slate-300 hover:bg-slate-400 text-slate-900 px-8 py-3 rounded-lg font-semibold"
+                >
+                  ✕ Cancelar
+                </button>
+              </div>
+            </form>
+          }
+        </div>
+      }
 
-						<div class="mt-3 flex flex-wrap items-center gap-4 text-sm text-slate-600">
-							<span>Presupuesto: {{ trabajo.presupuesto || 0 }} €</span>
-							<span>Fecha límite: {{ trabajo.fecha_limite || '-' }}</span>
-							<span>Publicado: {{ trabajo.createdAt ? (trabajo.createdAt | date:'short') : '-' }}</span>
-						</div>
-					</article>
-				}
-			</div>
-		}
-	</div>
-</section>
-}
+      <!-- Tab: Mis Trabajos -->
+      @if (pestanaActiva === 'mis-trabajos') {
+        <div class="space-y-6">
+          <h2 class="text-2xl font-bold text-slate-900">Mis Trabajos Publicados</h2>
 
-@if (!cargandoPerfil && cliente) {
-<section class="max-w-4xl mx-auto pb-10 px-4">
-	<div class="bg-white rounded-xl shadow-sm border border-slate-200 p-6 space-y-4">
-		<div class="flex flex-wrap items-center justify-between gap-3">
-			<h2 class="text-xl font-semibold text-slate-900">Mis reservas realizadas</h2>
-			<span class="inline-flex items-center rounded-full bg-slate-100 px-3 py-1 text-sm font-medium text-slate-700">
-				{{ cantidadMisReservasPendientes }} pendiente{{ cantidadMisReservasPendientes !== 1 ? 's' : '' }}
-			</span>
-		</div>
+          @if (cargandoTrabajosPublicados) {
+            <div class="bg-white rounded-lg p-6 text-center">
+              <div class="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-sky-600 mx-auto mb-4"></div>
+              <p class="text-slate-600">Cargando trabajos...</p>
+            </div>
+          }
 
-		@if (!cargandoReservasCliente && errorReservasCliente) {
-			<p class="text-red-700 bg-red-50 border border-red-200 rounded p-3">{{ errorReservasCliente }}</p>
-		}
+          @if (!cargandoTrabajosPublicados && errorTrabajosPublicados) {
+            <div class="bg-red-50 border border-red-200 rounded-lg p-4 text-red-700">
+              {{ errorTrabajosPublicados }}
+            </div>
+          }
 
-		@if (!cargandoReservasCliente && !errorReservasCliente && reservasCliente.length === 0) {
-			<p class="text-slate-600">Todavia no has realizado ninguna reserva.</p>
-		}
+          @if (!cargandoTrabajosPublicados && trabajosPublicados.length === 0) {
+            <div class="bg-white rounded-lg p-8 text-center border border-slate-200">
+              <p class="text-slate-600 text-lg">No has publicado ningún trabajo aún</p>
+              <button
+                class="mt-4 bg-sky-600 hover:bg-sky-700 text-white px-6 py-2 rounded-lg font-medium"
+                (click)="irAPublicarTrabajo()"
+              >
+                + Publicar Trabajo
+              </button>
+            </div>
+          }
 
-		@if (!cargandoReservasCliente && !errorReservasCliente && reservasCliente.length > 0) {
-			<div class="space-y-3">
-				@for (reserva of reservasCliente; track reserva._id) {
-					<article class="rounded-lg border p-4" [class.border-blue-200]="reserva.estado_reserva === 'pendiente'" [class.bg-blue-50]="reserva.estado_reserva === 'pendiente'" [class.border-emerald-200]="reserva.estado_reserva === 'aceptado'" [class.bg-emerald-50]="reserva.estado_reserva === 'aceptado'" [class.border-red-200]="reserva.estado_reserva === 'rechazado'" [class.bg-red-50]="reserva.estado_reserva === 'rechazado'" [class.border-slate-200]="!reserva.estado_reserva" [class.bg-white]="!reserva.estado_reserva">
-						<div class="flex flex-wrap items-start justify-between gap-3">
-							<div class="flex-1">
-								<h3 class="text-base font-semibold text-slate-900">{{ reserva.trabajo_titulo }}</h3>
-								<p class="text-sm text-slate-600 mt-1">{{ reserva.categoria }} · {{ reserva.subcategoria }} · {{ reserva.ubicacion }}</p>
-							</div>
-							<span [class]="'inline-flex items-center rounded-full px-2.5 py-1 text-xs font-semibold'"
-								[class.bg-blue-100]="reserva.estado_reserva === 'pendiente'"
-								[class.text-blue-700]="reserva.estado_reserva === 'pendiente'"
-								[class.bg-emerald-100]="reserva.estado_reserva === 'aceptado'"
-								[class.text-emerald-700]="reserva.estado_reserva === 'aceptado'"
-								[class.bg-red-100]="reserva.estado_reserva === 'rechazado'"
-								[class.text-red-700]="reserva.estado_reserva === 'rechazado'">
-								{{ reserva.estado_reserva || 'pendiente' }}
-							</span>
-						</div>
+          @if (!cargandoTrabajosPublicados && trabajosPublicados.length > 0) {
+            <div class="grid grid-cols-1 gap-4">
+              @for (trabajo of trabajosPublicados; track trabajo._id) {
+                <div class="bg-white rounded-lg shadow-sm border border-slate-200 p-6 hover:shadow-md transition-shadow">
+                  <div class="flex items-start justify-between gap-4 flex-wrap">
+                    <div class="flex-1">
+                      <h3 class="text-lg font-bold text-slate-900">{{ trabajo.titulo }}</h3>
+                      <p class="text-slate-600 text-sm mt-1">
+                        {{ trabajo.categoria }} • {{ trabajo.subcategoria }} • {{ trabajo.ubicacion }}
+                      </p>
+                      <p class="text-slate-700 mt-3">{{ trabajo.descripcion }}</p>
+                      <div class="flex items-center gap-4 mt-4 text-sm text-slate-600">
+                        <span>💰 {{ trabajo.presupuesto || 0 }} €</span>
+                        <span>📅 {{ (trabajo.fecha_limite | date:'short') || '-' }}</span>
+                        <span>📆 Publicado: {{ trabajo.createdAt | date:'short' }}</span>
+                      </div>
+                    </div>
+                    <div class="flex items-center gap-2">
+                      <span class="inline-flex items-center rounded-full bg-blue-100 px-3 py-1 text-xs font-semibold text-blue-700">
+                        {{ trabajo.estado || 'activo' }}
+                      </span>
+                      <button
+                        (click)="editarTrabajo(trabajo._id)"
+                        class="bg-sky-600 hover:bg-sky-700 text-white px-3 py-2 rounded text-sm font-medium"
+                      >
+                        Editar
+                      </button>
+                      <button
+                        (click)="eliminarTrabajo(trabajo._id)"
+                        class="bg-red-600 hover:bg-red-700 text-white px-3 py-2 rounded text-sm font-medium"
+                      >
+                        Eliminar
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              }
+            </div>
+          }
+        </div>
+      }
 
-						<p class="text-sm text-slate-700 mt-3">{{ reserva.trabajo_descripcion }}</p>
+      <!-- Tab: Reservas (Prestador) -->
+      @if (pestanaActiva === 'reservas' && cliente.es_prestador) {
+        <div class="space-y-6">
+          <div class="flex items-center justify-between">
+            <h2 class="text-2xl font-bold text-slate-900">Solicitudes de Reserva</h2>
+            <div class="bg-sky-100 text-sky-700 px-4 py-2 rounded-lg font-semibold text-sm">
+              {{ cantidadReservasPendientes }} pendiente{{ cantidadReservasPendientes !== 1 ? 's' : '' }}
+            </div>
+          </div>
 
-						<div class="mt-3 flex flex-wrap items-center gap-4 text-sm text-slate-600">
-							<span>Presupuesto: {{ reserva.presupuesto || 0 }} €</span>
-							<span>Fecha: {{ reserva.fecha_reserva }}</span>
-							<span>Hora: {{ reserva.hora_reserva }}</span>
-						</div>
+          @if (cargandoReservas) {
+            <div class="bg-white rounded-lg p-6 text-center">
+              <div class="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-sky-600 mx-auto mb-4"></div>
+              <p class="text-slate-600">Cargando reservas...</p>
+            </div>
+          }
 
-						@if (reserva.estado_reserva === 'aceptado' && !reserva.tiene_resena) {
-							<div class="mt-4 flex gap-2">
-								<button type="button" class="bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2 rounded text-sm font-semibold" (click)="abrirModalResena(reserva)">
-									✓ Trabajo hecho
-								</button>
-							</div>
-						}
+          @if (!cargandoReservas && errorReservas) {
+            <div class="bg-red-50 border border-red-200 rounded-lg p-4 text-red-700">
+              {{ errorReservas }}
+            </div>
+          }
 
-						@if (reserva.tiene_resena) {
-							<div class="mt-4 rounded-lg border border-yellow-200 bg-yellow-50 p-3">
-								<div class="flex items-center gap-1 mb-2">
-									<span class="text-sm font-semibold text-slate-900">Tu reseña:</span>
-									@for (star of [1,2,3,4,5]; track star) {
-										<span [class]="'text-lg'" [class.text-yellow-400]="star <= (reserva.resena_calificacion || 0)" [class.text-slate-300]="star > (reserva.resena_calificacion || 0)">★</span>
-									}
-									<span class="text-sm text-slate-600 ml-1">({{ reserva.resena_calificacion || 0 }}/5)</span>
-								</div>
-								<p class="text-sm text-slate-700">{{ reserva.resena_comentario }}</p>
-							</div>
-						}
-					</article>
-				}
-			</div>
-		}
-	</div>
-</section>
-}
+          @if (!cargandoReservas && reservasPrestador.length === 0) {
+            <div class="bg-white rounded-lg p-8 text-center border border-slate-200">
+              <p class="text-slate-600 text-lg">No tienes solicitudes de reserva en este momento</p>
+            </div>
+          }
 
-@if (!cargandoPerfil && cliente && !cliente.es_prestador) {
-<section class="max-w-4xl mx-auto pb-10 px-4">
-	<div class="bg-white rounded-xl shadow-sm border border-slate-200 p-6 space-y-4">
-		<div class="flex flex-wrap items-center justify-between gap-3">
-			<h2 class="text-xl font-semibold text-slate-900">Avisos de mis trabajos</h2>
-		</div>
+          @if (!cargandoReservas && reservasPrestador.length > 0) {
+            <div class="grid grid-cols-1 gap-4">
+              @for (reserva of reservasPrestador; track reserva._id) {
+                <div
+                  [class.border-blue-200]="reserva.estado_reserva === 'pendiente'"
+                  [class.bg-blue-50]="reserva.estado_reserva === 'pendiente'"
+                  [class.border-emerald-200]="reserva.estado_reserva === 'aceptado'"
+                  [class.bg-emerald-50]="reserva.estado_reserva === 'aceptado'"
+                  [class.border-red-200]="reserva.estado_reserva === 'rechazado'"
+                  [class.bg-red-50]="reserva.estado_reserva === 'rechazado'"
+                  class="bg-white rounded-lg shadow-sm border p-6 hover:shadow-md transition-shadow"
+                >
+                  <div class="flex items-start justify-between gap-4 flex-wrap">
+                    <div class="flex-1">
+                      <h3 class="text-lg font-bold text-slate-900">{{ reserva.trabajo_titulo }}</h3>
+                      <p class="text-slate-600 text-sm mt-1">
+                        {{ reserva.categoria }} • {{ reserva.subcategoria }}
+                      </p>
+                      <p class="text-slate-700 mt-2">{{ reserva.trabajo_descripcion }}</p>
+                      <div class="flex flex-wrap items-center gap-4 mt-4 text-sm text-slate-600">
+                        <span>💰 Presupuesto: {{ reserva.presupuesto }} €</span>
+                        <span>📅 Fecha: {{ reserva.fecha_reserva }}</span>
+                        <span>⏰ Hora: {{ reserva.hora_reserva }}</span>
+                      </div>
+                    </div>
+                    <div class="flex flex-col items-end gap-2">
+                      <span
+                        [class.bg-blue-100]="reserva.estado_reserva === 'pendiente'"
+                        [class.text-blue-700]="reserva.estado_reserva === 'pendiente'"
+                        [class.bg-emerald-100]="reserva.estado_reserva === 'aceptado'"
+                        [class.text-emerald-700]="reserva.estado_reserva === 'aceptado'"
+                        [class.bg-red-100]="reserva.estado_reserva === 'rechazado'"
+                        [class.text-red-700]="reserva.estado_reserva === 'rechazado'"
+                        class="inline-flex items-center rounded-full px-3 py-1 text-xs font-semibold"
+                      >
+                        {{ reserva.estado_reserva || 'pendiente' }}
+                      </span>
 
-		@if (!cargandoAvisosCliente && errorAvisosCliente) {
-			<p class="text-red-700 bg-red-50 border border-red-200 rounded p-3">{{ errorAvisosCliente }}</p>
-		}
+                      @if (reserva.estado_reserva === 'pendiente' && reserva._id) {
+                        <div class="flex gap-2 mt-2">
+                          <button
+                            (click)="cambiarEstadoReserva($any(reserva._id), 'aceptado')"
+                            [disabled]="estaProcesandoReserva($any(reserva._id))"
+                            class="bg-emerald-600 hover:bg-emerald-700 disabled:opacity-50 text-white px-4 py-2 rounded text-sm font-medium"
+                          >
+                            ✓ Aceptar
+                          </button>
+                          <button
+                            (click)="cambiarEstadoReserva($any(reserva._id), 'rechazado')"
+                            [disabled]="estaProcesandoReserva($any(reserva._id))"
+                            class="bg-red-600 hover:bg-red-700 disabled:opacity-50 text-white px-4 py-2 rounded text-sm font-medium"
+                          >
+                            ✕ Rechazar
+                          </button>
+                        </div>
+                      }
+                    </div>
+                  </div>
+                </div>
+              }
+            </div>
+          }
+        </div>
+      }
 
-		@if (!cargandoAvisosCliente && !errorAvisosCliente && avisosCliente.length === 0) {
-			<p class="text-slate-600">Aun no tienes avisos en tus trabajos solicitados.</p>
-		}
+      <!-- Tab: Mis Reservas (Cliente) -->
+      @if (pestanaActiva === 'reservas' && !cliente.es_prestador) {
+        <div class="space-y-6">
+          <div class="flex items-center justify-between">
+            <h2 class="text-2xl font-bold text-slate-900">Mis Reservas</h2>
+            <div class="bg-sky-100 text-sky-700 px-4 py-2 rounded-lg font-semibold text-sm">
+              {{ cantidadMisReservasPendientes }} pendiente{{ cantidadMisReservasPendientes !== 1 ? 's' : '' }}
+            </div>
+          </div>
 
-		@if (!cargandoAvisosCliente && !errorAvisosCliente && avisosCliente.length > 0) {
-			<div class="space-y-3">
-				@for (aviso of avisosCliente; track aviso._id) {
-					<article class="rounded-lg border p-4" [class.border-emerald-200]="!aviso.leido" [class.bg-emerald-50]="!aviso.leido" [class.border-slate-200]="aviso.leido" [class.bg-white]="aviso.leido">
-						<div class="flex flex-wrap items-start justify-between gap-3">
-							<div>
-								<h3 class="text-base font-semibold text-slate-900">{{ aviso.trabajo_titulo }}</h3>
-								<p class="text-sm text-slate-600 mt-1">{{ aviso.categoria }} · {{ aviso.subcategoria }} · {{ aviso.ubicacion }}</p>
-							</div>
-							@if (!aviso.leido) {
-								<span class="inline-flex items-center rounded-full bg-emerald-100 px-2.5 py-1 text-xs font-semibold text-emerald-700">Nuevo</span>
-							}
-						</div>
+          @if (cargandoReservas) {
+            <div class="bg-white rounded-lg p-6 text-center">
+              <div class="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-sky-600 mx-auto mb-4"></div>
+              <p class="text-slate-600">Cargando reservas...</p>
+            </div>
+          }
 
-						<p class="text-sm text-slate-700 mt-3">{{ aviso.trabajo_descripcion }}</p>
-					</article>
-				}
-			</div>
-		}
-	</div>
-</section>
-}
+          @if (!cargandoReservas && errorReservas) {
+            <div class="bg-red-50 border border-red-200 rounded-lg p-4 text-red-700">
+              {{ errorReservas }}
+            </div>
+          }
 
-@if (!cargandoPerfil && cliente?.es_prestador) {
-<section class="max-w-4xl mx-auto pb-10 px-4">
-	<div class="bg-white rounded-xl shadow-sm border border-slate-200 p-6 space-y-4">
-		<div class="flex flex-wrap items-center justify-between gap-3">
-			<h2 class="text-xl font-semibold text-slate-900">Avisos de trabajos</h2>
-			<span class="inline-flex items-center rounded-full bg-slate-100 px-3 py-1 text-sm font-medium text-slate-700">
-				{{ cantidadAvisosNoLeidos }} sin leer
-			</span>
-		</div>
+          @if (!cargandoReservas && reservasCliente.length === 0) {
+            <div class="bg-white rounded-lg p-8 text-center border border-slate-200">
+              <p class="text-slate-600 text-lg">No has realizado ninguna reserva aún</p>
+            </div>
+          }
 
-		@if (!cargandoAvisos && errorAvisos) {
-			<p class="text-red-700 bg-red-50 border border-red-200 rounded p-3">{{ errorAvisos }}</p>
-		}
+          @if (!cargandoReservas && reservasCliente.length > 0) {
+            <div class="grid grid-cols-1 gap-4">
+              @for (reserva of reservasCliente; track reserva._id) {
+                <div
+                  [class.border-blue-200]="reserva.estado_reserva === 'pendiente'"
+                  [class.bg-blue-50]="reserva.estado_reserva === 'pendiente'"
+                  [class.border-emerald-200]="reserva.estado_reserva === 'aceptado'"
+                  [class.bg-emerald-50]="reserva.estado_reserva === 'aceptado'"
+                  [class.border-red-200]="reserva.estado_reserva === 'rechazado'"
+                  [class.bg-red-50]="reserva.estado_reserva === 'rechazado'"
+                  class="bg-white rounded-lg shadow-sm border p-6 hover:shadow-md transition-shadow"
+                >
+                  <div class="flex items-start justify-between gap-4 flex-wrap">
+                    <div class="flex-1">
+                      <h3 class="text-lg font-bold text-slate-900">{{ reserva.trabajo_titulo }}</h3>
+                      <p class="text-slate-600 text-sm mt-1">
+                        {{ reserva.categoria }} • {{ reserva.subcategoria }}
+                      </p>
+                      <p class="text-slate-700 mt-2">{{ reserva.trabajo_descripcion }}</p>
+                      <div class="flex flex-wrap items-center gap-4 mt-4 text-sm text-slate-600">
+                        <span>💰 Presupuesto: {{ reserva.presupuesto }} €</span>
+                        <span>📅 Fecha: {{ reserva.fecha_reserva }}</span>
+                        <span>⏰ Hora: {{ reserva.hora_reserva }}</span>
+                      </div>
+                    </div>
+                    <div class="flex flex-col items-end gap-2">
+                      <span
+                        [class.bg-blue-100]="reserva.estado_reserva === 'pendiente'"
+                        [class.text-blue-700]="reserva.estado_reserva === 'pendiente'"
+                        [class.bg-emerald-100]="reserva.estado_reserva === 'aceptado'"
+                        [class.text-emerald-700]="reserva.estado_reserva === 'aceptado'"
+                        [class.bg-red-100]="reserva.estado_reserva === 'rechazado'"
+                        [class.text-red-700]="reserva.estado_reserva === 'rechazado'"
+                        class="inline-flex items-center rounded-full px-3 py-1 text-xs font-semibold"
+                      >
+                        {{ reserva.estado_reserva || 'pendiente' }}
+                      </span>
 
-		@if (!cargandoAvisos && !errorAvisos && avisosPrestador.length === 0) {
-			<p class="text-slate-600">Todavía no tienes avisos en tus categorías.</p>
-		}
+                      @if (reserva.estado_reserva === 'aceptado' && !reserva.tiene_resena) {
+                        <button
+                          (click)="abrirModalResena(reserva)"
+                          class="bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2 rounded text-sm font-medium mt-2"
+                        >
+                          ✓ Dejar Reseña
+                        </button>
+                      }
+                      @if (reserva.tiene_resena) {
+                        <div class="text-xs text-slate-600 mt-2">✓ Reseña enviada</div>
+                      }
+                    </div>
+                  </div>
+                </div>
+              }
+            </div>
+          }
+        </div>
+      }
 
-		@if (!cargandoAvisos && !errorAvisos && avisosPrestador.length > 0) {
-			<div class="space-y-3">
-				@for (aviso of avisosPrestador; track aviso._id) {
-					<article class="rounded-lg border p-4" [class.border-emerald-200]="!aviso.leido" [class.bg-emerald-50]="!aviso.leido" [class.border-slate-200]="aviso.leido" [class.bg-white]="aviso.leido">
-						<div class="flex flex-wrap items-start justify-between gap-3">
-							<div>
-								<h3 class="text-base font-semibold text-slate-900">{{ aviso.trabajo_titulo }}</h3>
-								<p class="text-sm text-slate-600 mt-1">{{ aviso.categoria }} · {{ aviso.subcategoria }} · {{ aviso.ubicacion }}</p>
-							</div>
-							<div class="flex items-center gap-2">
-								@if (!aviso.leido) {
-									<span class="inline-flex items-center rounded-full bg-emerald-100 px-2.5 py-1 text-xs font-semibold text-emerald-700">Nuevo</span>
-								}
-								@if (!aviso.leido) {
-									<button class="bg-emerald-600 hover:bg-emerald-700 text-white px-3 py-1.5 rounded text-xs" (click)="marcarComoLeido(aviso._id)" [disabled]="estaProcesandoAviso(aviso._id)">
-										@if (estaProcesandoAviso(aviso._id)) {
-											Guardando...
-										} @else {
-											Marcar leído
-										}
-									</button>
-								}
-								<button class="bg-slate-200 hover:bg-slate-300 text-slate-900 px-3 py-1.5 rounded text-xs" (click)="eliminarAviso(aviso._id)" [disabled]="estaProcesandoAviso(aviso._id)">
-									Quitar aviso
-								</button>
-							</div>
-						</div>
+      <!-- Tab: Reseñas (Prestador) -->
+      @if (pestanaActiva === 'resenas') {
+        <div class="space-y-6">
+          <div class="flex items-center justify-between">
+            <h2 class="text-2xl font-bold text-slate-900">Reseñas Recibidas</h2>
+            @if (promedioCalificacion > 0) {
+              <div class="bg-amber-50 border border-amber-200 rounded-lg p-4">
+                <div class="text-center">
+                  <div class="text-3xl font-bold text-amber-600">{{ promedioCalificacion }}</div>
+                  <div class="text-sm text-amber-700">⭐ de {{ resenasRecibidas.length }} reseña{{ resenasRecibidas.length !== 1 ? 's' : '' }}</div>
+                </div>
+              </div>
+            }
+          </div>
 
-						<p class="text-sm text-slate-700 mt-3">{{ aviso.trabajo_descripcion }}</p>
+          @if (cargandoResenasRecibidas) {
+            <div class="bg-white rounded-lg p-6 text-center">
+              <div class="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-sky-600 mx-auto mb-4"></div>
+              <p class="text-slate-600">Cargando reseñas...</p>
+            </div>
+          }
 
-						<div class="mt-3 flex flex-wrap items-center gap-4 text-sm text-slate-600">
-							<span>Presupuesto: {{ aviso.presupuesto || 0 }} €</span>
-							<span>Fecha límite: {{ aviso.fecha_limite || '-' }}</span>
-						</div>
+          @if (!cargandoResenasRecibidas && errorResenasRecibidas) {
+            <div class="bg-red-50 border border-red-200 rounded-lg p-4 text-red-700">
+              {{ errorResenasRecibidas }}
+            </div>
+          }
 
-						@if (aviso.foto_principal) {
-							<div class="mt-3 h-36 w-full max-w-sm overflow-hidden rounded border border-slate-200 bg-slate-100">
-								<img [src]="aviso.foto_principal" alt="Foto trabajo" class="h-full w-full object-cover" />
-							</div>
-						}
-					</article>
-				}
-			</div>
-		}
-	</div>
-</section>
-}
+          @if (!cargandoResenasRecibidas && resenasRecibidas.length === 0) {
+            <div class="bg-white rounded-lg p-8 text-center border border-slate-200">
+              <p class="text-slate-600 text-lg">Todavía no has recibido reseñas</p>
+            </div>
+          }
 
-@if (!cargandoPerfil && cliente?.es_prestador) {
-<section class="max-w-4xl mx-auto pb-10 px-4">
-	<div class="bg-white rounded-xl shadow-sm border border-slate-200 p-6 space-y-4">
-		<div class="flex flex-wrap items-center justify-between gap-3">
-			<h2 class="text-xl font-semibold text-slate-900">Reservas</h2>
-			<span class="inline-flex items-center rounded-full bg-slate-100 px-3 py-1 text-sm font-medium text-slate-700">
-				{{ cantidadReservasPendientes }} pendiente{{ cantidadReservasPendientes !== 1 ? 's' : '' }}
-			</span>
-		</div>
+          @if (!cargandoResenasRecibidas && resenasRecibidas.length > 0) {
+            <div class="grid grid-cols-1 gap-4">
+              @for (resena of resenasRecibidas; track resena._id) {
+                <div class="bg-white rounded-lg shadow-sm border border-slate-200 p-6 hover:shadow-md transition-shadow">
+                  <div class="flex items-start justify-between gap-4 flex-wrap mb-4">
+                    <div>
+                      <h3 class="font-bold text-slate-900">{{ resena.cliente_nombre }}</h3>
+                      <p class="text-sm text-slate-600">{{ resena.fecha_reserva | date:'short' }}</p>
+                    </div>
+                    <div class="flex items-center gap-1">
+                      @for (i of [1,2,3,4,5]; track i) {
+                        <span [class.text-amber-400]="i <= (resena.resena_calificacion || 0)" class="text-xl">
+                          ⭐
+                        </span>
+                      }
+                    </div>
+                  </div>
+                  <p class="text-slate-700">{{ resena.resena_comentario }}</p>
+                </div>
+              }
+            </div>
+          }
+        </div>
+      }
 
-		@if (!cargandoReservas && errorReservas) {
-			<p class="text-red-700 bg-red-50 border border-red-200 rounded p-3">{{ errorReservas }}</p>
-		}
+      <!-- Tab: Servicios (Prestador) -->
+      @if (pestanaActiva === 'servicios') {
+        <div class="bg-white rounded-lg shadow-sm border border-slate-200 p-8">
+          <h2 class="text-2xl font-bold text-slate-900 mb-6">Mi Perfil de Prestador</h2>
 
-		@if (!cargandoReservas && !errorReservas && reservasPrestador.length === 0) {
-			<p class="text-slate-600">Todavía no tienes ninguna reserva.</p>
-		}
+          <div class="space-y-6">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div class="bg-slate-50 p-6 rounded-lg">
+                <p class="text-xs text-slate-500 uppercase tracking-wide font-semibold">Servicio</p>
+                <p class="text-lg text-slate-900 font-medium mt-2">{{ cliente.tipo_servicio || '-' }}</p>
+              </div>
+              <div class="bg-slate-50 p-6 rounded-lg">
+                <p class="text-xs text-slate-500 uppercase tracking-wide font-semibold">Categoría</p>
+                <p class="text-lg text-slate-900 font-medium mt-2">{{ cliente.categoria || '-' }}</p>
+              </div>
+              <div class="bg-slate-50 p-6 rounded-lg">
+                <p class="text-xs text-slate-500 uppercase tracking-wide font-semibold">Especialización</p>
+                <p class="text-lg text-slate-900 font-medium mt-2">{{ cliente.subcategoria || '-' }}</p>
+              </div>
+              <div class="bg-slate-50 p-6 rounded-lg">
+                <p class="text-xs text-slate-500 uppercase tracking-wide font-semibold">Tarifa por Hora</p>
+                <p class="text-lg text-slate-900 font-medium mt-2">{{ cliente.coste_hora || 0 }} €</p>
+              </div>
+              <div class="bg-slate-50 p-6 rounded-lg">
+                <p class="text-xs text-slate-500 uppercase tracking-wide font-semibold">Ubicación</p>
+                <p class="text-lg text-slate-900 font-medium mt-2">{{ cliente.ubicacion_servicio || '-' }}</p>
+              </div>
+              <div class="bg-slate-50 p-6 rounded-lg">
+                <p class="text-xs text-slate-500 uppercase tracking-wide font-semibold">Dirección</p>
+                <p class="text-lg text-slate-900 font-medium mt-2">{{ cliente.direccion_servicio || '-' }}</p>
+              </div>
+            </div>
 
-		@if (!cargandoReservas && !errorReservas && reservasPrestador.length > 0) {
-			<div class="space-y-3">
-				@for (reserva of reservasPrestador; track reserva._id) {
-					<article class="rounded-lg border p-4" [class.border-blue-200]="reserva.estado_reserva === 'pendiente'" [class.bg-blue-50]="reserva.estado_reserva === 'pendiente'" [class.border-emerald-200]="reserva.estado_reserva === 'aceptado'" [class.bg-emerald-50]="reserva.estado_reserva === 'aceptado'" [class.border-red-200]="reserva.estado_reserva === 'rechazado'" [class.bg-red-50]="reserva.estado_reserva === 'rechazado'" [class.border-slate-200]="!reserva.estado_reserva" [class.bg-white]="!reserva.estado_reserva">
-						<div class="flex flex-wrap items-start justify-between gap-3">
-							<div class="flex-1">
-								<h3 class="text-base font-semibold text-slate-900">{{ reserva.trabajo_titulo }}</h3>
-								<p class="text-sm text-slate-600 mt-1">{{ reserva.categoria }} · {{ reserva.subcategoria }} · {{ reserva.ubicacion }}</p>
-								<div class="mt-2 space-y-1">
-									<p class="text-sm"><span class="font-medium text-slate-700">Cliente:</span> {{ reserva.cliente_nombre }}</p>
-									<p class="text-sm"><span class="font-medium text-slate-700">Email:</span> {{ reserva.cliente_email }}</p>
-									<p class="text-sm"><span class="font-medium text-slate-700">Teléfono:</span> {{ reserva.cliente_telefono }}</p>
-								</div>
-							</div>
-							<div class="flex flex-col items-end gap-2">
-								<span [class]="'inline-flex items-center rounded-full px-2.5 py-1 text-xs font-semibold'" 
-									[class.bg-blue-100]="reserva.estado_reserva === 'pendiente'"
-									[class.text-blue-700]="reserva.estado_reserva === 'pendiente'"
-									[class.bg-emerald-100]="reserva.estado_reserva === 'aceptado'"
-									[class.text-emerald-700]="reserva.estado_reserva === 'aceptado'"
-									[class.bg-red-100]="reserva.estado_reserva === 'rechazado'"
-									[class.text-red-700]="reserva.estado_reserva === 'rechazado'">
-									{{ reserva.estado_reserva || 'pendiente' }}
-								</span>
-								@if (reserva.estado_reserva === 'pendiente') {
-									<div class="flex gap-2">
-										<button type="button" class="rounded bg-emerald-600 px-2.5 py-1.5 text-xs font-semibold text-white hover:bg-emerald-700" (click)="cambiarEstadoReserva(reserva._id!, 'aceptado')" [disabled]="estaProcesandoReserva(reserva._id!)">
-											@if (estaProcesandoReserva(reserva._id!)) {
-												⏳
-											} @else {
-												✓ Aceptar
-											}
-										</button>
-										<button type="button" class="rounded bg-red-600 px-2.5 py-1.5 text-xs font-semibold text-white hover:bg-red-700" (click)="cambiarEstadoReserva(reserva._id!, 'rechazado')" [disabled]="estaProcesandoReserva(reserva._id!)">
-											@if (estaProcesandoReserva(reserva._id!)) {
-												⏳
-											} @else {
-												✗ Rechazar
-											}
-										</button>
-									</div>
-								}
-							</div>
-						</div>
+            @if (cliente.descripcion_servicio) {
+              <div class="bg-slate-50 p-6 rounded-lg">
+                <p class="text-xs text-slate-500 uppercase tracking-wide font-semibold">Descripción del Servicio</p>
+                <p class="text-slate-700 mt-3">{{ cliente.descripcion_servicio }}</p>
+              </div>
+            }
 
-						<p class="text-sm text-slate-700 mt-3">{{ reserva.trabajo_descripcion }}</p>
+            <div class="border-t border-slate-200 pt-6">
+              <button
+                (click)="activarEdicion(); cambiarPestana('perfil')"
+                class="bg-sky-600 hover:bg-sky-700 text-white px-6 py-3 rounded-lg font-medium"
+              >
+                ✏️ Editar Servicios
+              </button>
+            </div>
+          </div>
+        </div>
+      }
+    </div>
+  }
+</div>
 
-						<div class="mt-3 flex flex-wrap items-center gap-4 text-sm text-slate-600">
-							<span>Presupuesto: {{ reserva.presupuesto || 0 }} €</span>
-							<span>Fecha: {{ reserva.fecha_reserva }}</span>
-							<span>Hora: {{ reserva.hora_reserva }}</span>
-						</div>
-
-						@if (reserva.estado_reserva !== 'pendiente') {
-							<div class="mt-3">
-								<button type="button" class="text-xs text-red-600 hover:text-red-700 font-medium" (click)="eliminarReserva(reserva._id!)" [disabled]="estaProcesandoReserva(reserva._id!)">
-									Eliminar
-								</button>
-							</div>
-						}
-					</article>
-				}
-			</div>
-		}
-	</div>
-</section>
-}
-
-@if (!cargandoPerfil && cliente?.es_prestador) {
-<section class="max-w-4xl mx-auto pb-10 px-4">
-	<div class="bg-white rounded-xl shadow-sm border border-slate-200 p-6 space-y-4">
-		<div class="flex flex-wrap items-center justify-between gap-3">
-			<h2 class="text-xl font-semibold text-slate-900">Mis reseñas recibidas</h2>
-			@if (resenasRecibidas.length > 0) {
-				<div class="flex items-center gap-3">
-					<div class="flex items-center gap-1">
-						@for (star of [1,2,3,4,5]; track star) {
-							<span [class]="'text-lg'" [class.text-yellow-400]="star <= promedioCalificacion" [class.text-slate-300]="star > promedioCalificacion">★</span>
-						}
-					</div>
-					<span class="text-sm font-semibold text-slate-700">{{ promedioCalificacion | number:'1.1-1' }}/5 ({{ resenasRecibidas.length }} reseña{{ resenasRecibidas.length !== 1 ? 's' : '' }})</span>
-				</div>
-			}
-		</div>
-
-		@if (!cargandoResenasRecibidas && errorResenasRecibidas) {
-			<p class="text-red-700 bg-red-50 border border-red-200 rounded p-3">{{ errorResenasRecibidas }}</p>
-		}
-
-		@if (!cargandoResenasRecibidas && !errorResenasRecibidas && resenasRecibidas.length === 0) {
-			<p class="text-slate-600">Todavía no has recibido ninguna reseña. Cuando los clientes completen trabajos contigo, podrán dejarte reseñas.</p>
-		}
-
-		@if (!cargandoResenasRecibidas && !errorResenasRecibidas && resenasRecibidas.length > 0) {
-			<div class="space-y-3">
-				@for (resena of resenasRecibidas; track resena._id) {
-					<article class="rounded-lg border border-slate-200 bg-white p-4">
-						<div class="flex flex-wrap items-start justify-between gap-3">
-							<div class="flex-1">
-								<h3 class="text-base font-semibold text-slate-900">{{ resena.trabajo_titulo }}</h3>
-								<p class="text-sm text-slate-600 mt-1">Por: {{ resena.cliente_nombre }}</p>
-							</div>
-							<div class="flex items-center gap-1">
-								@for (star of [1,2,3,4,5]; track star) {
-									<span [class]="'text-lg'" [class.text-yellow-400]="star <= (resena.resena_calificacion || 0)" [class.text-slate-300]="star > (resena.resena_calificacion || 0)">★</span>
-								}
-								<span class="text-sm font-semibold text-slate-700 ml-1">({{ resena.resena_calificacion }}/5)</span>
-							</div>
-						</div>
-
-						<p class="text-sm text-slate-700 mt-3">{{ resena.resena_comentario }}</p>
-
-						@if (resena.resena_fecha) {
-							<p class="text-xs text-slate-500 mt-3">{{ resena.resena_fecha | date:'short' }}</p>
-						}
-					</article>
-				}
-			</div>
-		}
-	</div>
-</section>
-}
-
-<!-- Modal de Reseña -->
+<!-- Modal: Agregar Reseña -->
 @if (mostrarModalResena) {
-	<div class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-		<div class="bg-white rounded-xl shadow-2xl max-w-md w-full p-8">
-			<div class="flex justify-between items-center mb-6">
-				<h2 class="text-2xl font-bold text-slate-900">Dejar reseña</h2>
-				<button (click)="cerrarModalResena()" class="text-slate-400 hover:text-slate-600 text-2xl">✕</button>
-			</div>
+  <div class="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+    <div class="bg-white rounded-xl max-w-md w-full p-8 shadow-xl">
+      <h2 class="text-2xl font-bold text-slate-900 mb-6">Dejar Reseña</h2>
 
-			@if (errorResena) {
-				<div class="mb-4 rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
-					{{ errorResena }}
-				</div>
-			}
+      @if (errorResena) {
+        <div class="mb-4 p-4 bg-red-50 border border-red-200 rounded-lg text-red-700 text-sm">
+          {{ errorResena }}
+        </div>
+      }
 
-			@if (exitoResena) {
-				<div class="mb-4 rounded-lg border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm text-emerald-700">
-					{{ exitoResena }}
-				</div>
-			}
+      <div class="space-y-4">
+        <!-- Calificación -->
+        <div>
+          <label class="block text-sm font-semibold text-slate-700 mb-3">Calificación</label>
+          <div class="flex gap-2">
+            @for (i of [1,2,3,4,5]; track i) {
+              <button
+                (click)="actualizarCalificacion(i)"
+                [class.text-amber-400]="formularioResena.calificacion >= i"
+                [class.text-slate-300]="formularioResena.calificacion < i"
+                class="text-3xl transition-colors hover:text-amber-300"
+              >
+                ⭐
+              </button>
+            }
+          </div>
+        </div>
 
-			<div class="space-y-6">
-				<!-- Información del trabajo -->
-				<div>
-					<p class="text-sm font-medium text-slate-700 mb-1">Trabajo:</p>
-					<p class="text-slate-900 font-semibold">{{ reservaEnResena?.trabajo_titulo }}</p>
-				</div>
+        <!-- Comentario -->
+        <div>
+          <label class="block text-sm font-semibold text-slate-700 mb-2">Tu Comentario</label>
+          <textarea
+            [value]="formularioResena.comentario"
+            (input)="actualizarComentario($any($event).target.value)"
+            rows="4"
+            placeholder="Cuéntanos sobre tu experiencia..."
+            class="w-full px-4 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-sky-500"
+          ></textarea>
+          <p class="text-xs text-slate-500 mt-2">{{ formularioResena.comentario.length }}/500 caracteres</p>
+        </div>
 
-				<!-- Calificación -->
-				<div>
-					<p class="text-sm font-medium text-slate-700 mb-3">Calificación</p>
-					<div class="flex gap-2">
-						@for (estrella of [1,2,3,4,5]; track estrella) {
-							<button 
-								type="button"
-								(click)="actualizarCalificacion(estrella)"
-								class="text-3xl transition-colors"
-								[class.text-yellow-400]="estrella <= formularioResena.calificacion"
-								[class.text-slate-300]="estrella > formularioResena.calificacion"
-							>
-								★
-							</button>
-						}
-					</div>
-					<p class="text-xs text-slate-500 mt-2">{{ formularioResena.calificacion }} de 5 estrellas</p>
-				</div>
-
-				<!-- Comentario -->
-				<div>
-					<label class="block text-sm font-medium text-slate-700 mb-2">
-						Tu comentario (mínimo 10 caracteres)
-					</label>
-					<textarea 
-						#comentarioInput
-						[value]="formularioResena.comentario"
-						(input)="actualizarComentario(comentarioInput.value)"
-						[disabled]="cargandoResena"
-						class="w-full border border-slate-300 rounded-lg px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent disabled:bg-slate-100"
-						rows="4"
-						placeholder="Cuéntanos tu experiencia con este servicio..."
-					></textarea>
-					<p class="text-xs text-slate-500 mt-1">{{ formularioResena.comentario.length }} caracteres</p>
-				</div>
-
-				<!-- Botones -->
-				<div class="flex gap-3 pt-4">
-					<button 
-						type="button"
-						(click)="cerrarModalResena()"
-						[disabled]="cargandoResena"
-						class="flex-1 border border-slate-300 text-slate-900 px-4 py-2 rounded-lg font-semibold hover:bg-slate-50 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-					>
-						Cancelar
-					</button>
-					<button 
-						type="button"
-						(click)="enviarResena()"
-						[disabled]="cargandoResena"
-						class="flex-1 bg-emerald-600 text-white px-4 py-2 rounded-lg font-semibold hover:bg-emerald-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-					>
-						@if (cargandoResena) {
-							⏳ Guardando...
-						} @else {
-							Enviar reseña
-						}
-					</button>
-				</div>
-			</div>
-		</div>
-	</div>
+        <!-- Botones -->
+        <div class="flex gap-3 pt-4">
+          <button
+            (click)="enviarResena()"
+            [disabled]="cargandoResena"
+            class="flex-1 bg-emerald-600 hover:bg-emerald-700 disabled:opacity-50 text-white px-4 py-2 rounded-lg font-semibold"
+          >
+            @if (!cargandoResena) {
+              ✓ Enviar Reseña
+            } @else {
+              Enviando...
+            }
+          </button>
+          <button
+            (click)="cerrarModalResena()"
+            [disabled]="cargandoResena"
+            class="flex-1 bg-slate-300 hover:bg-slate-400 disabled:opacity-50 text-slate-900 px-4 py-2 rounded-lg font-semibold"
+          >
+            Cancelar
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
 }
