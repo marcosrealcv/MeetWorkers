@@ -76,7 +76,7 @@ routerAvisos.put('/:id/leido', (request, response) => __awaiter(void 0, void 0, 
             response.status(400).json({ error: 'Identificador de aviso inválido' });
             return;
         }
-        const avisoActualizado = yield AvisoModel_1.default.findOneAndUpdate({ _id: idAviso, prestador_id: idCliente }, { $set: { leido: true } }, { returnDocument: 'after' }).lean();
+        const avisoActualizado = yield AvisoModel_1.default.findOneAndUpdate({ _id: idAviso, prestador_id: idCliente }, { $set: { leido: true } }, { new: true }).lean();
         if (!avisoActualizado) {
             response.status(404).json({ error: 'Aviso no encontrado' });
             return;

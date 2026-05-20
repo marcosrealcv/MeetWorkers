@@ -259,7 +259,7 @@ routerTrabajos.put('/:id/aceptar', (request, response) => __awaiter(void 0, void
                 prestador_aceptado_nombre: nombrePrestador,
                 fecha_aceptacion: fechaAceptacion,
             },
-        }, { returnDocument: 'after' }).lean();
+        }, { new: true }).lean();
         if (!trabajoAceptado) {
             const trabajoActual = yield TrabajoSolicitudModel_1.default.findById(idTrabajo).lean();
             if (!trabajoActual) {
@@ -318,7 +318,7 @@ routerTrabajos.put('/:id/aceptar', (request, response) => __awaiter(void 0, void
                 },
             }, {
                 upsert: true,
-                returnDocument: 'after',
+                new: true,
             });
         }
         response.status(200).json({
@@ -459,7 +459,7 @@ routerTrabajos.put('/:id', (request, response) => __awaiter(void 0, void 0, void
         }
         const trabajoGuardado = yield TrabajoSolicitudModel_1.default.findByIdAndUpdate(idTrabajo, {
             $set: trabajoActualizado,
-        }, { returnDocument: 'after' }).lean();
+        }, { new: true }).lean();
         if (!trabajoGuardado) {
             response.status(404).json({ error: 'Trabajo no encontrado' });
             return;

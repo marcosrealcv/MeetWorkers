@@ -7,7 +7,6 @@ export type ClienteDocument = {
     contrasena: string;
     direccion: string;
     descripcion?: string;
-    foto_perfil?: string;
     es_prestador: boolean;
     tipo_servicio?: string;
     categoria?: string;
