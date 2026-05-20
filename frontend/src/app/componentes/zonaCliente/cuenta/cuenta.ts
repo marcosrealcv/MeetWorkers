@@ -1,4 +1,4 @@
-import { Component, OnDestroy, OnInit, inject } from '@angular/core';
+import { Component, OnDestroy, OnInit, inject, ViewChild, ElementRef } from '@angular/core';
 import { DatePipe, CommonModule } from '@angular/common';
 import { HttpErrorResponse } from '@angular/common/http';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
@@ -26,39 +26,63 @@ const API_SUBCATEGORIAS_URL = 'http://localhost:3000/api/subcategorias';
   templateUrl: './cuenta.html',
   styleUrl: './cuenta.css',
 })
-export class Cuenta implements OnInit {
+export class Cuenta implements OnInit, OnDestroy {
+  @ViewChild('inputFoto') inputFoto!: ElementRef<HTMLInputElement>;
+  
   private readonly fb = inject(FormBuilder);
   private suscripcionNavegacion: Subscription | null = null;
 
+  // Estado general
   cliente: Cliente | null = null;
   cargandoPerfil = true;
   errorPerfil = '';
   mensajeExito = '';
+  
+  // Pestañas activas
+  pestanaActiva: 'perfil' | 'mis-trabajos' | 'reservas' | 'resenas' | 'servicios' = 'perfil';
+  
+  // Edición
   enModoEdicion = false;
+  
+  // Foto de perfil
+  cargandoFoto = false;
+  errorFoto = '';
+  previewFoto: string | null = null;
+  @ViewChild('fotoInput') fotoInput!: ElementRef<HTMLInputElement>;
+  
+  // Categorías
   categorias: string[] = [];
   ubicaciones = ['A domicilio', 'En mi lugar', 'Ambas opciones'];
   subcategorias: { [key: string]: string[] } = {};
+  
+  // Avisos
   avisosPrestador: AvisoPrestador[] = [];
   avisosCliente: AvisoPrestador[] = [];
   cargandoAvisos = false;
-  cargandoAvisosCliente = false;
   errorAvisos = '';
-  errorAvisosCliente = '';
   idsAvisosProcesando = new Set<string>();
+  
+  // Trabajos publicados
   trabajosPublicados: TrabajoSolicitud[] = [];
   cargandoTrabajosPublicados = false;
   errorTrabajosPublicados = '';
+  
+  // Reservas
   reservasPrestador: Reserva[] = [];
   reservasCliente: Reserva[] = [];
   cantidadReservasPendientes = 0;
   cantidadMisReservasPendientes = 0;
   cargandoReservas = false;
-  cargandoReservasCliente = false;
   errorReservas = '';
-  errorReservasCliente = '';
   idsReservasProcesando = new Set<string>();
-
-  // Modal de reseña
+  
+  // Reseñas
+  resenasRecibidas: Reserva[] = [];
+  cargandoResenasRecibidas = false;
+  errorResenasRecibidas = '';
+  promedioCalificacion = 0;
+  
+  // Modal reseña
   mostrarModalResena = false;
   reservaEnResena: Reserva | null = null;
   formularioResena: { calificacion: number; comentario: string } = {
@@ -67,13 +91,6 @@ export class Cuenta implements OnInit {
   };
   cargandoResena = false;
   errorResena = '';
-  exitoResena = '';
-
-  // Reseñas recibidas
-  resenasRecibidas: Reserva[] = [];
-  cargandoResenasRecibidas = false;
-  errorResenasRecibidas = '';
-  promedioCalificacion = 0;
 
   formularioEdicion = this.fb.group({
     nombre: [''],
@@ -203,10 +220,10 @@ export class Cuenta implements OnInit {
 
   private inicializarDatosCuenta(cliente: Cliente): void {
     this.cliente = cliente;
+    this.previewFoto = cliente.foto_perfil || null;
     this.rellenarFormulario(cliente);
     this.cargandoPerfil = false;
     this.cargarAvisosSiEsPrestador(cliente);
-    this.cargarAvisosCliente(cliente);
     this.cargarReservasSiEsPrestador(cliente);
     this.cargarMisReservas(cliente);
     this.cargarMisTrabajosPublicados(cliente);
@@ -242,10 +259,48 @@ export class Cuenta implements OnInit {
     if (this.cliente) {
       this.rellenarFormulario(this.cliente);
     }
-
+    this.previewFoto = this.cliente?.foto_perfil || null;
     this.errorPerfil = '';
     this.mensajeExito = '';
     this.enModoEdicion = false;
+  }
+
+  clickInputFoto(): void {
+    this.inputFoto?.nativeElement?.click();
+  }
+
+  alSeleccionarFoto(event: Event): void {
+    const input = event.target as HTMLInputElement;
+    const files = input.files;
+
+    if (!files || files.length === 0) {
+      return;
+    }
+
+    const archivo = files[0];
+
+    // Validar que sea una imagen
+    if (!archivo.type.startsWith('image/')) {
+      this.errorFoto = 'Por favor selecciona un archivo de imagen válido';
+      return;
+    }
+
+    // Validar el tamaño (máximo 5MB)
+    if (archivo.size > 5 * 1024 * 1024) {
+      this.errorFoto = 'La imagen no debe superar 5MB';
+      return;
+    }
+
+    this.errorFoto = '';
+
+    // Crear preview
+    const reader = new FileReader();
+    reader.onload = (e: ProgressEvent<FileReader>) => {
+      if (e.target?.result) {
+        this.previewFoto = e.target.result as string;
+      }
+    };
+    reader.readAsDataURL(archivo);
   }
 
   guardarCambios(): void {
@@ -254,6 +309,7 @@ export class Cuenta implements OnInit {
 
     const snapshotClienteAnterior = this.cliente ? { ...this.cliente } : null;
     const payload = this.formularioEdicion.value as Partial<Cliente>;
+
 
     if (this.cliente) {
       this.cliente = {
@@ -267,6 +323,7 @@ export class Cuenta implements OnInit {
     this.authService.actualizarPerfilCliente(payload).subscribe({
       next: (cliente) => {
         this.cliente = cliente;
+        this.previewFoto = cliente.foto_perfil || null;
         this.rellenarFormulario(cliente);
         this.mensajeExito = 'Datos actualizados correctamente';
       },
@@ -296,6 +353,14 @@ export class Cuenta implements OnInit {
 
   irAIniciarSesion(): void {
     void this.router.navigate(['/iniciar-sesion']);
+  }
+
+  cambiarPestana(pestaña: 'perfil' | 'mis-trabajos' | 'reservas' | 'resenas' | 'servicios'): void {
+    this.pestanaActiva = pestaña;
+  }
+
+  irAPublicarTrabajo(): void {
+    void this.router.navigate(['/publicar-trabajo']);
   }
 
   cargarAvisosSiEsPrestador(clienteBase?: Cliente): void {
@@ -335,29 +400,29 @@ export class Cuenta implements OnInit {
 
     if (!cliente || cliente.es_prestador) {
       this.avisosCliente = [];
-      this.errorAvisosCliente = '';
-      this.cargandoAvisosCliente = false;
+      this.errorAvisos = '';
+      this.cargandoAvisos = false;
       return;
     }
 
-    this.cargandoAvisosCliente = true;
-    this.errorAvisosCliente = '';
+    this.cargandoAvisos = true;
+    this.errorAvisos = '';
 
     this.avisosService.obtenerMisAvisos().subscribe({
       next: (avisos) => {
         this.avisosCliente = avisos;
-        this.cargandoAvisosCliente = false;
+        this.cargandoAvisos = false;
       },
       error: (error: HttpErrorResponse) => {
         if (error.status === 401 || error.status === 403) {
           this.avisosCliente = [];
-          this.errorAvisosCliente = '';
-          this.cargandoAvisosCliente = false;
+          this.errorAvisos = '';
+          this.cargandoAvisos = false;
           return;
         }
 
-        this.errorAvisosCliente = error.error?.error ?? 'No se pudieron cargar tus avisos';
-        this.cargandoAvisosCliente = false;
+        this.errorAvisos = error.error?.error ?? 'No se pudieron cargar tus avisos';
+        this.cargandoAvisos = false;
       },
     });
   }
@@ -525,33 +590,33 @@ export class Cuenta implements OnInit {
     if (!cliente) {
       this.reservasCliente = [];
       this.cantidadMisReservasPendientes = 0;
-      this.errorReservasCliente = '';
-      this.cargandoReservasCliente = false;
+      this.errorReservas = '';
+      this.cargandoReservas = false;
       return;
     }
 
-    this.cargandoReservasCliente = true;
-    this.errorReservasCliente = '';
+    this.cargandoReservas = true;
+    this.errorReservas = '';
 
     this.reservasService.obtenerMisReservas().subscribe({
       next: (reservas) => {
         setTimeout(() => {
           this.reservasCliente = reservas;
           this.cantidadMisReservasPendientes = reservas.filter((reserva) => reserva.estado_reserva === 'pendiente').length;
-          this.cargandoReservasCliente = false;
+          this.cargandoReservas = false;
         }, 0);
       },
       error: (error: HttpErrorResponse) => {
         if (error.status === 401 || error.status === 403) {
           this.reservasCliente = [];
           this.cantidadMisReservasPendientes = 0;
-          this.errorReservasCliente = '';
-          this.cargandoReservasCliente = false;
+          this.errorReservas = '';
+          this.cargandoReservas = false;
           return;
         }
 
-        this.errorReservasCliente = error.error?.error ?? 'No se pudieron cargar tus reservas';
-        this.cargandoReservasCliente = false;
+        this.errorReservas = error.error?.error ?? 'No se pudieron cargar tus reservas';
+        this.cargandoReservas = false;
       },
     });
   }
@@ -677,7 +742,6 @@ export class Cuenta implements OnInit {
       comentario: '',
     };
     this.errorResena = '';
-    this.exitoResena = '';
   }
 
   cerrarModalResena(): void {
@@ -688,7 +752,6 @@ export class Cuenta implements OnInit {
       comentario: '',
     };
     this.errorResena = '';
-    this.exitoResena = '';
   }
 
   enviarResena(): void {
@@ -717,7 +780,6 @@ export class Cuenta implements OnInit {
 
     this.cargandoResena = true;
     this.errorResena = '';
-    this.exitoResena = '';
 
     this.reservasService.crearResena(this.reservaEnResena._id, calificacion, comentario).subscribe({
       next: (response) => {
@@ -734,7 +796,6 @@ export class Cuenta implements OnInit {
         );
 
         this.cargandoResena = false;
-        this.exitoResena = '¡Reseña guardada exitosamente! Gracias por tu comentario.';
 
         // Cerrar modal después de 2 segundos
         setTimeout(() => {

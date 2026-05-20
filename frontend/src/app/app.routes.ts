@@ -8,6 +8,9 @@ import { DetallesServicioComponent } from './componentes/zonaTienda/detalles-ser
 import { ContratacionComponent } from './componentes/zonaTienda/contratacion/contratacion';
 import { PublicarTrabajoComponent } from './componentes/zonaCliente/publicar-trabajo/publicar-trabajo';
 import { DetalleAvisoComponent } from './componentes/zonaTienda/detalle-aviso/detalle-aviso';
+import { AyudaComponent } from './componentes/zonaTienda/ayuda/ayuda';
+import { LegalComponent } from './componentes/zonaTienda/legal/legal';
+import { ContactoComponent } from './componentes/zonaTienda/contacto/contacto';
 
 export const rutasApp: Routes = [ 
 
@@ -51,6 +54,18 @@ export const rutasApp: Routes = [
   {
     path: 'detalle-aviso',
     component: DetalleAvisoComponent
+  },
+  {
+    path: 'ayuda',
+    component: AyudaComponent
+  },
+  {
+    path: 'legal',
+    component: LegalComponent
+  },
+  {
+    path: 'contacto',
+    component: ContactoComponent
   },
 {    path: '**',
     redirectTo: ''

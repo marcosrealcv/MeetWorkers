@@ -1,0 +1,54 @@
+.contact-shell {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 3rem 1rem 4rem;
+}
+
+.contact-hero {
+  background: linear-gradient(135deg, #f8f8f8 0%, #eef3f5 100%);
+  border: 1px solid #dfe7ea;
+  border-radius: 24px;
+  padding: 2rem;
+  margin-bottom: 1.5rem;
+}
+
+.contact-hero h1 {
+  font-size: clamp(2rem, 4vw, 3rem);
+  line-height: 1.05;
+  margin: 0.35rem 0 0.8rem;
+  color: #0f172a;
+}
+
+.contact-hero p,
+.contact-card p {
+  color: #334155;
+  line-height: 1.65;
+}
+
+.eyebrow {
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: #5f818c;
+}
+
+.contact-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 1rem;
+}
+
+.contact-card {
+  background: white;
+  border: 1px solid #e5e7eb;
+  border-radius: 20px;
+  padding: 1.5rem;
+  box-shadow: 0 10px 30px rgba(15, 23, 42, 0.05);
+}
+
+.contact-card h2 {
+  font-size: 1.15rem;
+  margin-bottom: 0.75rem;
+  color: #0f172a;
+}

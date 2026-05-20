@@ -35,12 +35,13 @@ function startServer() {
         yield mongoose_1.default.connect(mongoUrl);
         console.log('...Conectado a MongoDB...');
         yield (0, inicializarIndices_1.inicializarIndices)();
-        app.listen(3000, (error) => {
+        const port = process.env.PORT ? Number(process.env.PORT) : 3000;
+        app.listen(port, (error) => {
             if (error) {
-                console.log('Error al INICIAR servidor WEB EXPRESS en puerto 3000:', error);
+                console.log(`Error al INICIAR servidor WEB EXPRESS en puerto ${port}:`, error);
             }
             else {
-                console.log('...Servidor WEB EXPRESS iniciado en puerto 3000...');
+                console.log(`...Servidor WEB EXPRESS iniciado en puerto ${port}...`);
             }
         });
     });

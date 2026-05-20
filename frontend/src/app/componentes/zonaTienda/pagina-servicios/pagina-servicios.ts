@@ -3,7 +3,7 @@ import { ActivatedRoute } from '@angular/router';
 import { TarjetasSubcategorias } from '../tarjetas-subcategorias/tarjetas-subcategorias';
 import { Servicio } from '../../../models/servicio.interface';
 import { ServiciosService } from '../../../services/servicios.service';
-import { CategoriasService, Subcategoria } from '../../../services/categorias.service';
+import { CategoriasService, Categoria, Subcategoria } from '../../../services/categorias.service';
 
 @Component({
   selector: 'app-pagina-servicios',
@@ -26,6 +26,21 @@ export class PaginaServicios implements OnInit {
     this.route.queryParamMap.subscribe(params => {
       const pathCat = params.get('pathCategoria');
       if (pathCat) {
+        this.categoria.set(this.formatearCategoriaDesdePath(pathCat));
+
+        this.categoriasService.obtenerCategorias().subscribe({
+          next: (categorias) => {
+            const categoriaPrincipal = categorias.find((categoria) => categoria.pathCategoria === pathCat);
+
+            if (categoriaPrincipal) {
+              this.categoria.set(categoriaPrincipal.nombreCategoria);
+            }
+          },
+          error: (err) => {
+            console.error('Error cargando categoría principal:', err);
+          }
+        });
+
         // Obtener subcategorías dinámicamente
         this.categoriasService.obtenerSubcategorias(pathCat).subscribe({
           next: (subcategorias) => {
@@ -43,20 +58,12 @@ export class PaginaServicios implements OnInit {
               rating: 4.5
             }));
             this.serviciosFiltrados.set(servicios);
-            
-            // Obtener el nombre de la categoría
-            if (servicios.length > 0) {
-              this.categoria.set(servicios[0].categoria);
-            }
           },
           error: (err) => {
             console.error('Error cargando subcategorías:', err);
             // Fallback a datos locales
             const filtrados = this.serviciosService.filtrarPorPathCategoria(pathCat);
             this.serviciosFiltrados.set(filtrados);
-            if (filtrados.length > 0) {
-              this.categoria.set(filtrados[0].nombre);
-            }
           }
         });
       } else {
@@ -64,6 +71,16 @@ export class PaginaServicios implements OnInit {
         this.serviciosFiltrados.set(this.serviciosService.obtenerTodos());
       }
     });
+  }
+
+  private formatearCategoriaDesdePath(pathCategoria: string): string {
+    const textoNormalizado = pathCategoria.replace(/-/g, ' ').trim();
+
+    if (!textoNormalizado) {
+      return 'Todos los servicios';
+    }
+
+    return textoNormalizado.charAt(0).toUpperCase() + textoNormalizado.slice(1);
   }
 }
 

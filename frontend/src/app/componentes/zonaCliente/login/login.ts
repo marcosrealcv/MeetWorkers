@@ -27,6 +27,7 @@ export class Login implements OnInit {
   cargandoRegistro = false;
   errorRegistro = '';
   exitoRegistro = '';
+  mostrarContrasena = false;
   
   subcategorias: { [key: string]: string[] } = {};
 
@@ -181,5 +182,9 @@ export class Login implements OnInit {
 
   get necesitaDireccionServicio(): boolean {
     return this.esPrestador && (this.ubicacionSeleccionada === 'En mi lugar' || this.ubicacionSeleccionada === 'Ambas opciones');
+  }
+
+  alternarVisibilidadContrasena(): void {
+    this.mostrarContrasena = !this.mostrarContrasena;
   }
 }
