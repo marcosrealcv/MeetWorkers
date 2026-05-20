@@ -67,6 +67,7 @@ routerCategorias.get('/prestadores-categoria/:pathCategoria', (request, response
             es_prestador: true,
             $or: filtroSubcategoria,
         }, {
+            _id: 1,
             nombre: 1,
             apellido: 1,
             descripcion_servicio: 1,
@@ -85,6 +86,7 @@ routerCategorias.get('/prestadores-categoria/:pathCategoria', (request, response
 routerCategorias.get('/prestadores', (_request, response) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const prestadores = yield ClienteModel_1.default.find({ es_prestador: true }, {
+            _id: 1,
             nombre: 1,
             apellido: 1,
             descripcion_servicio: 1,
