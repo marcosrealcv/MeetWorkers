@@ -113,8 +113,15 @@ export class PaginaServicios implements OnInit {
         'estetica_corporal': '/imgs/belleza/estetica/estetica.png',
       },
       'limpieza': {
-        'limpieza residencial': '/imgs/limpieza/residencial/residencial.png',
+        'limpieza residencial': '/imgs/limpieza/hogar/hogar.png',
+        'limpieza del hogar': '/imgs/limpieza/hogar/hogar.png',
+        'limpieza_del_hogar': '/imgs/limpieza/hogar/hogar.png',
         'limpieza de oficinas': '/imgs/limpieza/oficinas/oficinas.png',
+        'limpieza_de_oficinas': '/imgs/limpieza/oficinas/oficinas.png',
+        'limpieza de ventanas': '/imgs/limpieza/ventanas/ventanas.png',
+        'limpieza_de_ventanas': '/imgs/limpieza/ventanas/ventanas.png',
+        'presupuesto especial': '/imgs/limpieza/especial/especial.png',
+        'presupuesto_especial': '/imgs/limpieza/especial/especial.png',
       },
       'enseñanza': {  
         'ingles': '/imgs/enseñanza/ingles/ingles.png',
@@ -129,10 +136,10 @@ export class PaginaServicios implements OnInit {
         'clases de matemáticas': '/imgs/enseñanza/matematicas/matematicas.png',
         'clases matematicas': '/imgs/enseñanza/matematicas/matematicas.png',
         'clases_matematicas': '/imgs/enseñanza/matematicas/matematicas.png',
-        'español': '/imgs/enseñanza/español/español.png',
-        'clases de español': '/imgs/enseñanza/español/español.png',
-        'clases español': '/imgs/enseñanza/español/español.png',
-        'clases_español': '/imgs/enseñanza/español/español.png',
+        'español': '/imgs/enseñanza/espanol/espanol.png',
+        'clases de español': '/imgs/enseñanza/espanol/espanol.png',
+        'clases español': '/imgs/enseñanza/espanol/espanol.png',
+        'clases_español': '/imgs/enseñanza/espanol/espanol.png',
         'informatica': '/imgs/enseñanza/informatica/informatica.png',
         'informática': '/imgs/enseñanza/informatica/informatica.png',
         'clases de informatica': '/imgs/enseñanza/informatica/informatica.png',
@@ -158,25 +165,29 @@ export class PaginaServicios implements OnInit {
         'clases_musica': '/imgs/enseñanza/musica/musica.png',
         // Subcategorías de reparaciones y construcciones que vienen bajo categoría 4
         'electricidad': '/imgs/reparaciones/electricista/electricista.png',
-        'albanileria': '/imgs/reparaciones/albañil/albañil.png',
+        'albanileria': '/imgs/reparaciones/albanil/albanil.png',
         'carpinteria': '/imgs/reparaciones/carpintero/carpintero.png',
         'fontaneria': '/imgs/reparaciones/fontanero/fontanero.png',
         'herreria': '/imgs/reparaciones/herreria/herreria.png',
         'vidrieria': '/imgs/reparaciones/vidrieria/vidrieria.png',
         'estanterias_personalizadas': '/imgs/construcciones_y_reformas/estanterias/estanterias.png',
-        'remodelacion_de_banos': '/imgs/construcciones_y_reformas/baños/baños.png',
-        'diseno_de_interiores': '/imgs/construcciones_y_reformas/baños/baños.png',
-        'muebles_a_medida': '/imgs/construcciones_y_reformas/estanterias/estanterias.png',
-        'armarios_empotrados': '/imgs/construcciones_y_reformas/estanterias/estanterias.png',
-        'remodelacion_de_cocinas': '/imgs/construcciones_y_reformas/baños/baños.png',
-        'reformas_integrales': '/imgs/construcciones_y_reformas/baños/baños.png',
+        'remodelacion_de_banos': '/imgs/construcciones_y_reformas/banos/banos.png',
+        'diseno_de_interiores': '/imgs/construcciones_y_reformas/interiores/interiores.png',
+        'muebles_a_medida': '/imgs/construcciones_y_reformas/muebles/muebles.png',
+        'armarios_empotrados': '/imgs/construcciones_y_reformas/armarios/armarios.png',
+        'remodelacion_de_cocinas': '/imgs/construcciones_y_reformas/cocina/cocina.png',
+        'reformas_integrales': '/imgs/construcciones_y_reformas/integrales/integrales.png',
       },
       'reparaciones': {
-        'albanil': '/imgs/reparaciones/albañil/albañil.png',
-        'albañil': '/imgs/reparaciones/albañil/albañil.png',
+        'albanil': '/imgs/reparaciones/albanil/albanil.png',
+        'albañil': '/imgs/reparaciones/albanil/albanil.png',
+        'albanileria': '/imgs/reparaciones/albanil/albanil.png',
         'carpintero': '/imgs/reparaciones/carpintero/carpintero.png',
+        'carpinteria': '/imgs/reparaciones/carpintero/carpintero.png',
         'electricista': '/imgs/reparaciones/electricista/electricista.png',
+        'electricidad': '/imgs/reparaciones/electricista/electricista.png',
         'fontanero': '/imgs/reparaciones/fontanero/fontanero.png',
+        'fontaneria': '/imgs/reparaciones/fontanero/fontanero.png',
         'herreria': '/imgs/reparaciones/herreria/herreria.png',
         'herraría': '/imgs/reparaciones/herreria/herreria.png',
         'herraira': '/imgs/reparaciones/herreria/herreria.png',
@@ -185,12 +196,20 @@ export class PaginaServicios implements OnInit {
         'vidriera': '/imgs/reparaciones/vidrieria/vidrieria.png',
         // Subcategorías de construcciones y reformas que vienen bajo ID 7
         'estanterias_personalizadas': '/imgs/construcciones_y_reformas/estanterias/estanterias.png',
-        'remodelacion_de_banos': '/imgs/construcciones_y_reformas/baños/baños.png',
+        'remodelacion_de_banos': '/imgs/construcciones_y_reformas/banos/banos.png',
         'diseno_de_interiores': '/imgs/construcciones_y_reformas/interiores/interiores.png',
         'muebles_a_medida': '/imgs/construcciones_y_reformas/muebles/muebles.png',
         'armarios_empotrados': '/imgs/construcciones_y_reformas/armarios/armarios.png',
         'remodelacion_de_cocinas': '/imgs/construcciones_y_reformas/cocina/cocina.png',
         'reformas_integrales': '/imgs/construcciones_y_reformas/integrales/integrales.png',
+      },
+      'cuidado_personal': {
+        'cuidado de niños': '/imgs/cuidado_personal/niños/niños.png',
+        'cuidado_de_ninos': '/imgs/cuidado_personal/niños/niños.png',
+        'cuidado de ancianos': '/imgs/cuidado_personal/ancianos/ancianos.png',
+        'cuidado_de_ancianos': '/imgs/cuidado_personal/ancianos/ancianos.png',
+        'cuidado de mascotas': '/imgs/cuidado_personal/mascotas/mascotas.png',
+        'cuidado_de_mascotas': '/imgs/cuidado_personal/mascotas/mascotas.png',
       },
     };
 
@@ -202,9 +221,9 @@ export class PaginaServicios implements OnInit {
     if (categoriaNormalizada === '1') categoriaKey = 'automocion';
     if (categoriaNormalizada === '2') categoriaKey = 'belleza';
     if (categoriaNormalizada === '3') categoriaKey = 'enseñanza';
-    if (categoriaNormalizada === '4') categoriaKey = 'enseñanza';
+    if (categoriaNormalizada === '4') categoriaKey = 'reparaciones';
     if (categoriaNormalizada === '5') categoriaKey = 'limpieza';
-    if (categoriaNormalizada === '6') categoriaKey = 'enseñanza';
+    if (categoriaNormalizada === '6') categoriaKey = 'cuidado_personal';
     if (categoriaNormalizada === '7') categoriaKey = 'reparaciones';
     
     console.log('📂 Categoría identificada:', categoriaKey, 'ID:', categoriaNormalizada);
@@ -226,5 +245,21 @@ export class PaginaServicios implements OnInit {
     console.log('⚠️ Usando ruta dinámica:', rutaDinamica);
     return rutaDinamica;
   }
+
+  private formatearCategoriaDesdePath(path: string): string {
+    // Extrae el nombre de la categoría del path (ej: "1-automocion" → "Automóvil")
+    const mapeoNombres: { [key: string]: string } = {
+      '1': 'Automóvil',
+      '2': 'Belleza',
+      '3': 'Enseñanza',
+      '4': 'Enseñanza',
+      '5': 'Limpieza',
+      '6': 'Enseñanza',
+      '7': 'Reparaciones'
+    };
+
+    const id = path.split('-')[0];
+    return mapeoNombres[id] || 'Servicios';
   }
+}
 
