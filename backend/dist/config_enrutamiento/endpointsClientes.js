@@ -145,6 +145,9 @@ function sanitizarCamposEditables(payload) {
             clienteEditable.coste_hora = costeHora;
         }
     }
+    if (typeof payload.foto_perfil === 'string') {
+        clienteEditable.foto_perfil = payload.foto_perfil.trim();
+    }
     return clienteEditable;
 }
 routerCliente.post('/registro', (request, response) => __awaiter(void 0, void 0, void 0, function* () {
@@ -220,7 +223,18 @@ routerCliente.post('/login', (request, response) => __awaiter(void 0, void 0, vo
     }
 }));
 routerCliente.get('/perfil', (request, response) => __awaiter(void 0, void 0, void 0, function* () {
+    var _a;
     try {
+        const token = extraerTokenBearer(request.headers.authorization);
+        if (!token) {
+            response.status(401).json({ error: 'Token inválido o ausente' });
+            return;
+        }
+        const verification = JwtService_1.default.verificarJWT(token);
+        if (!verification.valid) {
+            response.status(401).json({ error: (_a = verification.message) !== null && _a !== void 0 ? _a : 'Token inválido o expirado' });
+            return;
+        }
         const idCliente = obtenerIdClienteDesdeToken(request.headers.authorization);
         if (!idCliente || !mongoose_1.default.Types.ObjectId.isValid(idCliente)) {
             response.status(401).json({ error: 'Token inválido o ausente' });
@@ -239,13 +253,27 @@ routerCliente.get('/perfil', (request, response) => __awaiter(void 0, void 0, vo
     }
 }));
 routerCliente.put('/perfil', (request, response) => __awaiter(void 0, void 0, void 0, function* () {
+    var _a;
     try {
+        const token = extraerTokenBearer(request.headers.authorization);
+        if (!token) {
+            response.status(401).json({ error: 'Token inválido o ausente' });
+            return;
+        }
+        const verification = JwtService_1.default.verificarJWT(token);
+        if (!verification.valid) {
+            response.status(401).json({ error: (_a = verification.message) !== null && _a !== void 0 ? _a : 'Token inválido o expirado' });
+            return;
+        }
         const idCliente = obtenerIdClienteDesdeToken(request.headers.authorization);
         if (!idCliente || !mongoose_1.default.Types.ObjectId.isValid(idCliente)) {
             response.status(401).json({ error: 'Token inválido o ausente' });
             return;
         }
         const camposActualizables = sanitizarCamposEditables(request.body);
+        console.log('[PUT /api/clientes/perfil] idCliente:', idCliente);
+        console.log('[PUT /api/clientes/perfil] request.body keys:', Object.keys(request.body));
+        console.log('[PUT /api/clientes/perfil] camposActualizables keys:', Object.keys(camposActualizables));
         if (Object.keys(camposActualizables).length === 0) {
             response.status(400).json({ error: 'No hay campos válidos para actualizar' });
             return;
@@ -331,7 +359,7 @@ routerCliente.get('/buscar/prestador/:nombre', (request, response) => __awaiter(
 routerCliente.get('/prestadores', (request, response) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const prestadores = yield ClienteModel_1.default.find({ es_prestador: true })
-            .select('_id nombre apellido email categoria subcategoria coste_hora descripcion_servicio')
+            .select('_id nombre apellido email categoria subcategoria coste_hora descripcion_servicio foto_perfil')
             .lean();
         response.status(200).json(prestadores);
     }

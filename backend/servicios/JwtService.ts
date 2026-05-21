@@ -44,7 +44,16 @@ export default {
       return { valid: true, payload };
     } catch (error: any) {
       console.log('Error al verificar JWT:', error);
-      return { valid: false, message: error.message };
+      const result: { valid: boolean; message?: string; name?: string; expiredAt?: any } = { valid: false };
+      if (error && typeof error === 'object') {
+        result.message = error.message;
+        result.name = error.name;
+        if ('expiredAt' in error) {
+          result.expiredAt = (error as any).expiredAt;
+        }
+      }
+
+      return result as { valid: boolean; payload?: any; message?: string };
     }
   },
 

@@ -16,6 +16,7 @@ export type ClienteDocument = {
     direccion_servicio?: string;
     coste_hora?: number;
     trabajos_solicitados?: string[];
+    foto_perfil?: string;
 };
 declare const ClienteModel: mongoose.Model<ClienteDocument, {}, {}, {}, mongoose.Document<unknown, {}, ClienteDocument, {}, mongoose.DefaultSchemaOptions> & ClienteDocument & {
     _id: mongoose.Types.ObjectId;

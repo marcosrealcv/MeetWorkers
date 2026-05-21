@@ -3,7 +3,7 @@ import { DatePipe, CommonModule } from '@angular/common';
 import { HttpErrorResponse } from '@angular/common/http';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { NavigationEnd, Router } from '@angular/router';
-import { filter, Subscription } from 'rxjs';
+import { filter, Subscription, timeout } from 'rxjs';
 import { AuthService } from '../../../services/auth.service';
 import { Cliente } from '../../../models/cliente.interface';
 import { AvisoPrestador } from '../../../models/aviso.interface';
@@ -147,14 +147,25 @@ export class Cuenta implements OnInit, OnDestroy {
     const clienteSesion = this.authService.clienteActual();
 
     if (clienteSesion) {
-      this.inicializarDatosCuenta(clienteSesion);
+      setTimeout(() => this.inicializarDatosCuenta(clienteSesion));
     }
 
-    this.authService.cargarPerfilCliente().subscribe({
+    this.authService.cargarPerfilCliente().pipe(
+      // si el servidor no responde en 10s, salimos del loading y mostramos mensaje
+      timeout({ first: 10000 })
+    ).subscribe({
       next: (cliente) => {
-        this.inicializarDatosCuenta(cliente);
+        setTimeout(() => this.inicializarDatosCuenta(cliente));
       },
       error: (error: HttpErrorResponse) => {
+        // TimeoutError from rxjs appears as a simple Error with name 'TimeoutError'
+        const isTimeout = (error as any)?.name === 'TimeoutError';
+        if (isTimeout) {
+          this.cargandoPerfil = false;
+          this.errorPerfil = 'El servidor no responde. Reintenta más tarde.';
+          console.error('Timeout cargando perfil:', error);
+          return;
+        }
         if (error.status === 401) {
           this.authService.cerrarSesion();
           this.cliente = null;
@@ -165,7 +176,7 @@ export class Cuenta implements OnInit, OnDestroy {
         }
 
         if (clienteSesion) {
-          this.inicializarDatosCuenta(clienteSesion);
+          setTimeout(() => this.inicializarDatosCuenta(clienteSesion));
           this.errorPerfil = '';
           return;
         }
@@ -309,6 +320,11 @@ export class Cuenta implements OnInit, OnDestroy {
 
     const snapshotClienteAnterior = this.cliente ? { ...this.cliente } : null;
     const payload = this.formularioEdicion.value as Partial<Cliente>;
+
+    // Si hay una preview (data URL) añadimos la imagen al payload para que el backend la guarde
+    if (this.previewFoto) {
+      (payload as any).foto_perfil = this.previewFoto;
+    }
 
 
     if (this.cliente) {

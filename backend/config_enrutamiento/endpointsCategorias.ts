@@ -73,14 +73,15 @@ routerCategorias.get('/prestadores-categoria/:pathCategoria', async (request: Re
         es_prestador: true,
         $or: filtroSubcategoria,
       },
-      { 
+      {
         _id: 1,
-        nombre: 1, 
-        apellido: 1, 
-        descripcion_servicio: 1, 
-        coste_hora: 1, 
+        nombre: 1,
+        apellido: 1,
+        descripcion_servicio: 1,
+        coste_hora: 1,
         subcategoria: 1,
-        categoria: 1 
+        categoria: 1,
+        foto_perfil: 1,
       }
     ).lean();
     response.status(200).json(prestadores);
@@ -95,14 +96,15 @@ routerCategorias.get('/prestadores', async (_request: Request, response: Respons
   try {
     const prestadores = await ClienteModel.find(
       { es_prestador: true },
-      { 
+      {
         _id: 1,
-        nombre: 1, 
-        apellido: 1, 
-        descripcion_servicio: 1, 
-        coste_hora: 1, 
+        nombre: 1,
+        apellido: 1,
+        descripcion_servicio: 1,
+        coste_hora: 1,
         subcategoria: 1,
-        categoria: 1 
+        categoria: 1,
+        foto_perfil: 1,
       }
     ).lean();
     response.status(200).json(prestadores);

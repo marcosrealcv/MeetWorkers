@@ -73,7 +73,8 @@ routerCategorias.get('/prestadores-categoria/:pathCategoria', (request, response
             descripcion_servicio: 1,
             coste_hora: 1,
             subcategoria: 1,
-            categoria: 1
+            categoria: 1,
+            foto_perfil: 1,
         }).lean();
         response.status(200).json(prestadores);
     }
@@ -92,7 +93,8 @@ routerCategorias.get('/prestadores', (_request, response) => __awaiter(void 0, v
             descripcion_servicio: 1,
             coste_hora: 1,
             subcategoria: 1,
-            categoria: 1
+            categoria: 1,
+            foto_perfil: 1,
         }).lean();
         response.status(200).json(prestadores);
     }
