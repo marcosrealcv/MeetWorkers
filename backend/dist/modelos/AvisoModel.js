@@ -36,7 +36,8 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const mongoose_1 = __importStar(require("mongoose"));
 const avisoSchema = new mongoose_1.Schema({
     prestador_id: { type: String, required: true, trim: true, index: true },
-    tipo: { type: String, enum: ['trabajo', 'reserva'], default: 'trabajo' },
+    cliente_id: { type: String, trim: true, index: true, sparse: true },
+    tipo: { type: String, enum: ['trabajo', 'reserva', 'reserva_rechazada', 'solicitud_rechazada'], default: 'trabajo' },
     trabajo_id: { type: String, trim: true, index: true, sparse: true },
     reserva_id: { type: String, trim: true, index: true, sparse: true },
     trabajo_titulo: { type: String, required: true, trim: true },

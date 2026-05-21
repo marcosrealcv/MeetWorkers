@@ -1,7 +1,8 @@
 import mongoose from 'mongoose';
 export type AvisoDocument = {
     prestador_id: string;
-    tipo: 'trabajo' | 'reserva';
+    cliente_id?: string;
+    tipo: 'trabajo' | 'reserva' | 'reserva_rechazada' | 'solicitud_rechazada';
     trabajo_id?: string;
     reserva_id?: string;
     trabajo_titulo: string;
@@ -12,7 +13,6 @@ export type AvisoDocument = {
     presupuesto?: number;
     fecha_limite?: string;
     foto_principal?: string;
-    cliente_id?: string;
     cliente_nombre?: string;
     cliente_email?: string;
     cliente_telefono?: string;

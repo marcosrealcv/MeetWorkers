@@ -121,5 +121,28 @@ routerAvisos.delete('/:id', (request, response) => __awaiter(void 0, void 0, voi
         response.status(500).json({ error: 'No se pudo eliminar el aviso' });
     }
 }));
+// GET /avisos/cliente/mis-avisos - Obtener avisos del cliente (rechazos de reservas, etc.)
+routerAvisos.get('/cliente/mis-avisos', (request, response) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const idCliente = obtenerIdClienteDesdeToken(request.headers.authorization);
+        if (!idCliente || !mongoose_1.default.Types.ObjectId.isValid(idCliente)) {
+            response.status(401).json({ error: 'Token inválido o ausente' });
+            return;
+        }
+        const cliente = yield ClienteModel_1.default.findById(idCliente, { _id: 1 }).lean();
+        if (!cliente) {
+            response.status(404).json({ error: 'Cliente no encontrado' });
+            return;
+        }
+        const avisos = yield AvisoModel_1.default.find({ cliente_id: idCliente })
+            .sort({ leido: 1, createdAt: -1 })
+            .lean();
+        response.status(200).json(avisos);
+    }
+    catch (error) {
+        console.error('Error obteniendo avisos del cliente:', error);
+        response.status(500).json({ error: 'No se pudieron obtener los avisos' });
+    }
+}));
 exports.default = routerAvisos;
 //# sourceMappingURL=endpointsAvisos.js.map
