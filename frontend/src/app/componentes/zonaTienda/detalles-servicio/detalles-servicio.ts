@@ -50,7 +50,7 @@ export class DetallesServicioComponent implements OnInit {
               rating: 0,
               resenas: 0,
               precio: `${prestador.coste_hora}€/hora`,
-              imagen: prestador.foto_perfil || '/imgs/proveedor.png',
+              imagen: prestador.foto_perfil || '/imgs/proveedor.svg',
               experiencia: 'Prestador verificado'
             }));
             
@@ -68,7 +68,7 @@ export class DetallesServicioComponent implements OnInit {
                   rating: 0,
                   resenas: 0,
                   precio: `${prestador.coste_hora}€/hora`,
-                  imagen: prestador.foto_perfil || '/imgs/proveedor.png',
+                  imagen: prestador.foto_perfil || '/imgs/proveedor.svg',
                   experiencia: 'Prestador verificado'
                 }));
                 this.proveedores.set(proveedoresConvertidos);
@@ -90,7 +90,7 @@ export class DetallesServicioComponent implements OnInit {
               rating: 0,
               resenas: 0,
               precio: `${prestador.coste_hora}€/hora`,
-              imagen: prestador.foto_perfil || '/imgs/proveedor.png',
+              imagen: prestador.foto_perfil || '/imgs/proveedor.svg',
               experiencia: 'Prestador verificado'
             }));
             this.proveedores.set(proveedoresConvertidos);

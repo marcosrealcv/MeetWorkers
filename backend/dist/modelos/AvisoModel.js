@@ -36,7 +36,8 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const mongoose_1 = __importStar(require("mongoose"));
 const avisoSchema = new mongoose_1.Schema({
     prestador_id: { type: String, required: true, trim: true, index: true },
-    tipo: { type: String, enum: ['trabajo', 'reserva'], default: 'trabajo' },
+    cliente_id: { type: String, trim: true, index: true, sparse: true },
+    tipo: { type: String, enum: ['trabajo', 'reserva', 'reserva_rechazada', 'solicitud_rechazada'], default: 'trabajo' },
     trabajo_id: { type: String, trim: true, index: true, sparse: true },
     reserva_id: { type: String, trim: true, index: true, sparse: true },
     trabajo_titulo: { type: String, required: true, trim: true },
@@ -47,12 +48,12 @@ const avisoSchema = new mongoose_1.Schema({
     presupuesto: { type: Number, default: 0 },
     fecha_limite: { type: String, default: '' },
     foto_principal: { type: String, default: '' },
-    cliente_id: { type: String, trim: true, sparse: true },
     cliente_nombre: { type: String, trim: true, default: '' },
     cliente_email: { type: String, trim: true, lowercase: true, sparse: true },
     cliente_telefono: { type: String, trim: true, default: '' },
     fecha_reserva: { type: String, default: '' },
     hora_reserva: { type: String, default: '' },
+    cancel_motivo: { type: String, default: '' },
     estado_reserva: { type: String, enum: ['pendiente', 'aceptado', 'rechazado'], default: 'pendiente', sparse: true },
     leido: { type: Boolean, default: false },
     resena_calificacion: { type: Number, min: 1, max: 5, sparse: true },

@@ -27,6 +27,7 @@ export interface Reserva {
   resena_comentario?: string;
   resena_fecha?: string;
   tiene_resena?: boolean;
+  cancel_motivo?: string;
   createdAt?: string;
   updatedAt?: string;
 }
@@ -106,6 +107,15 @@ export class ReservasService {
   obtenerResenasPrestador(prestadorId: string) {
     return this.http.get<Reserva[]>(
       `${API_RESERVAS_URL}/prestador/${prestadorId}/resenas`
+    );
+  }
+
+  cancelarReserva(reservaId: string, motivo: string) {
+    const headers = this.getHeaders();
+    return this.http.put<{ mensaje: string; reserva?: Reserva }>(
+      `${API_RESERVAS_URL}/${encodeURIComponent(reservaId)}/cancelar`,
+      { motivo },
+      { headers }
     );
   }
 }

@@ -21,6 +21,7 @@ export type AvisoDocument = {
   fecha_reserva?: string;
   hora_reserva?: string;
   estado_reserva?: 'pendiente' | 'aceptado' | 'rechazado';
+  cancel_motivo?: string;
   leido: boolean;
   // Campos para reseñas
   resena_calificacion?: number;
@@ -44,12 +45,12 @@ const avisoSchema = new Schema<AvisoDocument>(
     presupuesto: { type: Number, default: 0 },
     fecha_limite: { type: String, default: '' },
     foto_principal: { type: String, default: '' },
-    cliente_id: { type: String, trim: true, sparse: true },
     cliente_nombre: { type: String, trim: true, default: '' },
     cliente_email: { type: String, trim: true, lowercase: true, sparse: true },
     cliente_telefono: { type: String, trim: true, default: '' },
     fecha_reserva: { type: String, default: '' },
     hora_reserva: { type: String, default: '' },
+    cancel_motivo: { type: String, default: '' },
     estado_reserva: { type: String, enum: ['pendiente', 'aceptado', 'rechazado'], default: 'pendiente', sparse: true },
     leido: { type: Boolean, default: false },
     resena_calificacion: { type: Number, min: 1, max: 5, sparse: true },

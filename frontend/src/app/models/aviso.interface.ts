@@ -17,6 +17,7 @@ export interface AvisoPrestador {
   hora_reserva?: string;
   estado_reserva?: 'pendiente' | 'aceptado' | 'rechazado';
   leido: boolean;
+  cancel_motivo?: string;
   createdAt: string;
   updatedAt: string;
 }

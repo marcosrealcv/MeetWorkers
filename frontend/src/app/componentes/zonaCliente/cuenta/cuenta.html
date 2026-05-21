@@ -163,7 +163,6 @@
             }
           </button>
 
-          @if (cliente.es_prestador) {
             <button
               (click)="cambiarPestana('mis-solicitudes')"
               [class.bg-sky-600]="pestanaActiva === 'mis-solicitudes'"
@@ -180,7 +179,6 @@
                 </span>
               }
             </button>
-          }
 
           @if (cliente.es_prestador) {
             <button
@@ -584,6 +582,9 @@
                         {{ reserva.categoria }} • {{ reserva.subcategoria }}
                       </p>
                       <p class="text-slate-700 mt-2">{{ reserva.trabajo_descripcion }}</p>
+                      @if (reserva.cancel_motivo) {
+                        <p class="text-sm text-red-600 mt-2">Motivo de cancelación: {{ reserva.cancel_motivo }}</p>
+                      }
                       <div class="flex flex-wrap items-center gap-4 mt-4 text-sm text-slate-600">
                         <span>💰 Presupuesto: {{ reserva.presupuesto }} €</span>
                         <span>📅 Fecha: {{ reserva.fecha_reserva }}</span>
@@ -642,7 +643,7 @@
       }
 
       <!-- Tab: Mis Reservas (Cliente) -->
-      @if (pestanaActiva === 'reservas' && !cliente.es_prestador) {
+      @if (pestanaActiva === 'mis-solicitudes') {
         <div class="space-y-6">
           <div class="flex items-center justify-between">
             <h2 class="text-2xl font-bold text-slate-900">Mis Reservas</h2>
@@ -689,6 +690,9 @@
                         {{ reserva.categoria }} • {{ reserva.subcategoria }}
                       </p>
                       <p class="text-slate-700 mt-2">{{ reserva.trabajo_descripcion }}</p>
+                      @if (reserva.cancel_motivo) {
+                        <p class="text-sm text-red-600 mt-2">Motivo de cancelación: {{ reserva.cancel_motivo }}</p>
+                      }
                       <div class="flex flex-wrap items-center gap-4 mt-4 text-sm text-slate-600">
                         <span>💰 Presupuesto: {{ reserva.presupuesto }} €</span>
                         <span>📅 Fecha: {{ reserva.fecha_reserva }}</span>
@@ -711,11 +715,11 @@
                       @if (reserva.estado_reserva === 'pendiente' && reserva._id) {
                         <div class="flex gap-2 mt-2">
                           <button
-                            (click)="cambiarEstadoReserva($any(reserva._id), 'rechazado')"
+                            (click)="cancelarReservaConMotivo(reserva)"
                             [disabled]="estaProcesandoReserva($any(reserva._id))"
                             class="bg-red-600 hover:bg-red-700 disabled:opacity-50 text-white px-4 py-2 rounded text-sm font-medium"
                           >
-                            ✕ Rechazar
+                            ✕ Cancelar cita
                           </button>
                         </div>
                       }
@@ -728,11 +732,11 @@
                             ✓ Dejar Reseña
                           </button>
                           <button
-                            (click)="cambiarEstadoReserva($any(reserva._id), 'rechazado')"
+                            (click)="cancelarReservaConMotivo(reserva)"
                             [disabled]="estaProcesandoReserva($any(reserva._id))"
                             class="bg-red-600 hover:bg-red-700 disabled:opacity-50 text-white px-4 py-2 rounded text-sm font-medium"
                           >
-                            ✕ Rechazar
+                            ✕ Cancelar cita
                           </button>
                         </div>
                       }
@@ -764,8 +768,8 @@
                         <p class="text-red-800 mt-2">{{ aviso.trabajo_descripcion }}</p>
                         <div class="flex flex-wrap items-center gap-4 mt-4 text-sm text-red-700">
                           <span>💰 Presupuesto: {{ aviso.presupuesto }} €</span>
-                          <span>📅 Fecha: {{ aviso.fecha_reserva }}</span>
-                          <span>⏰ Hora: {{ aviso.hora_reserva }}</span>
+                          <span>📅 Fecha: {{ $any(aviso).fecha_reserva }}</span>
+                          <span>⏰ Hora: {{ $any(aviso).hora_reserva }}</span>
                         </div>
                         <p class="text-red-600 text-sm mt-4 font-semibold">
                           El prestador ha rechazado tu reserva
@@ -784,38 +788,6 @@
           }
         </div>
       }
-
-                      @if (reserva.estado_reserva === 'pendiente' && reserva._id) {
-                        <div class="flex gap-2 mt-2">
-                          <button
-                            (click)="cambiarEstadoReserva($any(reserva._id), 'rechazado')"
-                            [disabled]="estaProcesandoReserva($any(reserva._id))"
-                            class="bg-red-600 hover:bg-red-700 disabled:opacity-50 text-white px-4 py-2 rounded text-sm font-medium"
-                          >
-                            ✕ Rechazar
-                          </button>
-                        </div>
-                      }
-                      @if (reserva.estado_reserva === 'aceptado' && !reserva.tiene_resena) {
-                        <div class="flex gap-2 mt-2 flex-wrap justify-end">
-                          <button
-                            (click)="abrirModalResena(reserva)"
-                            class="bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2 rounded text-sm font-medium"
-                          >
-                            ✓ Dejar Reseña
-                          </button>
-                          <button
-                            (click)="cambiarEstadoReserva($any(reserva._id), 'rechazado')"
-                            [disabled]="estaProcesandoReserva($any(reserva._id))"
-                            class="bg-red-600 hover:bg-red-700 disabled:opacity-50 text-white px-4 py-2 rounded text-sm font-medium"
-                          >
-                            ✕ Rechazar
-                          </button>
-                        </div>
-                      }
-                      @if (reserva.tiene_resena) {
-                        <div class="text-xs text-slate-600 mt-2">✓ Reseña enviada</div>
-                      }
 
       <!-- Tab: Reseñas (Prestador) -->
       @if (pestanaActiva === 'resenas') {
