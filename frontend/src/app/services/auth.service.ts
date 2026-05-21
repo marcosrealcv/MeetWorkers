@@ -5,7 +5,7 @@ import { AuthResponse, Cliente, LoginPayload, RegistroClientePayload } from '../
 import { JwtService } from './jwt.service';
 
 // NOTE: backend dev server may run on a different port during development
-const API_CLIENTES_URL = 'http://localhost:3001/api/clientes';
+const API_CLIENTES_URL = 'http://localhost:3000/api/clientes';
 const CLIENTE_STORAGE_KEY = 'meetworkers_cliente';
 
 @Injectable({

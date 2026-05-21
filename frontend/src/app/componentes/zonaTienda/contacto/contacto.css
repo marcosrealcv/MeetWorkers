@@ -17,6 +17,7 @@
   line-height: 1.05;
   margin: 0.35rem 0 0.8rem;
   color: #0f172a;
+  font-weight: 600;
 }
 
 .contact-hero p,
@@ -34,21 +35,61 @@
 }
 
 .contact-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
-  gap: 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+  align-items: center;
 }
 
 .contact-card {
-  background: white;
-  border: 1px solid #e5e7eb;
-  border-radius: 20px;
-  padding: 1.5rem;
-  box-shadow: 0 10px 30px rgba(15, 23, 42, 0.05);
+  width: 100%;
+  max-width: 1100px;
+  background: linear-gradient(135deg, #ffffff 0%, #f7fbfd 100%);
+  border: 1px solid rgba(15,23,42,0.06);
+  border-radius: 26px;
+  padding: 0.9rem 1.25rem;
+  box-shadow: 0 12px 30px rgba(15, 23, 42, 0.05);
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.contact-card h2 {
+  margin: 0;
+  font-size: clamp(1.05rem, 1.6vw, 1.25rem);
+  color: #0b1220;
+  font-weight: 700;
+}
+
+.card-content p,
+.card-content li {
+  font-size: 0.98rem;
+  color: #475569;
+  font-weight: 400;
+}
+
+.contact-card ol {
+  padding-left: 0;
+  margin: 0;
+  list-style-position: inside;
+}
+
+.contact-card ol li {
+  margin: 0 0 0.6rem 0;
 }
 
 .contact-card h2 {
   font-size: 1.15rem;
   margin-bottom: 0.75rem;
   color: #0f172a;
+}
+.card-left {
+  width: auto;
+  padding: 0;
+  border: none;
+  display: block;
+}
+
+.card-content {
+  padding-left: 0;
 }

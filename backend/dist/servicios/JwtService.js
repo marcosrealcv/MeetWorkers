@@ -35,7 +35,15 @@ exports.default = {
         }
         catch (error) {
             console.log('Error al verificar JWT:', error);
-            return { valid: false, message: error.message };
+            const result = { valid: false };
+            if (error && typeof error === 'object') {
+                result.message = error.message;
+                result.name = error.name;
+                if ('expiredAt' in error) {
+                    result.expiredAt = error.expiredAt;
+                }
+            }
+            return result;
         }
     },
     listaClaimsJWT: (token) => {

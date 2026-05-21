@@ -11,6 +11,7 @@ export interface PrestadorBD {
   subcategoria: string;
   coste_hora: number;
   descripcion_servicio?: string;
+  foto_perfil?: string;
 }
 
 @Injectable({

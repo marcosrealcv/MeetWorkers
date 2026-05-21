@@ -50,6 +50,7 @@ const clienteSchema = new mongoose_1.Schema({
     ubicacion_servicio: { type: String, default: '' },
     direccion_servicio: { type: String, default: '' },
     coste_hora: { type: Number, default: 0 },
+    foto_perfil: { type: String, default: '' },
     trabajos_solicitados: { type: [String], default: [] },
 }, {
     collection: 'clientes',

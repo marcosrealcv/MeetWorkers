@@ -4,6 +4,6 @@ import { Component } from '@angular/core';
   selector: 'app-ayuda',
   standalone: true,
   templateUrl: './ayuda.html',
-  styleUrl: './ayuda.css',
+  styleUrls: ['./ayuda.css'],
 })
 export class AyudaComponent {}

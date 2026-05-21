@@ -151,6 +151,10 @@ function sanitizarCamposEditables(payload: Record<string, unknown>): Partial<Cli
     }
   }
 
+  if (typeof payload.foto_perfil === 'string') {
+    (clienteEditable as any).foto_perfil = payload.foto_perfil.trim();
+  }
+
   return clienteEditable;
 }
 
@@ -254,6 +258,18 @@ routerCliente.post('/login', async (request: Request, response: Response) => {
 
 routerCliente.get('/perfil', async (request: Request, response: Response) => {
   try {
+    const token = extraerTokenBearer(request.headers.authorization);
+    if (!token) {
+      response.status(401).json({ error: 'Token inválido o ausente' });
+      return;
+    }
+
+    const verification = JwtService.verificarJWT(token);
+    if (!verification.valid) {
+      response.status(401).json({ error: verification.message ?? 'Token inválido o expirado' });
+      return;
+    }
+
     const idCliente = obtenerIdClienteDesdeToken(request.headers.authorization);
 
     if (!idCliente || !mongoose.Types.ObjectId.isValid(idCliente)) {
@@ -277,6 +293,18 @@ routerCliente.get('/perfil', async (request: Request, response: Response) => {
 
 routerCliente.put('/perfil', async (request: Request, response: Response) => {
   try {
+    const token = extraerTokenBearer(request.headers.authorization);
+    if (!token) {
+      response.status(401).json({ error: 'Token inválido o ausente' });
+      return;
+    }
+
+    const verification = JwtService.verificarJWT(token);
+    if (!verification.valid) {
+      response.status(401).json({ error: verification.message ?? 'Token inválido o expirado' });
+      return;
+    }
+
     const idCliente = obtenerIdClienteDesdeToken(request.headers.authorization);
 
     if (!idCliente || !mongoose.Types.ObjectId.isValid(idCliente)) {
@@ -285,6 +313,10 @@ routerCliente.put('/perfil', async (request: Request, response: Response) => {
     }
 
     const camposActualizables = sanitizarCamposEditables(request.body as Record<string, unknown>);
+
+    console.log('[PUT /api/clientes/perfil] idCliente:', idCliente);
+    console.log('[PUT /api/clientes/perfil] request.body keys:', Object.keys(request.body));
+    console.log('[PUT /api/clientes/perfil] camposActualizables keys:', Object.keys(camposActualizables));
 
     if (Object.keys(camposActualizables).length === 0) {
       response.status(400).json({ error: 'No hay campos válidos para actualizar' });
@@ -387,7 +419,7 @@ routerCliente.get('/buscar/prestador/:nombre', async (request: Request, response
 routerCliente.get('/prestadores', async (request: Request, response: Response) => {
   try {
     const prestadores = await ClienteModel.find({ es_prestador: true })
-      .select('_id nombre apellido email categoria subcategoria coste_hora descripcion_servicio')
+      .select('_id nombre apellido email categoria subcategoria coste_hora descripcion_servicio foto_perfil')
       .lean();
 
     response.status(200).json(prestadores);

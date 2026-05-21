@@ -17,6 +17,7 @@
   line-height: 1.05;
   margin: 0.35rem 0 0.8rem;
   color: #0f172a;
+  font-weight: 600;
 }
 
 .help-hero p,
@@ -36,25 +37,82 @@
 
 .help-grid {
   display: flex;
-  gap: 1rem;
-  align-items: stretch;
+  flex-direction: column;
+  gap: 1.25rem;
+  align-items: center;
 }
 
 .help-card {
-  flex: 1 1 0;
-  min-width: 0;
-  background: white;
-  border: 1px solid #e5e7eb;
-  border-radius: 20px;
-  padding: 1.5rem;
-  box-shadow: 0 10px 30px rgba(15, 23, 42, 0.05);
-  height: 100%;
+  width: 100%;
+  max-width: 1100px;
+  background: linear-gradient(135deg, #fbfbfb 0%, #f7fbfd 100%);
+  border: 1px solid rgba(15,23,42,0.06);
+  border-radius: 28px;
+  padding: 1rem 1.25rem;
+  box-shadow: 0 12px 30px rgba(15, 23, 42, 0.05);
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
 }
 
 .help-card h2 {
-  font-size: 1.25rem;
-  margin-bottom: 1rem;
+  font-size: clamp(1.15rem, 1.7vw, 1.6rem);
+  margin: 0 0 0.4rem 0;
   color: #0f172a;
+  line-height: 1.03;
+}
+
+.card-eyebrow {
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: #5f818c;
+  margin-bottom: 0.35rem;
+}
+
+.card-intro {
+  margin: 0 0 0.8rem 0;
+  color: #475569;
+}
+
+.card-left {
+  width: auto;
+  padding: 0;
+  border: none;
+  display: block;
+}
+
+.card-left h2 {
+  font-size: clamp(1.05rem, 1.8vw, 1.25rem);
+  margin: 0 0 0.25rem 0;
+  color: #0b1220;
+  font-weight: 700;
+}
+
+.card-content p,
+.card-content li {
+  font-size: 0.98rem;
+  color: #4b5563;
+  font-weight: 400;
+}
+
+.card-content {
+  padding-left: 0;
+  display: block;
+  column-gap: 0;
+}
+
+.card-content p,
+.card-content li,
+.card-content .help-item {
+  break-inside: avoid-column;
+}
+
+/* Content uses single column for band layout; heavy lists remain single column */
+.card-content ol,
+.card-content {
+  column-count: 1;
 }
 
 .help-item + .help-item {
@@ -68,13 +126,36 @@
 }
 
 .help-card ol {
-  padding-left: 1.2rem;
-  display: grid;
-  gap: 0.75rem;
+  padding-left: 0;
+  margin: 0;
+  display: block;
+  gap: 0.5rem;
+  list-style-position: inside;
+}
+
+.help-card ol li {
+  margin: 0 0 0.6rem 0;
 }
 
 @media (max-width: 900px) {
   .help-grid {
-    flex-direction: column;
+    padding: 0 0.5rem;
+  }
+
+  .help-card {
+    padding: 0.85rem 1rem;
+    min-height: auto;
+  }
+
+  .card-left {
+    width: auto;
+    padding-right: 0;
+    margin-bottom: 0.25rem;
+  }
+
+  .card-content,
+  .card-content ol {
+    column-count: 1;
+    padding-left: 0;
   }
 }

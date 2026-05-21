@@ -4,6 +4,6 @@ import { Component } from '@angular/core';
   selector: 'app-legal',
   standalone: true,
   templateUrl: './legal.html',
-  styleUrl: './legal.css',
+  styleUrls: ['./legal.css'],
 })
 export class LegalComponent {}
