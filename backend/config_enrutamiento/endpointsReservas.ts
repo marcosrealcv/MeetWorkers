@@ -226,11 +226,11 @@ routerReservas.post('/', async (request: Request, response: Response) => {
 // PUT /reservas/:id - Actualizar estado de reserva (aceptar/rechazar)
 routerReservas.put('/:id', async (request: Request, response: Response) => {
   try {
-    const idPrestador = obtenerIdClienteDesdeToken(request.headers.authorization);
+    const idUsuario = obtenerIdClienteDesdeToken(request.headers.authorization);
     const avisoId = String(request.params.id ?? '').trim();
     const { estado_reserva } = request.body as { estado_reserva?: string };
 
-    if (!idPrestador || !mongoose.Types.ObjectId.isValid(idPrestador)) {
+    if (!idUsuario || !mongoose.Types.ObjectId.isValid(idUsuario)) {
       response.status(401).json({ error: 'Token inválido o ausente' });
       return;
     }
@@ -245,19 +245,78 @@ routerReservas.put('/:id', async (request: Request, response: Response) => {
       return;
     }
 
+    // Buscar la reserva - puede ser prestador o cliente
+    const avisoActual = await AvisoModel.findOne({
+      _id: avisoId,
+      tipo: 'reserva',
+      $or: [
+        { prestador_id: idUsuario },  // Usuario es prestador
+        { cliente_id: idUsuario },    // Usuario es cliente (solicitante)
+      ],
+    }).lean();
+
+    if (!avisoActual) {
+      response.status(404).json({ error: 'Reserva no encontrada' });
+      return;
+    }
+
+    // Determinar quién es el usuario (prestador o cliente)
+    const esPrestador = avisoActual.prestador_id === idUsuario;
+    const esCliente = avisoActual.cliente_id === idUsuario;
+
+    // Actualizar el estado de la reserva
     const avisoActualizado = await AvisoModel.findOneAndUpdate(
-      {
-        _id: avisoId,
-        prestador_id: idPrestador,
-        tipo: 'reserva',
-      },
+      { _id: avisoId },
       { $set: { estado_reserva } },
       { new: true }
     ).lean();
 
-    if (!avisoActualizado) {
-      response.status(404).json({ error: 'Reserva no encontrada' });
-      return;
+    // Si el estado es 'rechazado', crear un aviso para la otra parte
+    if (estado_reserva === 'rechazado') {
+      try {
+        if (esPrestador && avisoActual.cliente_id) {
+          // Prestador rechaza: crear aviso para cliente
+          const avisoCliente = {
+            cliente_id: avisoActual.cliente_id,
+            prestador_id: idUsuario,
+            tipo: 'reserva_rechazada' as any,
+            reserva_id: avisoId,
+            trabajo_titulo: avisoActual.trabajo_titulo,
+            trabajo_descripcion: avisoActual.trabajo_descripcion,
+            categoria: avisoActual.categoria,
+            subcategoria: avisoActual.subcategoria,
+            ubicacion: avisoActual.ubicacion,
+            presupuesto: avisoActual.presupuesto || 0,
+            fecha_reserva: avisoActual.fecha_reserva || '',
+            hora_reserva: avisoActual.hora_reserva || '',
+            leido: false,
+          };
+
+          await AvisoModel.create(avisoCliente);
+        } else if (esCliente && avisoActual.prestador_id) {
+          // Cliente rechaza: crear aviso para prestador
+          const avisoPrestador = {
+            prestador_id: avisoActual.prestador_id,
+            cliente_id: idUsuario,
+            tipo: 'solicitud_rechazada' as any,
+            reserva_id: avisoId,
+            trabajo_titulo: avisoActual.trabajo_titulo,
+            trabajo_descripcion: avisoActual.trabajo_descripcion,
+            categoria: avisoActual.categoria,
+            subcategoria: avisoActual.subcategoria,
+            ubicacion: avisoActual.ubicacion,
+            presupuesto: avisoActual.presupuesto || 0,
+            fecha_reserva: avisoActual.fecha_reserva || '',
+            hora_reserva: avisoActual.hora_reserva || '',
+            leido: false,
+          };
+
+          await AvisoModel.create(avisoPrestador);
+        }
+      } catch (error) {
+        console.error('Error creando aviso de rechazo:', error);
+        // No fallar la operación si el aviso no se crea
+      }
     }
 
     response.status(200).json({

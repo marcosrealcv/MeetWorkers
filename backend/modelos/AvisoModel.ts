@@ -2,7 +2,8 @@ import mongoose, { Schema } from 'mongoose';
 
 export type AvisoDocument = {
   prestador_id: string;
-  tipo: 'trabajo' | 'reserva';
+  cliente_id?: string;
+  tipo: 'trabajo' | 'reserva' | 'reserva_rechazada' | 'solicitud_rechazada';
   trabajo_id?: string;
   reserva_id?: string;
   trabajo_titulo: string;
@@ -14,7 +15,6 @@ export type AvisoDocument = {
   fecha_limite?: string;
   foto_principal?: string;
   // Campos específicos para reservas
-  cliente_id?: string;
   cliente_nombre?: string;
   cliente_email?: string;
   cliente_telefono?: string;
@@ -32,7 +32,8 @@ export type AvisoDocument = {
 const avisoSchema = new Schema<AvisoDocument>(
   {
     prestador_id: { type: String, required: true, trim: true, index: true },
-    tipo: { type: String, enum: ['trabajo', 'reserva'], default: 'trabajo' },
+    cliente_id: { type: String, trim: true, index: true, sparse: true },
+    tipo: { type: String, enum: ['trabajo', 'reserva', 'reserva_rechazada', 'solicitud_rechazada'], default: 'trabajo' },
     trabajo_id: { type: String, trim: true, index: true, sparse: true },
     reserva_id: { type: String, trim: true, index: true, sparse: true },
     trabajo_titulo: { type: String, required: true, trim: true },

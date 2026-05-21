@@ -136,4 +136,32 @@ routerAvisos.delete('/:id', async (request: Request, response: Response) => {
   }
 });
 
+// GET /avisos/cliente/mis-avisos - Obtener avisos del cliente (rechazos de reservas, etc.)
+routerAvisos.get('/cliente/mis-avisos', async (request: Request, response: Response) => {
+  try {
+    const idCliente = obtenerIdClienteDesdeToken(request.headers.authorization);
+
+    if (!idCliente || !mongoose.Types.ObjectId.isValid(idCliente)) {
+      response.status(401).json({ error: 'Token inválido o ausente' });
+      return;
+    }
+
+    const cliente = await ClienteModel.findById(idCliente, { _id: 1 }).lean();
+
+    if (!cliente) {
+      response.status(404).json({ error: 'Cliente no encontrado' });
+      return;
+    }
+
+    const avisos = await AvisoModel.find({ cliente_id: idCliente })
+      .sort({ leido: 1, createdAt: -1 })
+      .lean();
+
+    response.status(200).json(avisos);
+  } catch (error) {
+    console.error('Error obteniendo avisos del cliente:', error);
+    response.status(500).json({ error: 'No se pudieron obtener los avisos' });
+  }
+});
+
 export default routerAvisos;

@@ -1,18 +1,20 @@
-import { Component, OnDestroy, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit, HostListener } from '@angular/core';
 import { NavigationEnd, Router } from '@angular/router';
 import { RouterLink } from '@angular/router';
+import { CommonModule } from '@angular/common';
 import { AuthService } from '../../../services/auth.service';
 import { AvisosService } from '../../../services/avisos.service';
 import { filter, Subscription } from 'rxjs';
 
 @Component({
   selector: 'app-header',
-  imports: [RouterLink],
+  imports: [RouterLink, CommonModule],
   templateUrl: './header.html',
   styleUrl: './header.css',
 })
 export class Header implements OnInit, OnDestroy {
   cantidadAvisosNoLeidos = 0;
+  dropdownOpen = false;
   private routerEventsSubscription: Subscription | null = null;
   private pollingAvisosId: ReturnType<typeof setInterval> | null = null;
 
@@ -29,6 +31,7 @@ export class Header implements OnInit, OnDestroy {
       .pipe(filter((event) => event instanceof NavigationEnd))
       .subscribe(() => {
         this.actualizarContadorAvisos();
+        this.dropdownOpen = false;
       });
 
     this.pollingAvisosId = setInterval(() => {
@@ -44,9 +47,23 @@ export class Header implements OnInit, OnDestroy {
     }
   }
 
+  toggleDropdown(): void {
+    this.dropdownOpen = !this.dropdownOpen;
+  }
+
+  @HostListener('document:click', ['$event'])
+  onDocumentClick(event: MouseEvent): void {
+    const target = event.target as HTMLElement;
+    const dropdown = target.closest('.profile-dropdown');
+    if (!dropdown) {
+      this.dropdownOpen = false;
+    }
+  }
+
   cerrarSesion(): void {
     this.authService.cerrarSesion();
     this.cantidadAvisosNoLeidos = 0;
+    this.dropdownOpen = false;
     void this.router.navigate(['/']);
   }
 
@@ -70,6 +87,7 @@ export class Header implements OnInit, OnDestroy {
 
   irAAvisosPrestador(): void {
     void this.router.navigate(['/cuenta']);
+    this.dropdownOpen = false;
   }
 
 }

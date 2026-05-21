@@ -39,7 +39,7 @@ export class Cuenta implements OnInit, OnDestroy {
   mensajeExito = '';
   
   // Pestañas activas
-  pestanaActiva: 'perfil' | 'mis-trabajos' | 'reservas' | 'resenas' | 'servicios' = 'perfil';
+  pestanaActiva: 'perfil' | 'mis-trabajos' | 'reservas' | 'mis-solicitudes' | 'resenas' | 'servicios' = 'perfil';
   
   // Edición
   enModoEdicion = false;
@@ -58,6 +58,7 @@ export class Cuenta implements OnInit, OnDestroy {
   // Avisos
   avisosPrestador: AvisoPrestador[] = [];
   avisosCliente: AvisoPrestador[] = [];
+  avisosRechazoCliente: AvisoPrestador[] = [];
   cargandoAvisos = false;
   errorAvisos = '';
   idsAvisosProcesando = new Set<string>();
@@ -239,6 +240,7 @@ export class Cuenta implements OnInit, OnDestroy {
     this.cargarMisReservas(cliente);
     this.cargarMisTrabajosPublicados(cliente);
     this.cargarResenasRecibidas(cliente);
+    this.cargarAvisosRechazoCliente(cliente);
   }
 
   private rellenarFormulario(cliente: Cliente): void {
@@ -371,7 +373,7 @@ export class Cuenta implements OnInit, OnDestroy {
     void this.router.navigate(['/iniciar-sesion']);
   }
 
-  cambiarPestana(pestaña: 'perfil' | 'mis-trabajos' | 'reservas' | 'resenas' | 'servicios'): void {
+  cambiarPestana(pestaña: 'perfil' | 'mis-trabajos' | 'reservas' | 'mis-solicitudes' | 'resenas' | 'servicios'): void {
     this.pestanaActiva = pestaña;
   }
 
@@ -743,6 +745,30 @@ export class Cuenta implements OnInit, OnDestroy {
 
     const suma = this.resenasRecibidas.reduce((total, resena) => total + (resena.resena_calificacion || 0), 0);
     this.promedioCalificacion = suma / this.resenasRecibidas.length;
+  }
+
+  cargarAvisosRechazoCliente(clienteBase?: Cliente): void {
+    const cliente = clienteBase ?? this.cliente;
+
+    if (!cliente) {
+      this.avisosRechazoCliente = [];
+      return;
+    }
+
+    this.avisosService.obtenerMisAvisosCliente().subscribe({
+      next: (avisos) => {
+        // Filtrar solo los avisos de rechazo de reservas
+        this.avisosRechazoCliente = avisos.filter((aviso: any) => aviso.tipo === 'reserva_rechazada');
+      },
+      error: (error: HttpErrorResponse) => {
+        if (error.status === 401 || error.status === 403) {
+          this.avisosRechazoCliente = [];
+          return;
+        }
+        // No mostrar error, solo dejar lista vacía
+        this.avisosRechazoCliente = [];
+      },
+    });
   }
 
   // Métodos para manejar reseñas

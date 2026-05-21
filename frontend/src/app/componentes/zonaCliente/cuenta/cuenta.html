@@ -165,6 +165,25 @@
 
           @if (cliente.es_prestador) {
             <button
+              (click)="cambiarPestana('mis-solicitudes')"
+              [class.bg-sky-600]="pestanaActiva === 'mis-solicitudes'"
+              [class.text-white]="pestanaActiva === 'mis-solicitudes'"
+              [class.text-slate-600]="pestanaActiva !== 'mis-solicitudes'"
+              class="px-6 py-4 font-medium border-b-2 transition-colors whitespace-nowrap relative"
+              [class.border-sky-600]="pestanaActiva === 'mis-solicitudes'"
+              [class.border-transparent]="pestanaActiva !== 'mis-solicitudes'"
+            >
+              🔍 Mis Solicitudes
+              @if (cantidadMisReservasPendientes > 0) {
+                <span class="absolute top-3 right-2 bg-red-500 text-white text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center">
+                  {{ cantidadMisReservasPendientes }}
+                </span>
+              }
+            </button>
+          }
+
+          @if (cliente.es_prestador) {
+            <button
               (click)="cambiarPestana('resenas')"
               [class.bg-sky-600]="pestanaActiva === 'resenas'"
               [class.text-white]="pestanaActiva === 'resenas'"
@@ -602,6 +621,17 @@
                           </button>
                         </div>
                       }
+                      @if (reserva.estado_reserva === 'aceptado' && reserva._id) {
+                        <div class="flex gap-2 mt-2">
+                          <button
+                            (click)="cambiarEstadoReserva($any(reserva._id), 'rechazado')"
+                            [disabled]="estaProcesandoReserva($any(reserva._id))"
+                            class="bg-red-600 hover:bg-red-700 disabled:opacity-50 text-white px-4 py-2 rounded text-sm font-medium"
+                          >
+                            ✕ Rechazar
+                          </button>
+                        </div>
+                      }
                     </div>
                   </div>
                 </div>
@@ -678,13 +708,33 @@
                         {{ reserva.estado_reserva || 'pendiente' }}
                       </span>
 
+                      @if (reserva.estado_reserva === 'pendiente' && reserva._id) {
+                        <div class="flex gap-2 mt-2">
+                          <button
+                            (click)="cambiarEstadoReserva($any(reserva._id), 'rechazado')"
+                            [disabled]="estaProcesandoReserva($any(reserva._id))"
+                            class="bg-red-600 hover:bg-red-700 disabled:opacity-50 text-white px-4 py-2 rounded text-sm font-medium"
+                          >
+                            ✕ Rechazar
+                          </button>
+                        </div>
+                      }
                       @if (reserva.estado_reserva === 'aceptado' && !reserva.tiene_resena) {
-                        <button
-                          (click)="abrirModalResena(reserva)"
-                          class="bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2 rounded text-sm font-medium mt-2"
-                        >
-                          ✓ Dejar Reseña
-                        </button>
+                        <div class="flex gap-2 mt-2 flex-wrap justify-end">
+                          <button
+                            (click)="abrirModalResena(reserva)"
+                            class="bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2 rounded text-sm font-medium"
+                          >
+                            ✓ Dejar Reseña
+                          </button>
+                          <button
+                            (click)="cambiarEstadoReserva($any(reserva._id), 'rechazado')"
+                            [disabled]="estaProcesandoReserva($any(reserva._id))"
+                            class="bg-red-600 hover:bg-red-700 disabled:opacity-50 text-white px-4 py-2 rounded text-sm font-medium"
+                          >
+                            ✕ Rechazar
+                          </button>
+                        </div>
                       }
                       @if (reserva.tiene_resena) {
                         <div class="text-xs text-slate-600 mt-2">✓ Reseña enviada</div>
@@ -695,8 +745,77 @@
               }
             </div>
           }
+
+          <!-- Avisos de Rechazo de Reservas -->
+          @if (avisosRechazoCliente.length > 0) {
+            <div class="mt-12 pt-8 border-t border-slate-200">
+              <h3 class="text-xl font-bold text-slate-900 mb-4 flex items-center gap-2">
+                <span class="text-red-600">⚠️</span> Reservas Rechazadas
+              </h3>
+              <div class="grid grid-cols-1 gap-4">
+                @for (aviso of avisosRechazoCliente; track aviso._id) {
+                  <div class="bg-red-50 border border-red-200 rounded-lg p-6">
+                    <div class="flex items-start justify-between gap-4">
+                      <div class="flex-1">
+                        <h4 class="text-lg font-bold text-red-900">{{ aviso.trabajo_titulo }}</h4>
+                        <p class="text-red-700 text-sm mt-1">
+                          {{ aviso.categoria }} • {{ aviso.subcategoria }}
+                        </p>
+                        <p class="text-red-800 mt-2">{{ aviso.trabajo_descripcion }}</p>
+                        <div class="flex flex-wrap items-center gap-4 mt-4 text-sm text-red-700">
+                          <span>💰 Presupuesto: {{ aviso.presupuesto }} €</span>
+                          <span>📅 Fecha: {{ aviso.fecha_reserva }}</span>
+                          <span>⏰ Hora: {{ aviso.hora_reserva }}</span>
+                        </div>
+                        <p class="text-red-600 text-sm mt-4 font-semibold">
+                          El prestador ha rechazado tu reserva
+                        </p>
+                      </div>
+                      <div>
+                        <span class="inline-flex items-center bg-red-100 text-red-700 rounded-full px-3 py-1 text-xs font-semibold">
+                          Rechazado
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                }
+              </div>
+            </div>
+          }
         </div>
       }
+
+                      @if (reserva.estado_reserva === 'pendiente' && reserva._id) {
+                        <div class="flex gap-2 mt-2">
+                          <button
+                            (click)="cambiarEstadoReserva($any(reserva._id), 'rechazado')"
+                            [disabled]="estaProcesandoReserva($any(reserva._id))"
+                            class="bg-red-600 hover:bg-red-700 disabled:opacity-50 text-white px-4 py-2 rounded text-sm font-medium"
+                          >
+                            ✕ Rechazar
+                          </button>
+                        </div>
+                      }
+                      @if (reserva.estado_reserva === 'aceptado' && !reserva.tiene_resena) {
+                        <div class="flex gap-2 mt-2 flex-wrap justify-end">
+                          <button
+                            (click)="abrirModalResena(reserva)"
+                            class="bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2 rounded text-sm font-medium"
+                          >
+                            ✓ Dejar Reseña
+                          </button>
+                          <button
+                            (click)="cambiarEstadoReserva($any(reserva._id), 'rechazado')"
+                            [disabled]="estaProcesandoReserva($any(reserva._id))"
+                            class="bg-red-600 hover:bg-red-700 disabled:opacity-50 text-white px-4 py-2 rounded text-sm font-medium"
+                          >
+                            ✕ Rechazar
+                          </button>
+                        </div>
+                      }
+                      @if (reserva.tiene_resena) {
+                        <div class="text-xs text-slate-600 mt-2">✓ Reseña enviada</div>
+                      }
 
       <!-- Tab: Reseñas (Prestador) -->
       @if (pestanaActiva === 'resenas') {

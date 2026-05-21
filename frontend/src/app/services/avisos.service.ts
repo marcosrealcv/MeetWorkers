@@ -52,6 +52,19 @@ export class AvisosService {
     return this.http.delete<EliminarAvisoResponse>(`${API_AVISOS_URL}/${idAviso}`, { headers }).pipe(timeout(10000));
   }
 
+  obtenerMisAvisosCliente(): Observable<AvisoPrestador[]> {
+    const headers = this.obtenerHeadersAutorizados();
+
+    if (!headers) {
+      return throwError(() => new HttpErrorResponse({
+        status: 401,
+        error: { error: 'No hay una sesión activa, inicia sesión de nuevo' }
+      }));
+    }
+
+    return this.http.get<AvisoPrestador[]>(`${API_AVISOS_URL}/cliente/mis-avisos`, { headers }).pipe(timeout(10000));
+  }
+
   private obtenerHeadersAutorizados(): HttpHeaders | null {
     const token = this.jwtService.obtenerToken();
 
