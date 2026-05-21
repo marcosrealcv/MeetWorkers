@@ -149,9 +149,15 @@ routerReservas.get('/mias', async (request: Request, response: Response) => {
           cliente_id: idCliente,
         };
 
+    console.log('[GET /api/reservas/mias] idCliente:', idCliente);
+    console.log('[GET /api/reservas/mias] emailCliente:', emailCliente);
+    console.log('[GET /api/reservas/mias] filtroReservas:', JSON.stringify(filtroReservas));
+
     const avisos = await AvisoModel.find(filtroReservas)
       .sort({ createdAt: -1 })
       .lean();
+
+    console.log('[GET /api/reservas/mias] found:', avisos.length);
 
     response.status(200).json(avisos);
   } catch (error) {
@@ -326,6 +332,87 @@ routerReservas.put('/:id', async (request: Request, response: Response) => {
   } catch (error) {
     console.error('Error actualizando reserva:', error);
     response.status(500).json({ error: 'No se pudo actualizar la reserva' });
+  }
+});
+
+// PUT /reservas/:id/cancelar - Cliente cancela una reserva aceptada con motivo
+routerReservas.put('/:id/cancelar', async (request: Request, response: Response) => {
+  try {
+    const idCliente = obtenerIdClienteDesdeToken(request.headers.authorization);
+    const avisoId = String(request.params.id ?? '').trim();
+    const { motivo } = request.body as { motivo?: string };
+
+    if (!idCliente || !mongoose.Types.ObjectId.isValid(idCliente)) {
+      response.status(401).json({ error: 'Token inválido o ausente' });
+      return;
+    }
+
+    if (!mongoose.Types.ObjectId.isValid(avisoId)) {
+      response.status(400).json({ error: 'ID de reserva inválido' });
+      return;
+    }
+
+    // Buscar la reserva y validar que el solicitante sea el cliente y que esté aceptada
+    const avisoActual = await AvisoModel.findOne({ _id: avisoId, tipo: 'reserva' }).lean();
+
+    if (!avisoActual) {
+      response.status(404).json({ error: 'Reserva no encontrada' });
+      return;
+    }
+
+    // Comprobar que el solicitante es el cliente que creó la reserva (o coincide email)
+    const cliente = await ClienteModel.findById(idCliente).select({ email: 1 }).lean();
+    const emailCliente = typeof cliente?.email === 'string' ? cliente.email.toLowerCase().trim() : '';
+
+    const esSolicitante = avisoActual.cliente_id === idCliente || (emailCliente && avisoActual.cliente_email === emailCliente);
+
+    if (!esSolicitante) {
+      response.status(403).json({ error: 'No tienes permiso para cancelar esta reserva' });
+      return;
+    }
+
+    if (avisoActual.estado_reserva !== 'aceptado') {
+      response.status(400).json({ error: 'Sólo se pueden cancelar reservas aceptadas' });
+      return;
+    }
+
+    // Actualizar la reserva: marcar como rechazado/cancelado y guardar motivo
+    const avisoActualizado = await AvisoModel.findOneAndUpdate(
+      { _id: avisoId },
+      { $set: { estado_reserva: 'rechazado', cancel_motivo: String(motivo ?? '').trim() } },
+      { new: true }
+    ).lean();
+
+    // Crear un aviso para el prestador informando de la cancelación
+    try {
+      if (avisoActual.prestador_id) {
+        const avisoPrestador = {
+          prestador_id: avisoActual.prestador_id,
+          cliente_id: idCliente,
+          tipo: 'solicitud_rechazada' as any,
+          reserva_id: avisoId,
+          trabajo_titulo: avisoActual.trabajo_titulo,
+          trabajo_descripcion: avisoActual.trabajo_descripcion,
+          categoria: avisoActual.categoria,
+          subcategoria: avisoActual.subcategoria,
+          ubicacion: avisoActual.ubicacion,
+          presupuesto: avisoActual.presupuesto || 0,
+          fecha_reserva: avisoActual.fecha_reserva || '',
+          hora_reserva: avisoActual.hora_reserva || '',
+          leido: false,
+          cancel_motivo: String(motivo ?? '').trim(),
+        };
+
+        await AvisoModel.create(avisoPrestador);
+      }
+    } catch (err) {
+      console.error('Error creando aviso de cancelación para prestador:', err);
+    }
+
+    response.status(200).json({ mensaje: 'Reserva cancelada correctamente', reserva: avisoActualizado });
+  } catch (error) {
+    console.error('Error cancelando reserva:', error);
+    response.status(500).json({ error: 'No se pudo cancelar la reserva' });
   }
 });
 

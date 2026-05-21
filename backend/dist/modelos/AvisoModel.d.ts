@@ -19,6 +19,7 @@ export type AvisoDocument = {
     fecha_reserva?: string;
     hora_reserva?: string;
     estado_reserva?: 'pendiente' | 'aceptado' | 'rechazado';
+    cancel_motivo?: string;
     leido: boolean;
     resena_calificacion?: number;
     resena_comentario?: string;

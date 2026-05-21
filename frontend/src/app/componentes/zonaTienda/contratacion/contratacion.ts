@@ -78,7 +78,7 @@ export class ContratacionComponent implements OnInit {
               rating: 0,
               resenas: 0,
               precio: `${prestadorReal.coste_hora}€/hora`,
-              imagen: '/imgs/proveedor.png',
+              imagen: '/imgs/proveedor.svg',
               experiencia: 'Prestador verificado'
             };
             this.proveedor.set(nuevoProveedor);

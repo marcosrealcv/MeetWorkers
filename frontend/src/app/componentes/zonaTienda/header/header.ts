@@ -77,7 +77,13 @@ export class Header implements OnInit, OnDestroy {
 
     this.avisosService.obtenerMisAvisos().subscribe({
       next: (avisos) => {
-        this.cantidadAvisosNoLeidos = avisos.filter((aviso) => !aviso.leido).length;
+        // deduplicate by _id in case backend returns duplicates
+        const unique = new Map<string, any>();
+        for (const a of avisos) {
+          unique.set(String(a._id), a);
+        }
+        const deduped = Array.from(unique.values());
+        this.cantidadAvisosNoLeidos = deduped.filter((aviso) => !aviso.leido).length;
       },
       error: () => {
         this.cantidadAvisosNoLeidos = 0;

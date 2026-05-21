@@ -1,9 +1,9 @@
-import { Component, OnDestroy, OnInit, inject, ViewChild, ElementRef } from '@angular/core';
+import { Component, OnDestroy, OnInit, inject, ViewChild, ElementRef, ChangeDetectorRef } from '@angular/core';
 import { DatePipe, CommonModule } from '@angular/common';
 import { HttpErrorResponse } from '@angular/common/http';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { NavigationEnd, Router } from '@angular/router';
-import { filter, Subscription, timeout } from 'rxjs';
+import { filter, Subscription, timeout, lastValueFrom } from 'rxjs';
 import { AuthService } from '../../../services/auth.service';
 import { Cliente } from '../../../models/cliente.interface';
 import { AvisoPrestador } from '../../../models/aviso.interface';
@@ -30,6 +30,7 @@ export class Cuenta implements OnInit, OnDestroy {
   @ViewChild('inputFoto') inputFoto!: ElementRef<HTMLInputElement>;
   
   private readonly fb = inject(FormBuilder);
+  private readonly cd = inject(ChangeDetectorRef);
   private suscripcionNavegacion: Subscription | null = null;
 
   // Estado general
@@ -241,6 +242,12 @@ export class Cuenta implements OnInit, OnDestroy {
     this.cargarMisTrabajosPublicados(cliente);
     this.cargarResenasRecibidas(cliente);
     this.cargarAvisosRechazoCliente(cliente);
+    // Ensure Angular notices async state changes and avoid ExpressionChangedAfterItHasBeenCheckedError
+    try {
+      this.cd.detectChanges();
+    } catch (e) {
+      // Safe to ignore if change detection is already running
+    }
   }
 
   private rellenarFormulario(cliente: Cliente): void {
@@ -276,6 +283,26 @@ export class Cuenta implements OnInit, OnDestroy {
     this.errorPerfil = '';
     this.mensajeExito = '';
     this.enModoEdicion = false;
+  }
+
+  async cancelarReservaConMotivo(aviso: Reserva): Promise<void> {
+    if (!aviso._id) return;
+
+    const motivo = prompt('Indica el motivo de la cancelación (opcional):');
+    if (motivo === null) return; // usuario canceló el prompt
+
+    try {
+      this.cargandoReservas = true;
+      await lastValueFrom(this.reservasService.cancelarReserva(aviso._id, motivo));
+      // Refrescar la lista de reservas del cliente
+      this.cargarMisReservas(this.cliente ?? undefined);
+      this.mensajeExito = 'Reserva cancelada correctamente';
+    } catch (error) {
+      console.error('Error cancelando reserva:', error);
+      this.errorReservas = (error as any)?.error?.error ?? 'No se pudo cancelar la reserva';
+    } finally {
+      this.cargandoReservas = false;
+    }
   }
 
   clickInputFoto(): void {
@@ -585,6 +612,7 @@ export class Cuenta implements OnInit, OnDestroy {
           this.reservasPrestador = reservas;
           this.cantidadReservasPendientes = reservas.filter((reserva) => reserva.estado_reserva === 'pendiente').length;
           this.cargandoReservas = false;
+          try { this.cd.detectChanges(); } catch (e) {}
         }, 0);
       },
       error: (error: HttpErrorResponse) => {
@@ -622,6 +650,7 @@ export class Cuenta implements OnInit, OnDestroy {
           this.reservasCliente = reservas;
           this.cantidadMisReservasPendientes = reservas.filter((reserva) => reserva.estado_reserva === 'pendiente').length;
           this.cargandoReservas = false;
+          try { this.cd.detectChanges(); } catch (e) {}
         }, 0);
       },
       error: (error: HttpErrorResponse) => {
