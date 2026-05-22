@@ -73,6 +73,11 @@ export class Cuenta implements OnInit, OnDestroy {
   trabajosAceptados: TrabajoSolicitud[] = [];
   cargandoTrabajosAceptados = false;
   errorTrabajosAceptados = '';
+
+  // Trabajos rechazados/cancelados
+  trabajosRechazados: AvisoPrestador[] = [];
+  cargandoTrabajosRechazados = false;
+  errorTrabajosRechazados = '';
   
   // Reservas
   reservasPrestador: Reserva[] = [];
@@ -246,6 +251,7 @@ export class Cuenta implements OnInit, OnDestroy {
     this.cargarMisReservas(cliente);
     this.cargarMisTrabajosPublicados(cliente);
     this.cargarTrabajosAceptados(cliente);
+    this.cargarTrabajosRechazados(cliente);
     this.cargarResenasRecibidas(cliente);
     this.cargarAvisosRechazoCliente(cliente);
     // Ensure Angular notices async state changes and avoid ExpressionChangedAfterItHasBeenCheckedError
@@ -649,6 +655,7 @@ export class Cuenta implements OnInit, OnDestroy {
       next: () => {
         this.mensajeExito = 'El trabajo se ha cancelado correctamente y se ha registrado el motivo.';
         this.cargarTrabajosAceptados(this.cliente ?? undefined);
+        this.cargarTrabajosRechazados(this.cliente ?? undefined);
         this.cargarAvisosCliente(this.cliente ?? undefined);
       },
       error: (error: HttpErrorResponse) => {
@@ -908,6 +915,36 @@ export class Cuenta implements OnInit, OnDestroy {
         }
         // No mostrar error, solo dejar lista vacía
         this.avisosRechazoCliente = [];
+      },
+    });
+  }
+
+  cargarTrabajosRechazados(clienteBase?: Cliente): void {
+    const cliente = clienteBase ?? this.cliente;
+
+    if (!cliente) {
+      this.trabajosRechazados = [];
+      return;
+    }
+
+    this.cargandoTrabajosRechazados = true;
+    this.errorTrabajosRechazados = '';
+
+    this.avisosService.obtenerMisAvisos().subscribe({
+      next: (avisos) => {
+        // Filtrar solo los avisos de trabajos rechazados/cancelados
+        this.trabajosRechazados = avisos.filter((aviso: any) => aviso.tipo === 'solicitud_rechazada');
+        this.cargandoTrabajosRechazados = false;
+      },
+      error: (error: HttpErrorResponse) => {
+        if (error.status === 401 || error.status === 403) {
+          this.trabajosRechazados = [];
+          this.cargandoTrabajosRechazados = false;
+          return;
+        }
+        // No mostrar error, solo dejar lista vacía
+        this.trabajosRechazados = [];
+        this.cargandoTrabajosRechazados = false;
       },
     });
   }

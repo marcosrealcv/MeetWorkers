@@ -493,6 +493,7 @@ routerReservas.get('/resenas/recibidas', (request, response) => __awaiter(void 0
             resena_calificacion: 1,
             resena_comentario: 1,
             resena_fecha: 1,
+            fecha_reserva: 1,
             trabajo_titulo: 1,
         }).lean();
         response.status(200).json(resenasRecibidas || []);
