@@ -77,9 +77,9 @@ export class Inicio implements OnInit, OnDestroy {
       'Reparaciones': '/imgs/reparaciones/reparaciones.png',
       'Cuidado Personal': '/imgs/cuidado_personal/cuidado.png',
       'Construcciones y Reformas': '/imgs/construcciones_y_reformas/consturccion.png',
-      'Otro': '/imgs/limpieza/limpieza.png'
+      'Otro': '/imgs/otros/otros.png'
     };
-    return imagenes[nombreCategoria] || '/imgs/limpieza/limpieza.png';
+    return imagenes[nombreCategoria] || '/imgs/otros/otros.png';
   }
 
   get esPrestador(): boolean {
