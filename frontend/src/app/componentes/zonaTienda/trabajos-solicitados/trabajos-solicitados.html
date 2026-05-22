@@ -1,0 +1,31 @@
+<section class="trabajos-hero">
+  <div class="trabajos-hero__content">
+    <span class="trabajos-hero__badge">Para prestadores</span>
+    <h1>Trabajos solicitados por usuarios</h1>
+    <p>
+      Revisa las solicitudes publicadas por la gente, filtra por tu especialidad y elige los trabajos que mejor encajan contigo.
+    </p>
+  </div>
+</section>
+
+<section class="trabajos-listado">
+  @if (cargandoTrabajosSolicitados()) {
+    <div class="estado-vacio">Cargando trabajos solicitados...</div>
+  }
+
+  @if (!cargandoTrabajosSolicitados() && errorTrabajosSolicitados()) {
+    <div class="estado-error">{{ errorTrabajosSolicitados() }}</div>
+  }
+
+  @if (!cargandoTrabajosSolicitados() && !errorTrabajosSolicitados() && trabajosSolicitados().length === 0) {
+    <div class="estado-vacio">No hay trabajos solicitados disponibles en este momento.</div>
+  }
+
+  @if (!cargandoTrabajosSolicitados() && trabajosSolicitados().length > 0) {
+    <div class="trabajos-grid">
+      @for (item of trabajosSolicitados(); track item.id) {
+        <app-tarjetas-servicios [info]="item" tipoTarjeta="trabajo"></app-tarjetas-servicios>
+      }
+    </div>
+  }
+</section>
