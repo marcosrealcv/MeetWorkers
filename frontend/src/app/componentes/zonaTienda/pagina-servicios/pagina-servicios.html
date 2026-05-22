@@ -1,9 +1,41 @@
 <div class="container mx-auto py-12 px-4">
-    <h1 class="text-3xl font-extrabold text-gray-900 mb-8">Filtrando por: {{ categoria() }}</h1>
+    <div class="header-servicios">
+        <h1 class="text-3xl font-extrabold text-gray-900">{{ categoria() }}</h1>
+        
+        <!-- Botón volver atrás solo si estamos viendo subcategorías -->
+        @if (mostrandoSubcategorias()) {
+            <button 
+                (click)="volverACategoriasprincipales()"
+                class="btn-volver"
+            >
+                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
+                </svg>
+                Volver a Categorías
+            </button>
+        }
+    </div>
     
     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
-        @for (servicio of serviciosFiltrados(); track servicio.id) {
-            <app-tarjetas-subcategorias [info]="servicio"></app-tarjetas-subcategorias>
+        <!-- Mostrar categorías principales si no hay categoría seleccionada -->
+        @if (!mostrandoSubcategorias()) {
+            @for (servicio of serviciosFiltrados(); track servicio.id) {
+                <app-tarjetas-subcategorias 
+                    [info]="servicio"
+                    [esCategoriaPrincipal]="true">
+                </app-tarjetas-subcategorias>
+            }
+        }
+        
+        <!-- Mostrar subcategorías si hay categoría seleccionada -->
+        @if (mostrandoSubcategorias()) {
+            @for (servicio of serviciosFiltrados(); track servicio.id) {
+                <app-tarjetas-subcategorias 
+                    [info]="servicio"
+                    [esCategoriaPrincipal]="false"
+                    [pathCategoriaPrincipal]="pathCategoriaPrincipal()">
+                </app-tarjetas-subcategorias>
+            }
         }
     </div>
 </div>
