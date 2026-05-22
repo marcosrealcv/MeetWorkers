@@ -550,6 +550,44 @@
               }
             </div>
           }
+
+          <!-- Trabajos Rechazados -->
+          @if (trabajosRechazados.length > 0) {
+            <div class="mt-12 pt-8 border-t border-slate-200">
+              <h3 class="text-xl font-bold text-slate-900 mb-4 flex items-center gap-2">
+                <span class="text-red-600">⚠️</span> Trabajos Rechazados
+              </h3>
+              <div class="grid grid-cols-1 gap-4">
+                @for (trabajo of trabajosRechazados; track trabajo._id) {
+                  <div class="bg-red-50 border border-red-200 rounded-lg p-6">
+                    <div class="flex items-start justify-between gap-4">
+                      <div class="flex-1">
+                        <h4 class="text-lg font-bold text-red-900">{{ trabajo.trabajo_titulo }}</h4>
+                        <p class="text-red-700 text-sm mt-1">
+                          {{ trabajo.categoria }} • {{ trabajo.subcategoria }}
+                        </p>
+                        <p class="text-red-800 mt-2">{{ trabajo.trabajo_descripcion }}</p>
+                        <div class="flex flex-wrap items-center gap-4 mt-4 text-sm text-red-700">
+                          <span>💰 Presupuesto: {{ trabajo.presupuesto }} €</span>
+                          @if (trabajo.fecha_limite) {
+                            <span>📅 Fecha límite: {{ trabajo.fecha_limite }}</span>
+                          }
+                        </div>
+                        <p class="text-red-600 text-sm mt-4 font-semibold">
+                          El prestador ha rechazado tu trabajo
+                        </p>
+                      </div>
+                      <div>
+                        <span class="inline-flex items-center bg-red-100 text-red-700 rounded-full px-3 py-1 text-xs font-semibold">
+                          Rechazado
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                }
+              </div>
+            </div>
+          }
         </div>
       }
 

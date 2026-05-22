@@ -248,15 +248,10 @@ export class PaginaServicios implements OnInit {
         'herraira': '/imgs/reparaciones/herreria/herreria.png',
         'herrero': '/imgs/reparaciones/herreria/herreria.png',
         'vidrieria': '/imgs/reparaciones/vidrieria/vidrieria.png',
-        'vidriera': '/imgs/reparaciones/vidrieria/vidrieria.png',
-        // Subcategorías de construcciones y reformas que vienen bajo ID 7
-        'estanterias_personalizadas': '/imgs/construcciones_y_reformas/estanterias/estanterias.png',
-        'remodelacion_de_banos': '/imgs/construcciones_y_reformas/banos/banos.png',
-        'diseno_de_interiores': '/imgs/construcciones_y_reformas/interiores/interiores.png',
-        'muebles_a_medida': '/imgs/construcciones_y_reformas/muebles/muebles.png',
-        'armarios_empotrados': '/imgs/construcciones_y_reformas/armarios/armarios.png',
-        'remodelacion_de_cocinas': '/imgs/construcciones_y_reformas/cocina/cocina.png',
-        'reformas_integrales': '/imgs/construcciones_y_reformas/integrales/integrales.png',
+      },
+      'otro': {
+        'especifica en la descripcion': '/imgs/otros/especifica_en_la_descripcion/especifica_en_la_descripcion.png',
+        'especifica_en_la_descripcion': '/imgs/otros/especifica_en_la_descripcion/especifica_en_la_descripcion.png',
       },
       'cuidado_personal': {
         'cuidado de niños': '/imgs/cuidado_personal/niños/niños.png',
@@ -280,6 +275,7 @@ export class PaginaServicios implements OnInit {
     if (categoriaNormalizada === '5') categoriaKey = 'limpieza';
     if (categoriaNormalizada === '6') categoriaKey = 'cuidado_personal';
     if (categoriaNormalizada === '7') categoriaKey = 'reparaciones';
+    if (categoriaNormalizada === '8') categoriaKey = 'otro';
     
     console.log('📂 Categoría identificada:', categoriaKey, 'ID:', categoriaNormalizada);
     
