@@ -123,6 +123,13 @@ function construirFiltroPropietarioTrabajo(idCliente: string, emailCliente: stri
   return filtros;
 }
 
+function construirFiltroPrestadorAceptado(idPrestador: string): Record<string, unknown> {
+  return {
+    prestador_aceptado_id: idPrestador,
+    estado: 'aceptado',
+  };
+}
+
 function escaparRegex(valor: string): string {
   return valor.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 }
@@ -234,6 +241,38 @@ routerTrabajos.get('/mis-trabajos', async (request: Request, response: Response)
   }
 });
 
+routerTrabajos.get('/mis-aceptados', async (request: Request, response: Response) => {
+  try {
+    const idPrestador = obtenerIdClienteDesdeToken(request.headers.authorization);
+
+    if (!idPrestador || !mongoose.Types.ObjectId.isValid(idPrestador)) {
+      response.status(401).json({ error: 'Token inválido o ausente' });
+      return;
+    }
+
+    const prestador = await ClienteModel.findById(idPrestador, { es_prestador: 1 }).lean();
+
+    if (!prestador) {
+      response.status(404).json({ error: 'Cliente no encontrado' });
+      return;
+    }
+
+    if (!prestador.es_prestador) {
+      response.status(403).json({ error: 'Solo un prestador puede consultar sus trabajos aceptados' });
+      return;
+    }
+
+    const trabajosAceptados = await TrabajoSolicitudModel.find(
+      construirFiltroPrestadorAceptado(idPrestador)
+    ).sort({ updatedAt: -1 }).lean();
+
+    response.status(200).json(trabajosAceptados);
+  } catch (error) {
+    console.error('Error obteniendo trabajos aceptados del prestador:', error);
+    response.status(500).json({ error: 'No se pudieron obtener los trabajos aceptados' });
+  }
+});
+
 routerTrabajos.get('/publico/:id', async (request: Request, response: Response) => {
   try {
     const idTrabajo = String(request.params.id ?? '').trim();
@@ -301,6 +340,10 @@ routerTrabajos.put('/:id/aceptar', async (request: Request, response: Response) 
           prestador_aceptado_id: idPrestador,
           prestador_aceptado_nombre: nombrePrestador,
           fecha_aceptacion: fechaAceptacion,
+          cancelado_por_id: '',
+          cancelado_por_nombre: '',
+          fecha_cancelacion: '',
+          motivo_cancelacion: '',
         },
       },
       { new: true }
@@ -394,6 +437,131 @@ routerTrabajos.put('/:id/aceptar', async (request: Request, response: Response) 
   } catch (error) {
     console.error('Error aceptando trabajo solicitado:', error);
     response.status(500).json({ error: 'No se pudo aceptar el trabajo' });
+  }
+});
+
+routerTrabajos.put('/:id/cancelar', async (request: Request, response: Response) => {
+  try {
+    const idTrabajo = String(request.params.id ?? '').trim();
+    const idPrestador = obtenerIdClienteDesdeToken(request.headers.authorization);
+
+    if (!idPrestador || !mongoose.Types.ObjectId.isValid(idPrestador)) {
+      response.status(401).json({ error: 'Token inválido o ausente' });
+      return;
+    }
+
+    if (!mongoose.Types.ObjectId.isValid(idTrabajo)) {
+      response.status(400).json({ error: 'Identificador de trabajo inválido' });
+      return;
+    }
+
+    const prestador = await ClienteModel.findById(idPrestador, { es_prestador: 1, nombre: 1, apellido: 1 }).lean();
+
+    if (!prestador) {
+      response.status(404).json({ error: 'Prestador no encontrado' });
+      return;
+    }
+
+    if (!prestador.es_prestador) {
+      response.status(403).json({ error: 'Solo un prestador puede cancelar trabajos aceptados' });
+      return;
+    }
+
+    const trabajoExistente = await TrabajoSolicitudModel.findOne({
+      _id: idTrabajo,
+      prestador_aceptado_id: idPrestador,
+      estado: 'aceptado',
+    }).lean();
+
+    if (!trabajoExistente) {
+      response.status(404).json({ error: 'No se encontró un trabajo aceptado por ti' });
+      return;
+    }
+
+    const motivoCancelacion = String((request.body as Record<string, unknown>)?.motivo_cancelacion ?? '').trim();
+
+    if (!motivoCancelacion) {
+      response.status(400).json({ error: 'Debes indicar un motivo de cancelación' });
+      return;
+    }
+
+    const fechaCancelacion = new Date().toISOString();
+    const nombrePrestador = `${String(prestador.nombre ?? '').trim()} ${String(prestador.apellido ?? '').trim()}`.trim() || 'Prestador';
+
+    const trabajoCancelado = await TrabajoSolicitudModel.findByIdAndUpdate(
+      idTrabajo,
+      {
+        $set: {
+          estado: 'publicado',
+          prestador_aceptado_id: '',
+          prestador_aceptado_nombre: '',
+          fecha_aceptacion: '',
+          cancelado_por_id: idPrestador,
+          cancelado_por_nombre: nombrePrestador,
+          fecha_cancelacion: fechaCancelacion,
+          motivo_cancelacion: motivoCancelacion,
+        },
+      },
+      { new: true }
+    ).lean();
+
+    if (!trabajoCancelado) {
+      response.status(404).json({ error: 'Trabajo no encontrado' });
+      return;
+    }
+
+    let idClienteDestino = String(trabajoCancelado.cliente_id ?? '').trim();
+
+    if (!idClienteDestino && trabajoCancelado.cliente_email) {
+      const clientePorEmail = await ClienteModel.findOne(
+        { email: String(trabajoCancelado.cliente_email).trim().toLowerCase() },
+        { _id: 1 }
+      ).lean();
+
+      if (clientePorEmail?._id) {
+        idClienteDestino = String(clientePorEmail._id);
+      }
+    }
+
+    if (idClienteDestino && mongoose.Types.ObjectId.isValid(idClienteDestino)) {
+      await AvisoModel.findOneAndUpdate(
+        {
+          prestador_id: idClienteDestino,
+          trabajo_id: idTrabajo,
+          tipo: 'solicitud_rechazada',
+        },
+        {
+          $set: {
+            trabajo_titulo: `Tu trabajo fue cancelado: ${trabajoCancelado.titulo}`,
+            trabajo_descripcion: `${nombrePrestador} canceló el trabajo aceptado. Motivo: ${motivoCancelacion}`,
+            categoria: trabajoCancelado.categoria,
+            subcategoria: trabajoCancelado.subcategoria,
+            ubicacion: trabajoCancelado.ubicacion,
+            presupuesto: trabajoCancelado.presupuesto ?? 0,
+            fecha_limite: trabajoCancelado.fecha_limite ?? '',
+            foto_principal: trabajoCancelado.fotos?.[0] ?? '',
+            leido: false,
+          },
+          $setOnInsert: {
+            prestador_id: idClienteDestino,
+            trabajo_id: idTrabajo,
+            tipo: 'solicitud_rechazada',
+          },
+        },
+        {
+          upsert: true,
+          new: true,
+        }
+      );
+    }
+
+    response.status(200).json({
+      mensaje: 'Trabajo cancelado correctamente',
+      trabajo: trabajoCancelado,
+    });
+  } catch (error) {
+    console.error('Error cancelando trabajo aceptado:', error);
+    response.status(500).json({ error: 'No se pudo cancelar el trabajo aceptado' });
   }
 });
 

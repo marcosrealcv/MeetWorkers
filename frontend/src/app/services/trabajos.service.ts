@@ -1,7 +1,7 @@
 import { Injectable, inject } from '@angular/core';
 import { HttpClient, HttpErrorResponse, HttpHeaders } from '@angular/common/http';
 import { Observable, throwError, timeout } from 'rxjs';
-import { EliminarTrabajoResponse, NuevoTrabajoSolicitudPayload, PublicarTrabajoResponse, TrabajoSolicitud } from '../models/trabajo-solicitud.interface';
+import { CancelarTrabajoResponse, EliminarTrabajoResponse, NuevoTrabajoSolicitudPayload, PublicarTrabajoResponse, TrabajoSolicitud } from '../models/trabajo-solicitud.interface';
 import { JwtService } from './jwt.service';
 
 const API_TRABAJOS_URL = 'http://localhost:3000/api/trabajos';
@@ -81,6 +81,36 @@ export class TrabajosService {
 
   obtenerTrabajosPublicados(): Observable<TrabajoSolicitud[]> {
     return this.http.get<TrabajoSolicitud[]>(API_TRABAJOS_URL).pipe(timeout(10000));
+  }
+
+  obtenerMisTrabajosAceptados(): Observable<TrabajoSolicitud[]> {
+    const headers = this.obtenerHeadersAutorizados();
+
+    if (!headers) {
+      return throwError(() => new HttpErrorResponse({
+        status: 401,
+        error: { error: 'No hay una sesión activa, inicia sesión de nuevo' }
+      }));
+    }
+
+    return this.http.get<TrabajoSolicitud[]>(`${API_TRABAJOS_URL}/mis-aceptados`, { headers }).pipe(timeout(10000));
+  }
+
+  cancelarTrabajoAceptado(idTrabajo: string, motivoCancelacion: string): Observable<CancelarTrabajoResponse> {
+    const headers = this.obtenerHeadersAutorizados();
+
+    if (!headers) {
+      return throwError(() => new HttpErrorResponse({
+        status: 401,
+        error: { error: 'No hay una sesión activa, inicia sesión de nuevo' }
+      }));
+    }
+
+    return this.http.put<CancelarTrabajoResponse>(
+      `${API_TRABAJOS_URL}/${idTrabajo}/cancelar`,
+      { motivo_cancelacion: motivoCancelacion },
+      { headers }
+    ).pipe(timeout(10000));
   }
 
   obtenerMisTrabajos(): Observable<TrabajoSolicitud[]> {

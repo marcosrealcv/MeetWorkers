@@ -141,6 +141,25 @@
             }
           </button>
 
+          @if (cliente.es_prestador) {
+            <button
+              (click)="cambiarPestana('trabajos-aceptados')"
+              [class.bg-sky-600]="pestanaActiva === 'trabajos-aceptados'"
+              [class.text-white]="pestanaActiva === 'trabajos-aceptados'"
+              [class.text-slate-600]="pestanaActiva !== 'trabajos-aceptados'"
+              class="px-6 py-4 font-medium border-b-2 transition-colors whitespace-nowrap relative"
+              [class.border-sky-600]="pestanaActiva === 'trabajos-aceptados'"
+              [class.border-transparent]="pestanaActiva !== 'trabajos-aceptados'"
+            >
+              ✅ Trabajos aceptados
+              @if (trabajosAceptados.length > 0) {
+                <span class="absolute top-3 right-2 bg-red-500 text-white text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center">
+                  {{ trabajosAceptados.length }}
+                </span>
+              }
+            </button>
+          }
+
           <button
             (click)="cambiarPestana('reservas')"
             [class.bg-sky-600]="pestanaActiva === 'reservas'"
@@ -534,6 +553,67 @@
         </div>
       }
 
+      <!-- Tab: Trabajos Aceptados (Prestador) -->
+      @if (pestanaActiva === 'trabajos-aceptados' && cliente.es_prestador) {
+        <div class="space-y-6">
+          <h2 class="text-2xl font-bold text-slate-900">Trabajos Aceptados</h2>
+
+          @if (cargandoTrabajosAceptados) {
+            <div class="bg-white rounded-lg p-6 text-center">
+              <div class="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-sky-600 mx-auto mb-4"></div>
+              <p class="text-slate-600">Cargando trabajos aceptados...</p>
+            </div>
+          }
+
+          @if (!cargandoTrabajosAceptados && errorTrabajosAceptados) {
+            <div class="bg-red-50 border border-red-200 rounded-lg p-4 text-red-700">
+              {{ errorTrabajosAceptados }}
+            </div>
+          }
+
+          @if (!cargandoTrabajosAceptados && trabajosAceptados.length === 0) {
+            <div class="bg-white rounded-lg p-8 text-center border border-slate-200">
+              <p class="text-slate-600 text-lg">No tienes trabajos aceptados en este momento</p>
+            </div>
+          }
+
+          @if (!cargandoTrabajosAceptados && trabajosAceptados.length > 0) {
+            <div class="grid grid-cols-1 gap-4">
+              @for (trabajo of trabajosAceptados; track trabajo._id) {
+                <div class="bg-white rounded-lg shadow-sm border border-slate-200 p-6 hover:shadow-md transition-shadow">
+                  <div class="flex items-start justify-between gap-4 flex-wrap">
+                    <div class="flex-1">
+                      <h3 class="text-lg font-bold text-slate-900">{{ trabajo.titulo }}</h3>
+                      <p class="text-slate-600 text-sm mt-1">
+                        {{ trabajo.categoria }} • {{ trabajo.subcategoria }} • {{ trabajo.ubicacion }}
+                      </p>
+                      <p class="text-slate-700 mt-3">{{ trabajo.descripcion }}</p>
+                      <div class="flex flex-wrap items-center gap-4 mt-4 text-sm text-slate-600">
+                        <span>👤 {{ trabajo.cliente_nombre }}</span>
+                        <span>📞 {{ trabajo.cliente_telefono }}</span>
+                        <span>💰 {{ trabajo.presupuesto || 0 }} €</span>
+                        <span>📅 Aceptado: {{ (trabajo.fecha_aceptacion | date:'short') || '-' }}</span>
+                      </div>
+                    </div>
+                    <div class="flex items-center gap-2">
+                      <span class="inline-flex items-center rounded-full bg-emerald-100 px-3 py-1 text-xs font-semibold text-emerald-700">
+                        aceptado
+                      </span>
+                      <button
+                        (click)="cancelarTrabajoAceptado(trabajo._id)"
+                        class="bg-red-600 hover:bg-red-700 text-white px-3 py-2 rounded text-sm font-medium"
+                      >
+                        Cancelar trabajo
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              }
+            </div>
+          }
+        </div>
+      }
+
       <!-- Tab: Reservas (Prestador) -->
       @if (pestanaActiva === 'reservas' && cliente.es_prestador) {
         <div class="space-y-6">
@@ -797,7 +877,7 @@
             @if (promedioCalificacion > 0) {
               <div class="bg-amber-50 border border-amber-200 rounded-lg p-4">
                 <div class="text-center">
-                  <div class="text-3xl font-bold text-amber-600">{{ promedioCalificacion }}</div>
+                  <div class="text-3xl font-bold text-amber-600">{{ promedioCalificacionFormateado }}</div>
                   <div class="text-sm text-amber-700">⭐ de {{ resenasRecibidas.length }} reseña{{ resenasRecibidas.length !== 1 ? 's' : '' }}</div>
                 </div>
               </div>
@@ -834,8 +914,12 @@
                     </div>
                     <div class="flex items-center gap-1">
                       @for (i of [1,2,3,4,5]; track i) {
-                        <span [class.text-amber-400]="i <= (resena.resena_calificacion || 0)" class="text-xl">
-                          ⭐
+                        <span
+                          [class.text-amber-400]="i <= (resena.resena_calificacion || 0)"
+                          [class.text-slate-300]="i > (resena.resena_calificacion || 0)"
+                          class="text-xl"
+                        >
+                          ★
                         </span>
                       }
                     </div>
@@ -922,12 +1006,13 @@
           <div class="flex gap-2">
             @for (i of [1,2,3,4,5]; track i) {
               <button
+                type="button"
                 (click)="actualizarCalificacion(i)"
                 [class.text-amber-400]="formularioResena.calificacion >= i"
                 [class.text-slate-300]="formularioResena.calificacion < i"
                 class="text-3xl transition-colors hover:text-amber-300"
               >
-                ⭐
+                ★
               </button>
             }
           </div>

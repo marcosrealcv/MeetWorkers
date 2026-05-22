@@ -19,6 +19,10 @@ export type TrabajoSolicitudDocument = {
   prestador_aceptado_id?: string;
   prestador_aceptado_nombre?: string;
   fecha_aceptacion?: string;
+  cancelado_por_id?: string;
+  cancelado_por_nombre?: string;
+  fecha_cancelacion?: string;
+  motivo_cancelacion?: string;
 };
 
 const trabajoSolicitudSchema = new Schema<TrabajoSolicitudDocument>(
@@ -41,6 +45,10 @@ const trabajoSolicitudSchema = new Schema<TrabajoSolicitudDocument>(
     prestador_aceptado_id: { type: String, default: '' },
     prestador_aceptado_nombre: { type: String, default: '' },
     fecha_aceptacion: { type: String, default: '' },
+    cancelado_por_id: { type: String, default: '' },
+    cancelado_por_nombre: { type: String, default: '' },
+    fecha_cancelacion: { type: String, default: '' },
+    motivo_cancelacion: { type: String, default: '' },
   },
   {
     collection: 'trabajos_solicitados',

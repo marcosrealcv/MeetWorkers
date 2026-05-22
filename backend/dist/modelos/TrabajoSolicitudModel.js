@@ -53,6 +53,10 @@ const trabajoSolicitudSchema = new mongoose_1.Schema({
     prestador_aceptado_id: { type: String, default: '' },
     prestador_aceptado_nombre: { type: String, default: '' },
     fecha_aceptacion: { type: String, default: '' },
+    cancelado_por_id: { type: String, default: '' },
+    cancelado_por_nombre: { type: String, default: '' },
+    fecha_cancelacion: { type: String, default: '' },
+    motivo_cancelacion: { type: String, default: '' },
 }, {
     collection: 'trabajos_solicitados',
     versionKey: false,
