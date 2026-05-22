@@ -1,14 +1,71 @@
-
-<div class="container mx-auto py-12 px-4">
-    <h1 class="text-3xl font-extrabold text-gray-900 mb-8">Servicios destacados</h1>
+<!-- Sección Hero - Presentación de MeetWorkers -->
+<div class="hero-section">
+  <div class="hero-content">
+    <div class="hero-text">
+      <h1 class="hero-title">Bienvenido a MeetWorkers</h1>
+      <p class="hero-subtitle">Conecta con profesionales especializados para todos tus servicios</p>
+      <p class="hero-description">
+        MeetWorkers es tu plataforma de confianza para encontrar y contratar los mejores servicios profesionales. 
+        Desde reparaciones y construcción, hasta belleza y educación. Encuentra el profesional perfecto para cada tarea.
+      </p>
+      <a (click)="explorarServicios()" class="btn-explorar">
+        Explorar Servicios
+        <svg class="btn-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6"></path>
+        </svg>
+      </a>
+    </div>
     
-    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
-        
-        @for (item of serviciosCategorias(); track item.id  ) {
-            <app-tarjetas-servicios [info] = "item"></app-tarjetas-servicios>
-        }
-
+    <!-- Carrusel de Categorías -->
+    @if (serviciosCategorias().length > 0) {
+      <div class="carrusel-container">
+        <div class="carrusel-slide" (click)="navegarACategoria()">
+          <div class="slide-image-wrapper">
+            <img 
+              [src]="obtenerDiapositivaActual()?.imagen" 
+              [alt]="obtenerDiapositivaActual()?.nombre"
+              class="slide-image"
+            />
+            <div class="slide-overlay">
+              <h3 class="slide-categoria">{{ obtenerDiapositivaActual()?.nombre }}</h3>
+            </div>
+          </div>
         </div>
+
+        <!-- Controles del carrusel -->
+        <button 
+          class="carrusel-btn carrusel-btn-prev" 
+          (click)="anteriorDiapositivaCarrusel()"
+          aria-label="Anterior"
+        >
+          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
+          </svg>
+        </button>
+        <button 
+          class="carrusel-btn carrusel-btn-next" 
+          (click)="siguienteDiapositivaCarrusel()"
+          aria-label="Siguiente"
+        >
+          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+          </svg>
+        </button>
+
+        <!-- Indicadores del carrusel -->
+        <div class="carrusel-indicadores">
+          @for (item of serviciosCategorias(); track item.id; let i = $index) {
+            <button 
+              class="indicador"
+              [class.activo]="i === carruselIndice()"
+              (click)="seleccionarDiapositivaCarrusel(i)"
+              [attr.aria-label]="'Ir a ' + item.nombre"
+            ></button>
+          }
+        </div>
+      </div>
+    }
+  </div>
 </div>
 
 @if (esPrestador) {

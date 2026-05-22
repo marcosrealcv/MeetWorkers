@@ -1,6 +1,5 @@
-import { Component, signal, OnInit } from '@angular/core';
-import { ActivatedRoute } from '@angular/router';
-import { CommonModule } from '@angular/common';
+import { Component, signal, OnInit, inject } from '@angular/core';
+import { ActivatedRoute, Router } from '@angular/router';
 import { Servicio } from '../../../models/servicio.interface';
 import { Proveedor } from '../../../models/proveedor.interface';
 import { ServiciosService } from '../../../services/servicios.service';
@@ -11,7 +10,7 @@ import { TarjetaProveedorComponent } from '../tarjeta-proveedor/tarjeta-proveedo
 @Component({
   selector: 'app-detalles-servicio',
   standalone: true,
-  imports: [TarjetaProveedorComponent, CommonModule],
+  imports: [TarjetaProveedorComponent],
   templateUrl: './detalles-servicio.html',
   styleUrl: './detalles-servicio.css',
 })
@@ -20,21 +19,26 @@ export class DetallesServicioComponent implements OnInit {
   proveedores = signal<Proveedor[]>([]);
   prestadores = signal<Prestador[]>([]);
   pathCategoria = signal<string>('');
+  pathCategoriaPrincipal = signal<string>('');
+  private route = inject(ActivatedRoute);
+  private router = inject(Router);
+  private serviciosService = inject(ServiciosService);
+  private proveedoresService = inject(ProveedoresService);
+  private categoriasService = inject(CategoriasService);
 
-  constructor(
-    private route: ActivatedRoute,
-    private serviciosService: ServiciosService,
-    private proveedoresService: ProveedoresService,
-    private categoriasService: CategoriasService
-  ) {}
+  constructor() {}
 
   ngOnInit() {
     this.route.queryParamMap.subscribe(params => {
       const servicioId = params.get('id');
       const pathCat = params.get('pathCategoria');
+      const pathCatPrincipal = params.get('pathCategoriaPrincipal');
 
       if (pathCat) {
         this.pathCategoria.set(pathCat);
+        if (pathCatPrincipal) {
+          this.pathCategoriaPrincipal.set(pathCatPrincipal);
+        }
         
         // Obtener prestadores de la BD para esta subcategoría
         this.categoriasService.obtenerPrestadoresPorSubcategoria(pathCat).subscribe({
@@ -101,6 +105,20 @@ export class DetallesServicioComponent implements OnInit {
         });
       }
     });
+  }
+
+  volverASubcategorias(): void {
+    if (this.pathCategoriaPrincipal()) {
+      this.router.navigate(['/pagina-servicios'], {
+        queryParams: { pathCategoria: this.pathCategoriaPrincipal() }
+      });
+    } else if (this.pathCategoria()) {
+      this.router.navigate(['/pagina-servicios'], {
+        queryParams: { pathCategoria: this.pathCategoria() }
+      });
+    } else {
+      this.router.navigate(['/pagina-servicios']);
+    }
   }
 }
 
