@@ -68,24 +68,138 @@
   </div>
 </div>
 
-@if (esPrestador) {
-<div class="container mx-auto pb-12 px-4">
-    <h2 class="text-3xl font-extrabold text-gray-900 mb-8">Trabajos solicitados</h2>
+<section class="publicar-section">
+  <div class="publicar-content">
+    <div class="publicar-copy">
+      <span class="section-badge">También para usuarios</span>
+      <h2 class="section-title">Publica tu propuesta y deja que los prestadores vengan a ti</h2>
+      <p class="section-description">
+        Si necesitas que te hagan un trabajo, puedes describir tu idea, fijar un presupuesto orientativo y publicar la solicitud para que los profesionales de tu zona la vean.
+      </p>
 
-    @if (cargandoTrabajosSolicitados()) {
-        <p class="text-gray-600 mb-6">Cargando trabajos de tu categoría...</p>
-    }
+      <div class="benefits-grid">
+        <article class="benefit-card">
+          <h3>Describe lo que necesitas</h3>
+          <p>Explica el servicio, la urgencia y los detalles importantes para que te encuentren la mejor solución.</p>
+        </article>
+        <article class="benefit-card">
+          <h3>Recibe interés real</h3>
+          <p>Los prestadores pueden revisar tu propuesta y decidir si encajan con lo que buscas.</p>
+        </article>
+        <article class="benefit-card">
+          <h3>Avanza con rapidez</h3>
+          <p>Centraliza todo en un solo lugar y convierte una idea en una solicitud visible para la comunidad.</p>
+        </article>
+      </div>
 
-    @if (!cargandoTrabajosSolicitados() && trabajosSolicitados().length === 0) {
-        <p class="text-gray-600 mb-6">No hay trabajos solicitados en tu categoría por ahora.</p>
-    }
-
-    @if (!cargandoTrabajosSolicitados() && trabajosSolicitados().length > 0) {
-    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
-        @for (item of trabajosSolicitados(); track item.id) {
-            <app-tarjetas-servicios [info]="item" tipoTarjeta="trabajo"></app-tarjetas-servicios>
-        }
+      <div class="publicar-actions">
+        <a (click)="irAPublicarTrabajo()" class="btn-publicar">
+          Publicar trabajo
+          <svg class="btn-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6"></path>
+          </svg>
+        </a>
+        <span class="publicar-hint">Disponible para usuarios registrados desde su cuenta.</span>
+      </div>
     </div>
-    }
-</div>
-}
+
+    <div class="publicar-panel">
+      <div class="panel-header">
+        <span class="panel-kicker">Flujo rápido</span>
+        <h3>Una propuesta clara, más respuestas útiles</h3>
+      </div>
+
+      <div class="panel-steps">
+        <div class="panel-step">
+          <span class="step-number">1</span>
+          <div>
+            <h4>Escribe tu idea</h4>
+            <p>Indica qué necesitas, dónde y cuándo te gustaría resolverlo.</p>
+          </div>
+        </div>
+        <div class="panel-step">
+          <span class="step-number">2</span>
+          <div>
+            <h4>Define condiciones</h4>
+            <p>Añade presupuesto, categoría y cualquier detalle que ayude a encajar la solicitud.</p>
+          </div>
+        </div>
+        <div class="panel-step">
+          <span class="step-number">3</span>
+          <div>
+            <h4>Haz visible tu trabajo</h4>
+            <p>Tu propuesta se muestra para que los prestadores puedan valorarla y darte una respuesta.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="publicar-section publicar-section--secondary">
+  <div class="publicar-content publicar-content--reverse">
+    <div class="publicar-copy">
+      <span class="section-badge">También para prestadores</span>
+      <h2 class="section-title">Trabajos publicados por la gente, listos para que encuentres nuevas oportunidades</h2>
+      <p class="section-description">
+        Consulta solicitudes reales publicadas por usuarios, revisa su categoría y entra en los trabajos que encajan con tu especialidad.
+      </p>
+
+      <div class="benefits-grid">
+        <article class="benefit-card">
+          <h3>Solicitudes visibles</h3>
+          <p>Accede a una lista de trabajos abiertos que puedes valorar desde el primer vistazo.</p>
+        </article>
+        <article class="benefit-card">
+          <h3>Encuentra encaje</h3>
+          <p>Busca oportunidades alineadas con tu categoría, tu zona y tu forma de trabajar.</p>
+        </article>
+        <article class="benefit-card">
+          <h3>Entra al detalle</h3>
+          <p>Abre cada propuesta para revisar la información y decidir si merece la pena responder.</p>
+        </article>
+      </div>
+
+      <div class="publicar-actions">
+        <a (click)="irAVerTrabajos()" class="btn-publicar">
+          Ver trabajos
+          <svg class="btn-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6"></path>
+          </svg>
+        </a>
+        <span class="publicar-hint">Pensado para prestadores que quieren detectar nuevas solicitudes.</span>
+      </div>
+    </div>
+
+    <div class="publicar-panel">
+      <div class="panel-header">
+        <span class="panel-kicker">Cómo funciona</span>
+        <h3>Revisar trabajos es rápido y directo</h3>
+      </div>
+
+      <div class="panel-steps">
+        <div class="panel-step">
+          <span class="step-number">1</span>
+          <div>
+            <h4>Explora la lista</h4>
+            <p>Entrarás en una pantalla con las solicitudes publicadas por la comunidad.</p>
+          </div>
+        </div>
+        <div class="panel-step">
+          <span class="step-number">2</span>
+          <div>
+            <h4>Filtra lo que encaja</h4>
+            <p>La vista ordena las oportunidades para que veas antes las que más te interesan.</p>
+          </div>
+        </div>
+        <div class="panel-step">
+          <span class="step-number">3</span>
+          <div>
+            <h4>Abre el detalle</h4>
+            <p>Desde cada tarjeta podrás entrar al aviso y revisar la información completa.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>

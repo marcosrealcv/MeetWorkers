@@ -7,6 +7,7 @@ import { PaginaServicios } from './componentes/zonaTienda/pagina-servicios/pagin
 import { DetallesServicioComponent } from './componentes/zonaTienda/detalles-servicio/detalles-servicio';
 import { ContratacionComponent } from './componentes/zonaTienda/contratacion/contratacion';
 import { PublicarTrabajoComponent } from './componentes/zonaCliente/publicar-trabajo/publicar-trabajo';
+import { TrabajosSolicitadosComponent } from './componentes/zonaTienda/trabajos-solicitados/trabajos-solicitados';
 import { DetalleAvisoComponent } from './componentes/zonaTienda/detalle-aviso/detalle-aviso';
 import { AyudaComponent } from './componentes/zonaTienda/ayuda/ayuda';
 import { LegalComponent } from './componentes/zonaTienda/legal/legal';
@@ -29,6 +30,10 @@ export const rutasApp: Routes = [
   {
     path: 'publicar-trabajo',
     component: PublicarTrabajoComponent
+  },
+  {
+    path: 'trabajos-solicitados',
+    component: TrabajosSolicitadosComponent
   },
   {
     path: 'login',
