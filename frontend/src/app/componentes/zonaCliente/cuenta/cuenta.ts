@@ -40,7 +40,7 @@ export class Cuenta implements OnInit, OnDestroy {
   mensajeExito = '';
   
   // Pestañas activas
-  pestanaActiva: 'perfil' | 'mis-trabajos' | 'reservas' | 'mis-solicitudes' | 'resenas' | 'servicios' = 'perfil';
+  pestanaActiva: 'perfil' | 'mis-trabajos' | 'trabajos-aceptados' | 'reservas' | 'mis-solicitudes' | 'resenas' | 'servicios' = 'perfil';
   
   // Edición
   enModoEdicion = false;
@@ -68,6 +68,11 @@ export class Cuenta implements OnInit, OnDestroy {
   trabajosPublicados: TrabajoSolicitud[] = [];
   cargandoTrabajosPublicados = false;
   errorTrabajosPublicados = '';
+
+  // Trabajos aceptados
+  trabajosAceptados: TrabajoSolicitud[] = [];
+  cargandoTrabajosAceptados = false;
+  errorTrabajosAceptados = '';
   
   // Reservas
   reservasPrestador: Reserva[] = [];
@@ -240,6 +245,7 @@ export class Cuenta implements OnInit, OnDestroy {
     this.cargarReservasSiEsPrestador(cliente);
     this.cargarMisReservas(cliente);
     this.cargarMisTrabajosPublicados(cliente);
+    this.cargarTrabajosAceptados(cliente);
     this.cargarResenasRecibidas(cliente);
     this.cargarAvisosRechazoCliente(cliente);
     // Ensure Angular notices async state changes and avoid ExpressionChangedAfterItHasBeenCheckedError
@@ -400,8 +406,12 @@ export class Cuenta implements OnInit, OnDestroy {
     void this.router.navigate(['/iniciar-sesion']);
   }
 
-  cambiarPestana(pestaña: 'perfil' | 'mis-trabajos' | 'reservas' | 'mis-solicitudes' | 'resenas' | 'servicios'): void {
+  cambiarPestana(pestaña: 'perfil' | 'mis-trabajos' | 'trabajos-aceptados' | 'reservas' | 'mis-solicitudes' | 'resenas' | 'servicios'): void {
     this.pestanaActiva = pestaña;
+  }
+
+  private esPrestadorActivo(cliente?: Cliente | null): boolean {
+    return Boolean(cliente?.es_prestador);
   }
 
   irAPublicarTrabajo(): void {
@@ -541,12 +551,110 @@ export class Cuenta implements OnInit, OnDestroy {
 
     this.trabajosService.obtenerMisTrabajos().subscribe({
       next: (trabajos) => {
-        this.trabajosPublicados = trabajos;
-        this.cargandoTrabajosPublicados = false;
+        setTimeout(() => {
+          this.trabajosPublicados = trabajos;
+          this.cargandoTrabajosPublicados = false;
+          try { this.cd.detectChanges(); } catch (e) {}
+        }, 0);
       },
       error: (error: HttpErrorResponse) => {
-        this.errorTrabajosPublicados = error.error?.error ?? 'No se pudieron cargar tus trabajos publicados';
-        this.cargandoTrabajosPublicados = false;
+        setTimeout(() => {
+          this.errorTrabajosPublicados = error.error?.error ?? 'No se pudieron cargar tus trabajos publicados';
+          this.cargandoTrabajosPublicados = false;
+          try { this.cd.detectChanges(); } catch (e) {}
+        }, 0);
+      },
+    });
+  }
+
+  cargarTrabajosAceptados(clienteBase?: Cliente): void {
+    const cliente = clienteBase ?? this.cliente;
+
+    if (!this.esPrestadorActivo(cliente)) {
+      this.trabajosAceptados = [];
+      this.errorTrabajosAceptados = '';
+      this.cargandoTrabajosAceptados = false;
+      return;
+    }
+
+    this.cargandoTrabajosAceptados = true;
+    this.errorTrabajosAceptados = '';
+
+    this.trabajosService.obtenerMisTrabajosAceptados().subscribe({
+      next: (trabajos) => {
+        setTimeout(() => {
+          this.trabajosAceptados = trabajos;
+          this.cargandoTrabajosAceptados = false;
+          try { this.cd.detectChanges(); } catch (e) {}
+        }, 0);
+      },
+      error: (error: HttpErrorResponse) => {
+        this.cargarTrabajosAceptadosConFallback(cliente, error);
+      },
+    });
+  }
+
+  private cargarTrabajosAceptadosConFallback(cliente: Cliente | null, errorOriginal: HttpErrorResponse): void {
+    const idPrestador = String(cliente?._id ?? '').trim();
+
+    if (!idPrestador) {
+      this.errorTrabajosAceptados = errorOriginal.error?.error ?? 'No se pudieron cargar tus trabajos aceptados';
+      this.trabajosAceptados = [];
+      this.cargandoTrabajosAceptados = false;
+      return;
+    }
+
+    this.trabajosService.obtenerTrabajosPublicados().subscribe({
+      next: (trabajos) => {
+        const trabajosFiltrados = trabajos.filter((trabajo) =>
+          trabajo.estado === 'aceptado' && String(trabajo.prestador_aceptado_id ?? '').trim() === idPrestador
+        );
+
+        setTimeout(() => {
+          this.trabajosAceptados = trabajosFiltrados;
+          this.cargandoTrabajosAceptados = false;
+          this.errorTrabajosAceptados = trabajosFiltrados.length > 0
+            ? ''
+            : (errorOriginal.error?.error ?? 'No se pudieron cargar tus trabajos aceptados');
+          try { this.cd.detectChanges(); } catch (e) {}
+        }, 0);
+      },
+      error: () => {
+        setTimeout(() => {
+          this.errorTrabajosAceptados = errorOriginal.error?.error ?? 'No se pudieron cargar tus trabajos aceptados';
+          this.trabajosAceptados = [];
+          this.cargandoTrabajosAceptados = false;
+          try { this.cd.detectChanges(); } catch (e) {}
+        }, 0);
+      },
+    });
+  }
+
+  cancelarTrabajoAceptado(idTrabajo: string): void {
+    if (!idTrabajo) {
+      return;
+    }
+
+    const motivo = window.prompt('Indica el motivo de la cancelación:')?.trim();
+    if (!motivo) {
+      return;
+    }
+
+    const trabajosAnteriores = [...this.trabajosAceptados];
+    this.trabajosAceptados = this.trabajosAceptados.filter((trabajo) => trabajo._id !== idTrabajo);
+    this.cargandoTrabajosAceptados = true;
+    this.errorTrabajosAceptados = '';
+
+    this.trabajosService.cancelarTrabajoAceptado(idTrabajo, motivo).subscribe({
+      next: () => {
+        this.mensajeExito = 'El trabajo se ha cancelado correctamente y se ha registrado el motivo.';
+        this.cargarTrabajosAceptados(this.cliente ?? undefined);
+        this.cargarAvisosCliente(this.cliente ?? undefined);
+      },
+      error: (error: HttpErrorResponse) => {
+        this.trabajosAceptados = trabajosAnteriores;
+        this.errorTrabajosAceptados = error.error?.error ?? 'No se pudo cancelar el trabajo aceptado';
+        this.cargandoTrabajosAceptados = false;
       },
     });
   }
@@ -776,6 +884,10 @@ export class Cuenta implements OnInit, OnDestroy {
     this.promedioCalificacion = suma / this.resenasRecibidas.length;
   }
 
+  get promedioCalificacionFormateado(): string {
+    return this.promedioCalificacion > 0 ? this.promedioCalificacion.toFixed(1) : '0.0';
+  }
+
   cargarAvisosRechazoCliente(clienteBase?: Cliente): void {
     const cliente = clienteBase ?? this.cliente;
 
@@ -809,7 +921,7 @@ export class Cuenta implements OnInit, OnDestroy {
     this.reservaEnResena = reserva;
     this.mostrarModalResena = true;
     this.formularioResena = {
-      calificacion: 5,
+      calificacion: 0,
       comentario: '',
     };
     this.errorResena = '';
@@ -819,7 +931,7 @@ export class Cuenta implements OnInit, OnDestroy {
     this.mostrarModalResena = false;
     this.reservaEnResena = null;
     this.formularioResena = {
-      calificacion: 5,
+      calificacion: 0,
       comentario: '',
     };
     this.errorResena = '';
