@@ -1,5 +1,5 @@
-import { Component, signal, OnInit } from '@angular/core';
-import { ActivatedRoute } from '@angular/router';
+import { Component, signal, OnInit, inject } from '@angular/core';
+import { ActivatedRoute, Router } from '@angular/router';
 import { TarjetasSubcategorias } from '../tarjetas-subcategorias/tarjetas-subcategorias';
 import { Servicio } from '../../../models/servicio.interface';
 import { ServiciosService } from '../../../services/servicios.service';
@@ -14,63 +14,118 @@ import { CategoriasService, Categoria, Subcategoria } from '../../../services/ca
 export class PaginaServicios implements OnInit {
   categoria = signal<string>('Todos los servicios');
   serviciosFiltrados = signal<Servicio[]>([]);
+  categoriasPrincipales = signal<Servicio[]>([]);
   subcategorias = signal<Subcategoria[]>([]);
+  mostrandoSubcategorias = signal<boolean>(false);
+  pathCategoriaPrincipal = signal<string>('');
 
-  constructor(
-    private route: ActivatedRoute,
-    private serviciosService: ServiciosService,
-    private categoriasService: CategoriasService
-  ) {}
+  private route = inject(ActivatedRoute);
+  private router = inject(Router);
+  private serviciosService = inject(ServiciosService);
+  private categoriasService = inject(CategoriasService);
 
   ngOnInit() {
     this.route.queryParamMap.subscribe(params => {
       const pathCat = params.get('pathCategoria');
+      
       if (pathCat) {
-        this.categoria.set(this.formatearCategoriaDesdePath(pathCat));
-
-        this.categoriasService.obtenerCategorias().subscribe({
-          next: (categorias) => {
-            const categoriaPrincipal = categorias.find((categoria) => categoria.pathCategoria === pathCat);
-
-            if (categoriaPrincipal) {
-              this.categoria.set(categoriaPrincipal.nombreCategoria);
-            }
-          },
-          error: (err) => {
-            console.error('Error cargando categoría principal:', err);
-          }
-        });
-
-        // Obtener subcategorías dinámicamente
-        this.categoriasService.obtenerSubcategorias(pathCat).subscribe({
-          next: (subcategorias) => {
-            this.subcategorias.set(subcategorias);
-            
-            // Convertir subcategorías a formato Servicio
-            const servicios: Servicio[] = subcategorias.map((subcat, index) => ({
-              id: index + 1,
-              nombre: subcat.nombreCategoria,
-              descripcion: `Servicios de ${subcat.nombreCategoria}`,
-              precio: '',
-              categoria: subcat.nombreCategoria,
-              pathCategoria: subcat.pathCategoria,
-              imagen: this.obtenerImagenSubcategoria(subcat.nombreCategoria, pathCat),
-              rating: 4.5
-            }));
-            this.serviciosFiltrados.set(servicios);
-          },
-          error: (err) => {
-            console.error('Error cargando subcategorías:', err);
-            // Fallback a datos locales
-            const filtrados = this.serviciosService.filtrarPorPathCategoria(pathCat);
-            this.serviciosFiltrados.set(filtrados);
-          }
-        });
+        // Si hay categoría seleccionada, mostrar sus subcategorías
+        this.mostrandoSubcategorias.set(true);
+        this.cargarSubcategorias(pathCat);
       } else {
-        // Si no hay filtro, mostrar todos los servicios
-        this.serviciosFiltrados.set(this.serviciosService.obtenerTodos());
+        // Si no hay categoría, mostrar todas las categorías principales
+        this.mostrandoSubcategorias.set(false);
+        this.cargarCategoriasprincipales();
       }
     });
+  }
+
+  private cargarCategoriasprincipales(): void {
+    this.categoria.set('Categorías Principales');
+    
+    this.categoriasService.obtenerCategorias().subscribe({
+      next: (categorias) => {
+        // Convertir categorías a formato de servicio para las tarjetas
+        const serviciosDeCategorias: Servicio[] = categorias.map((cat, index) => ({
+          id: index + 1,
+          nombre: cat.nombreCategoria,
+          descripcion: `Explorar servicios de ${cat.nombreCategoria}`,
+          precio: '',
+          categoria: cat.nombreCategoria,
+          pathCategoria: cat.pathCategoria,
+          imagen: this.obtenerImagenCategoria(cat.nombreCategoria),
+          rating: 4.5
+        }));
+        this.categoriasPrincipales.set(serviciosDeCategorias);
+        this.serviciosFiltrados.set(serviciosDeCategorias);
+      },
+      error: (err) => {
+        console.error('Error cargando categorías:', err);
+        this.serviciosFiltrados.set([]);
+      }
+    });
+  }
+
+  private cargarSubcategorias(pathCat: string): void {
+    this.categoria.set(this.formatearCategoriaDesdePath(pathCat));
+    this.pathCategoriaPrincipal.set(pathCat);
+
+    this.categoriasService.obtenerCategorias().subscribe({
+      next: (categorias) => {
+        const categoriaPrincipal = categorias.find((categoria) => categoria.pathCategoria === pathCat);
+
+        if (categoriaPrincipal) {
+          this.categoria.set(categoriaPrincipal.nombreCategoria);
+        }
+      },
+      error: (err) => {
+        console.error('Error cargando categoría principal:', err);
+      }
+    });
+
+    // Obtener subcategorías dinámicamente
+    this.categoriasService.obtenerSubcategorias(pathCat).subscribe({
+      next: (subcategorias) => {
+        this.subcategorias.set(subcategorias);
+        
+        // Convertir subcategorías a formato Servicio
+        const servicios: Servicio[] = subcategorias.map((subcat, index) => ({
+          id: index + 1,
+          nombre: subcat.nombreCategoria,
+          descripcion: `Servicios de ${subcat.nombreCategoria}`,
+          precio: '',
+          categoria: subcat.nombreCategoria,
+          pathCategoria: subcat.pathCategoria,
+          imagen: this.obtenerImagenSubcategoria(subcat.nombreCategoria, pathCat),
+          rating: 4.5
+        }));
+        this.serviciosFiltrados.set(servicios);
+      },
+      error: (err) => {
+        console.error('Error cargando subcategorías:', err);
+        // Fallback a datos locales
+        const filtrados = this.serviciosService.filtrarPorPathCategoria(pathCat);
+        this.serviciosFiltrados.set(filtrados);
+      }
+    });
+  }
+
+  volverACategoriasprincipales(): void {
+    this.router.navigate(['/pagina-servicios']);
+  }
+
+  private obtenerImagenCategoria(nombreCategoria: string): string {
+    const imagenes: { [key: string]: string } = {
+      'Automoción': '/imgs/automocion/automocion.png',
+      'Belleza': '/imgs/belleza/belleza.png',
+      'Limpieza': '/imgs/limpieza/limpieza.png',
+      'Enseñanza': '/imgs/enseñanza/enseñanza.png',
+      'Reparaciones': '/imgs/reparaciones/reparaciones.png',
+      'Cuidado Personal': '/imgs/cuidado_personal/cuidado.png',
+      'Construcciones y Reformas': '/imgs/construcciones_y_reformas/consturccion.png',
+      'Otro': '/imgs/limpieza/limpieza.png'
+    };
+    return imagenes[nombreCategoria] || '/imgs/limpieza/limpieza.png';
   }
 
   private obtenerImagenSubcategoria(nombreSubcategoria: string, pathCategoriaParent: string): string {
