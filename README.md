@@ -174,7 +174,6 @@ Aunque la plataforma es plenamente funcional como un Producto Mínimo Viable (MV
 
 ```bash
 cd backend
-npm install
 npm start
 ```
 
@@ -187,7 +186,6 @@ npm start
 
 ```bash
 cd frontend
-npm install
 ng serve
 ```
 
