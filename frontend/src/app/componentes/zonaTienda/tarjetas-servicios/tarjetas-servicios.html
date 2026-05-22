@@ -1,6 +1,6 @@
 <div class="max-w-sm bg-white rounded-xl shadow-md overflow-hidden border border-gray-100 hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1">
     <div class="relative h-48 w-full">
-        <img [src]="info.imagen" alt="titulo" class="w-full h-full object-cover">
+        <img [src]="info.imagen" (error)="onImgError($event)" alt="titulo" class="w-full h-full object-cover">
           @if (tipoTarjeta === 'trabajo' && info.estadoTrabajo === 'aceptado') {
           <div class="absolute top-2 left-2 bg-emerald-600 px-2 py-1 rounded-lg shadow text-xs font-bold text-white">
               Aceptado

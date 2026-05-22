@@ -30,6 +30,14 @@ export class TarjetaProveedorComponent implements OnInit {
     this.cargarResenas();
   }
 
+  onImgError(event: Event) {
+    const img = event.target as HTMLImageElement;
+    if (img) {
+      img.onerror = null;
+      img.src = '/imgs/otros/otros.png';
+    }
+  }
+
   private cargarResenas(): void {
     console.log('Cargando reseñas para prestador:', this.proveedor.id);
     this.cargandoResenas = true;

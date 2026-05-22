@@ -104,4 +104,12 @@ export class DetalleAvisoComponent implements OnInit {
   get trabajoAceptado(): boolean {
     return this.trabajo?.estado === 'aceptado';
   }
+
+  onImgError(event: Event) {
+    const img = event.target as HTMLImageElement;
+    if (img) {
+      img.onerror = null;
+      img.src = '/imgs/otros/otros.png';
+    }
+  }
 }

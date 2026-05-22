@@ -1,8 +1,8 @@
 <div class="container mx-auto py-12 px-4">
     @if (proveedor()) {
         <div class="max-w-2xl mx-auto bg-white rounded-xl shadow-lg overflow-hidden border border-gray-100">
-            <div class="h-96 w-full">
-                <img [src]="proveedor()!.imagen" alt="proveedor" class="w-full h-full object-cover">
+                <div class="h-96 w-full">
+                <img [src]="proveedor()!.imagen" (error)="onImgError($event)" alt="proveedor" class="w-full h-full object-cover">
             </div>
             <div class="p-8">
                 <h1 class="text-4xl font-bold text-gray-900 mb-2">{{ proveedor()!.nombre }}</h1>

@@ -1,6 +1,6 @@
 <div class="bg-white rounded-xl shadow-md overflow-hidden border border-gray-100 hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1">
     <div class="relative h-40 w-full">
-        <img [src]="proveedor.imagen" alt="proveedor" class="w-full h-full object-cover">
+        <img [src]="proveedor.imagen" (error)="onImgError($event)" alt="proveedor" class="w-full h-full object-cover">
         @if (proveedor.resenas > 0) {
             <div class="absolute top-2 right-2 bg-white px-3 py-1 rounded-lg shadow text-sm font-bold text-[#5F818C] flex items-center gap-1">
                 <span>{{ proveedor.rating }}★</span>

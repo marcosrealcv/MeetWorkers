@@ -172,6 +172,14 @@ export class ContratacionComponent implements OnInit {
     this.mostrarTodasResenas.set(false);
   }
 
+  onImgError(event: Event) {
+    const img = event.target as HTMLImageElement;
+    if (img) {
+      img.onerror = null;
+      img.src = '/imgs/otros/otros.png';
+    }
+  }
+
   seleccionarFecha(fecha: string) {
     this.fechaSeleccionada.set(fecha);
   }

@@ -58,17 +58,20 @@ export class Inicio implements OnInit, OnDestroy {
 
   // Función auxiliar para obtener imagen según categoría
   private obtenerImagenCategoria(nombreCategoria: string): string {
+    const key = (nombreCategoria || '').trim().toLowerCase();
     const imagenes: { [key: string]: string } = {
-      'Automoción': '/imgs/automocion/automocion.png',
-      'Belleza': '/imgs/belleza/belleza.png',
-      'Limpieza': '/imgs/limpieza/limpieza.png',
-      'Enseñanza': '/imgs/enseñanza/enseñanza.png',
-      'Reparaciones': '/imgs/reparaciones/reparaciones.png',
-      'Cuidado Personal': '/imgs/cuidado_personal/cuidado.png',
-      'Construcciones y Reformas': '/imgs/construcciones_y_reformas/consturccion.png',
-      'Otro': '/imgs/otros/otros.png'
+      'automoción': '/imgs/automocion/automocion.png',
+      'automocion': '/imgs/automocion/automocion.png',
+      'belleza': '/imgs/belleza/belleza.png',
+      'limpieza': '/imgs/limpieza/limpieza.png',
+      'enseñanza': '/imgs/enseñanza/enseñanza.png',
+      'reparaciones': '/imgs/reparaciones/reparaciones.png',
+      'cuidado personal': '/imgs/cuidado_personal/cuidado.png',
+      'construcciones y reformas': '/imgs/construcciones_y_reformas/consturccion.png',
+      'otro': '/imgs/otros/otros.png',
+      'otros': '/imgs/otros/otros.png'
     };
-    return imagenes[nombreCategoria] || '/imgs/otros/otros.png';
+    return imagenes[key] || '/imgs/otros/otros.png';
   }
 
   // Métodos para el carrusel

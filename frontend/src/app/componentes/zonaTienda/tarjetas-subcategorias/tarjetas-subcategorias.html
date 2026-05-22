@@ -1,6 +1,6 @@
 <div class="max-w-sm bg-white rounded-xl shadow-md overflow-hidden border border-gray-100 hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1">
     <div class="relative h-48 w-full">
-        <img [src]="info.imagen" alt="titulo" class="w-full h-full object-cover">
+        <img [src]="info.imagen" (error)="onImgError($event)" alt="titulo" class="w-full h-full object-cover">
         <div class="absolute top-2 right-2 bg-white px-2 py-1 rounded-lg shadow text-sm font-bold text-[#5F818C]">
            {{ info.precio }}
         </div>
