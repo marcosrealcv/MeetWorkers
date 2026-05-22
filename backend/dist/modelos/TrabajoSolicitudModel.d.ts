@@ -18,6 +18,10 @@ export type TrabajoSolicitudDocument = {
     prestador_aceptado_id?: string;
     prestador_aceptado_nombre?: string;
     fecha_aceptacion?: string;
+    cancelado_por_id?: string;
+    cancelado_por_nombre?: string;
+    fecha_cancelacion?: string;
+    motivo_cancelacion?: string;
 };
 declare const TrabajoSolicitudModel: mongoose.Model<TrabajoSolicitudDocument, {}, {}, {}, mongoose.Document<unknown, {}, TrabajoSolicitudDocument, {}, mongoose.DefaultSchemaOptions> & TrabajoSolicitudDocument & {
     _id: mongoose.Types.ObjectId;

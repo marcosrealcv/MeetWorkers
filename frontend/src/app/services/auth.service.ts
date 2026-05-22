@@ -92,7 +92,15 @@ export class AuthService {
 
   private guardarSesion(cliente: Cliente, token: string): void {
     this.jwtService.guardarToken(token);
-    localStorage.setItem(CLIENTE_STORAGE_KEY, JSON.stringify(cliente));
+    const clienteParaPersistir = this.clienteParaPersistencia(cliente);
+
+    try {
+      localStorage.setItem(CLIENTE_STORAGE_KEY, JSON.stringify(clienteParaPersistir));
+    } catch (error) {
+      localStorage.removeItem(CLIENTE_STORAGE_KEY);
+      localStorage.setItem(CLIENTE_STORAGE_KEY, JSON.stringify(this.clienteParaPersistenciaMinimal(cliente)));
+    }
+
     this.clienteSignal.set(cliente);
   }
 
@@ -104,11 +112,44 @@ export class AuthService {
     }
 
     try {
-      return JSON.parse(clienteGuardado) as Cliente;
+      const cliente = JSON.parse(clienteGuardado) as Cliente;
+
+      if (typeof cliente?._id !== 'string' || cliente._id.trim() === '') {
+        localStorage.removeItem(CLIENTE_STORAGE_KEY);
+        return null;
+      }
+
+      return cliente;
     } catch {
       localStorage.removeItem(CLIENTE_STORAGE_KEY);
       return null;
     }
+  }
+
+  private clienteParaPersistencia(cliente: Cliente): Partial<Cliente> {
+    const { foto_perfil, ...clienteSinFoto } = cliente;
+    return clienteSinFoto;
+  }
+
+  private clienteParaPersistenciaMinimal(cliente: Cliente): Partial<Cliente> {
+    return {
+      _id: cliente._id,
+      nombre: cliente.nombre,
+      apellido: cliente.apellido,
+      telefono: cliente.telefono,
+      email: cliente.email,
+      direccion: cliente.direccion,
+      descripcion: cliente.descripcion,
+      es_prestador: cliente.es_prestador,
+      tipo_servicio: cliente.tipo_servicio,
+      categoria: cliente.categoria,
+      subcategoria: cliente.subcategoria,
+      descripcion_servicio: cliente.descripcion_servicio,
+      ubicacion_servicio: cliente.ubicacion_servicio,
+      direccion_servicio: cliente.direccion_servicio,
+      coste_hora: cliente.coste_hora,
+      trabajos_solicitados: cliente.trabajos_solicitados,
+    };
   }
 
   private normalizarSesionInicial(): void {
